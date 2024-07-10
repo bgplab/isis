@@ -1,0 +1,40 @@
+# MKDOCS navigation structure and configuration
+---
+site_name: IS-IS Labs
+docs_dir: docs
+site_dir: _html
+repo_url: https://github.com/bgplab/isis
+site_url: https://isis.bgplabs.net/
+site_description: Hands-on IS-IS labs using virtual devices
+site_author: Ivan Pepelnjak, ipSpace.net AG
+extra:
+  toc_sidebar: False
+copyright: (C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)
+plugins:
+- search
+- include_dir_to_nav
+nav:
+- Home:
+  - index.md
+  - 99-about.md
+- Installation:
+  - 1-setup.md
+  - 4-codespaces.md
+
+- "Upcoming":
+  - Overview: 3-upcoming.md
+
+markdown_extensions:
+- footnotes
+- abbr
+- def_list
+- admonition
+- attr_list
+- sane_lists
+- smarty
+- nl2br
+
+theme:
+  name: mkdocs
+  custom_dir: _mkdocs_theme
+  navigation_depth: 3
