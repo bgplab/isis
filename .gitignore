@@ -1,0 +1,55 @@
+# Ignore Vagrant directories
+.vagrant
+.DS_Store
+
+# Ignore editor files
+.vscode/**
+.idea/
+
+# Ignore python virtual envs
+.venv/
+venv/
+
+# Ignore everything that should be ignored ;)
+*.ignore.*
+
+# Ignore solution files ;)
+*.solution.*
+solved/
+solution/
+
+# Ignore boilerplate templates
+*-boilerplate.*
+
+# Ignore Ansible retry and log files
+*.retry
+ansible.log
+
+# Ignore Python cache
+__pycache__
+*.pyc
+
+# Ignore Sphinx and mkdocs build directory
+_build
+_html
+build/
+
+# Don't publish SFTP configuration
+sftp-config.json
+
+# Ignore Python packaging directories
+dist/
+.eggs/
+*.egg-info
+
+# Ignore netlab-created topology files
+group_vars/
+host_vars/
+hosts.yml
+ansible.cfg
+Vagrantfile
+clab.yml
+
+# Ignore redirect and GitHub profile subprojects
+/redirect/
+/profile/
