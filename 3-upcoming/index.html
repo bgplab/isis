@@ -103,6 +103,28 @@
   
   
   
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#upcoming-labs" class="nav-link">Upcoming Labs</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#getting-started" class="nav-link">Getting Started</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configure-is-is-features" class="nav-link">Configure IS-IS Features</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#advanced-labs" class="nav-link">Advanced Labs</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
   
   
   <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
@@ -184,26 +206,49 @@
 
 <h1 id="upcoming-labs">Upcoming Labs</h1>
 <p>We just started the project, and all we can show is a list of ideas. Here they are:</p>
+<h2 id="getting-started">Getting Started</h2>
 <dl>
+<dt>Working with FRRouting</dt>
+<dd>
+<ul>
+<li>Similar to the <a href="https://bgplabs.net/basic/0-frrouting/">corresponding BGP lab</a>, explain FRRouting basics to people who have never seen a routing daemon running on Linux.</li>
+</ul>
+</dd>
 <dt>Start the IS-IS Routing</dt>
 <dd>
 <ul>
 <li>Configure an IS-IS routing process</li>
 <li>Assign an NET</li>
 <li>Enable IS-IS on interfaces</li>
+<li>Enable dynamic hostnames</li>
+<li>Enable adjacency logging</li>
+<li>Make interfaces point-to-point interfaces</li>
+<li>Explain other sane defaults and point the user to exercises covering them</li>
+<li>Explain the basic validation commands (show isis adjacency, show ip route)</li>
+</ul>
+</dd>
+<dt>Explore the IS-IS Database</dt>
+<dd>
+<ul>
+<li>Describe the basics of the IS-IS database (LSPs)</li>
+<li>Examine an LSP and its components (adjacencies, prefixes, metrics)</li>
 </ul>
 </dd>
 <dt>IS-IS on Point-to-Point Links</dt>
 <dd>
 <ul>
 <li>Explore how long it takes for IS-IS to establish adjacency</li>
-<li>Change the link to a point-to-point link</li>
+<li>Examine the IS-IS database; notice the pseudonodes and DIS.</li>
+<li>Change a link to a point-to-point link</li>
+<li>Configure 3-way handshake if available</li>
+<li>Examine the changes in adjacency setup time and the reduced information in the topology database (no pseudonode).</li>
 </ul>
 </dd>
 <dt>Using IS-IS Metrics</dt>
 <dd>
 <ul>
 <li>Change IS-IS metrics to avoid a backup link</li>
+<li>Explain narrow and wide metrics.</li>
 <li>If available, test the transitional and wide metrics</li>
 </ul>
 </dd>
@@ -217,15 +262,27 @@
 <dt>Optimize IS-IS Adjacencies</dt>
 <dd>
 <ul>
-<li>Change the adjacencies to L2-only</li>
+<li>Change the IS-type to L2-only</li>
 <li>Explain the difference between L1+L2 and L2-only adjacencies</li>
 </ul>
 </dd>
+<dt>Troubleshoot IS-IS Adjacencies</dt>
+<dd>This lab will include the most common mistakes that prevent an IS-IS adjacency from forming, including:</dd>
+</dl>
+<ul>
+<li>MTU mismatch</li>
+<li>L1/L2 mismatch</li>
+<li>Area mismatch on L1 adjacency</li>
+<li>3-way handshake on point-to-point links</li>
+</ul>
+<h2 id="configure-is-is-features">Configure IS-IS Features</h2>
+<dl>
 <dt>Passive IS-IS Interfaces</dt>
 <dd>
 <ul>
 <li>Explain the need for passive interfaces</li>
 <li>Configure passive IS-IS interfaces</li>
+<li>If available, disable the advertisement of inter-router prefixes</li>
 </ul>
 </dd>
 <dt>Influence the Designated IS Election</dt>
@@ -247,18 +304,21 @@
 <li>Configure static route and connected interface redistribution into IS-IS</li>
 </ul>
 </dd>
-<dt>Multi-Level IS-IS Networks</dt>
-<dd>
-<ul>
-<li>Explain intra-area and inter-area routing</li>
-<li>Configure a network with multiple areas and L1/L2 routers</li>
-</ul>
-</dd>
 <dt>Fast IS-IS Failure Detection and Convergence</dt>
 <dd>
 <ul>
 <li>Configure IS-IS timers</li>
 <li>Use BFD</li>
+</ul>
+</dd>
+</dl>
+<h2 id="advanced-labs">Advanced Labs</h2>
+<dl>
+<dt>Multi-Level IS-IS Networks</dt>
+<dd>
+<ul>
+<li>Explain intra-area and inter-area routing</li>
+<li>Configure a network with multiple areas and L1/L2 routers</li>
 </ul>
 </dd>
 <dt>Graceful Shutdown with IS-IS Overload Bit</dt>
