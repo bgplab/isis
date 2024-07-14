@@ -10,9 +10,10 @@ Working with FRRouting
 Start the IS-IS Routing
 : * Configure an IS-IS routing process
   * Assign an NET
-  * Enable IS-IS on interfaces
   * Enable dynamic hostnames
   * Enable adjacency logging
+  * Set the IS type to level-2-only
+  * Enable IS-IS on interfaces
   * Make interfaces point-to-point interfaces
   * Explain other sane defaults and point the user to exercises covering them
   * Explain the basic validation commands (show isis adjacency, show ip route)
