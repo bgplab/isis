@@ -56,6 +56,23 @@
 </li>
                                 </ul>
                             </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                </ul>
+                            </li>
                             <li class="dropdown active">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
@@ -74,7 +91,7 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../4-codespaces/" class="nav-link">
+                                <a rel="prev" href="../basic/1-simple-ipv4/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
@@ -127,106 +144,13 @@
   
   
   
-  <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
-    <ul class="nav flex-column">
-        
-    
-    <li class="nav-item" data-level="">
-      
-        <a class="nav-link">Home</a>
-      
-      
-        <ul class="nav flex-column">
-    
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="../99-about/" class="nav-link">About the Project</a>
-      
-      
-    </li>
-    
-        </ul>
-      
-    </li>
-    
-        
-    
-    <li class="nav-item" data-level="">
-      
-        <a class="nav-link">Installation</a>
-      
-      
-        <ul class="nav flex-column">
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="../1-setup/" class="nav-link">Installation and Setup</a>
-      
-      
-    </li>
-    
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="../4-codespaces/" class="nav-link">Use GitHub Codespaces</a>
-      
-      
-    </li>
-    
-        </ul>
-      
-    </li>
-    
-        
-    
-    <li class="nav-item" data-level="">
-      
-        <a class="nav-link">Upcoming</a>
-      
-      
-        <ul class="nav flex-column">
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="./" class="nav-link">Overview</a>
-      
-      
-    </li>
-    
-        </ul>
-      
-    </li>
-    
-    </ul>
-  </div>
-  
 </div></div>
                     <div class="col-md-9" role="main">
 
 <h1 id="upcoming-labs">Upcoming Labs</h1>
-<p>We just started the project, and all we can show is a list of ideas. Here they are:</p>
+<p>The <a href="../">first few labs are already online</a>; the list of ideas is much longer. Here they are:</p>
 <h2 id="getting-started">Getting Started</h2>
 <dl>
-<dt>Working with FRRouting</dt>
-<dd>
-<ul>
-<li>Similar to the <a href="https://bgplabs.net/basic/0-frrouting/">corresponding BGP lab</a>, explain FRRouting basics to people who have never seen a routing daemon running on Linux.</li>
-</ul>
-</dd>
-<dt>Start the IS-IS Routing</dt>
-<dd>
-<ul>
-<li>Configure an IS-IS routing process</li>
-<li>Assign an NET</li>
-<li>Enable IS-IS on interfaces</li>
-<li>Enable dynamic hostnames</li>
-<li>Enable adjacency logging</li>
-<li>Make interfaces point-to-point interfaces</li>
-<li>Explain other sane defaults and point the user to exercises covering them</li>
-<li>Explain the basic validation commands (show isis adjacency, show ip route)</li>
-</ul>
-</dd>
 <dt>Explore the IS-IS Database</dt>
 <dd>
 <ul>
@@ -282,7 +206,7 @@
 <ul>
 <li>Explain the need for passive interfaces</li>
 <li>Configure passive IS-IS interfaces</li>
-<li>If available, disable the advertisement of inter-router prefixes</li>
+<li>If available, turn off the advertisement of inter-router prefixes</li>
 </ul>
 </dd>
 <dt>Influence the Designated IS Election</dt>

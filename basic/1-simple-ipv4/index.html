@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/1-simple-ipv4/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Configure IS-IS Routing for IPv4 &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Home <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Installation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Configure IS-IS Routing for IPv4</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../0-frrouting/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#configure-is-is-routing-for-ipv4" class="nav-link">Configure IS-IS Routing for IPv4</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configuration-tasks" class="nav-link">Configuration Tasks</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#bg" class="nav-link">Background Information</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="configure-is-is-routing-for-ipv4">Configure IS-IS Routing for IPv4</h1>
+<p>We&rsquo;ll start with the simplest possible scenario: we&rsquo;re adding a new router to an existing IS-IS network and have to configure IS-IS routing on it.</p>
+<p><img alt="Lab topology" src="../topology-simple-ipv4.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<ul>
+<li>Use <a href="https://netlab.tools/platforms/">any <em>netlab</em>-supported device</a> for the router you&rsquo;ll be configuring.</li>
+<li>Use a device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> for X1 and X2 (default: FRRouting virtual machines or containers).</li>
+<li>You can do automated lab validation when using FRRouting on the external routers.</li>
+</ul>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
+<ul>
+<li>Change directory to <code>basic/1-simple-ipv4</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into your device (RTR) with <strong>netlab connect rtr</strong> and verify that the IP addresses are configured on all its interfaces.</li>
+</ul>
+<h2 id="configuration-tasks">Configuration Tasks</h2>
+<p>The minimal IS-IS configuration process has three or four steps:</p>
+<ul>
+<li>Start an IS-IS routing process with a global configuration command similar to <strong>router is-is</strong>. You might have to specify a <em>routing process tag</em> &ndash; usually a meaningless string, considering that many network devices can&rsquo;t run more than one IS-IS instance.</li>
+<li>Assign a CLNS address (NET &ndash; Network Entity Title) to the IS-IS routing process with a routing configuration command similar to <strong>net <em>address</em></strong> (<a href="#bg">more details</a>). The NET assigned to your router is <code>49.0001.0000.0000.0042.00</code></li>
+<li>Some devices want you to configure which <em>address families</em> (IPv4 or IPv6) you want to route with IS-IS. The router configuration command to do that is often <strong>address-family ipv4</strong>.</li>
+<li>Enable IS-IS routing for IPv4 on individual interfaces with an interface configuration command similar to <strong>ip router isis <em>tag</em></strong> or <strong>isis enable <em>tag</em></strong>.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you&rsquo;re using FRRouting on RTR, you might have to enable the IS-IS daemon first. You&rsquo;ll find more details in the <a href="../0-frrouting/#daemon">Configuring IS-IS on FRRouting</a> lab.</p>
+</div>
+<p>Unfortunately, most IS-IS implementations are ancient and use defaults that might have made sense decades ago. You should also configure the following parameters<sup id="fnref:TMGT"><a class="footnote-ref" href="#fn:TMGT">1</a></sup>:</p>
+<ul>
+<li>Configure the links with two nodes attached to them as point-to-point links with an interface configuration command similar to <strong>isis network point-to-point</strong>.</li>
+<li>Configure your router to be a Level-2-Only router with the router configuration command similar to <strong>is-type level-2-only</strong>.</li>
+</ul>
+<p>Finally, make sure your configuration includes these settings:</p>
+<ul>
+<li>Logging of adjacency changes (typically configured with a router configuration command like <strong>log-adjacency-changes</strong>)</li>
+<li>Dynamic mapping of NETs to hostnames (usually enabled; sometimes you can&rsquo;t turn it off)</li>
+</ul>
+<h2 id="validation">Validation</h2>
+<p>You can use the <strong>netlab validate</strong> command if you&rsquo;re using <em>netlab</em> release 1.8.4 or later and run FRRouting on the external routers. This is the printout you should get after completing the lab exercise:</p>
+<p><img alt="" src="../validate-simple-ipv4.png" /></p>
+<p>You should also do basic validation on your device:</p>
+<ul>
+<li>Inspect IS-IS adjacencies with a command similar to <strong>show isis neighbors</strong>. Your router should have level-2 adjacencies with X1 and X2; this is the printout you should get on Arista EOS:</li>
+</ul>
+<pre><code>rtr#show isis neighbors
+
+rtr# show isis neighbor
+Area SomeTag:
+  System Id           Interface   L  State        Holdtime SNPA
+ x1                  eth1        2  Up            29       2020.2020.2020
+ x2                  eth2        2  Up            30       2020.2020.2020
+</code></pre>
+<ul>
+<li>Inspect the IP routing table and verify that you can see three loopback prefixes (10.0.0.1/32 through 10.0.0.3/32). This is the printout you should get on FRRouting</li>
+</ul>
+<pre><code>rtr# show ip route isis
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.2, eth1, weight 1, 00:00:47
+I&gt;* 10.0.0.3/32 [115/20] via 10.1.0.6, eth2, weight 1, 00:00:18
+I   10.1.0.0/30 [115/20] via 10.1.0.2, eth1 inactive, weight 1, 00:00:47
+I   10.1.0.4/30 [115/20] via 10.1.0.6, eth2 inactive, weight 1, 00:00:18
+</code></pre>
+<p>FRRouting uses the IP routing table as the repository of <em>all routes</em>, not just the <em>best routes</em>, so it displays the <em>inactive</em> IS-IS routes. Other network devices, for example Arista EOS<sup id="fnref:DP"><a class="footnote-ref" href="#fn:DP">2</a></sup>, display just the <em>active</em> IS-IS routes:</p>
+<pre><code>rtr#show ip route isis detail|begin Priority
+Priority Codes:
+       PL - Priority low, PM - Priority medium, PH - Priority high
+
+ I L2     10.0.0.2/32 [115/20]
+           via 10.1.0.2, Ethernet1 rtr -&gt; x1
+ I L2     10.0.0.3/32 [115/20]
+           via 10.1.0.6, Ethernet2 rtr -&gt; x2
+</code></pre>
+<h2 id="bg">Background Information</h2>
+<p>IS-IS was designed to be the routing protocol for the ISO/OSI protocol stack. Its name is derived from ISO terminology: IS stands for Intermediate System (the device also known as <em>router</em>, <em>gateway</em> or <em>layer-3 switch</em>). Thus, IS-IS is the protocol that runs between Intermediate Systems.</p>
+<p>While ISO designed IS-IS to be used with CLNP, its data structures (everything is CLV<sup id="fnref:TLV"><a class="footnote-ref" href="#fn:TLV">3</a></sup>-based) made it easy to extend, and so IETF quickly specified how to use IS-IS for IPv4 and (later) IPv6 routing.</p>
+<p>IS-IS does not run on top of another layer-3 protocol like OSPF or BGP run on top of IP; it uses <a href="https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/">a separate layer-3 protocol and a dedicated 802.1 SAP</a>. You cannot use the standard IP access control mechanisms with IS-IS; on the other hand, it&rsquo;s impossible to spoof IS-IS messages if the intruder does not have access to the underlying layer-2 infrastructure.</p>
+<p>IS-IS addressing follows the OSI addressing principles. Network addresses (Network Service Access Points &ndash; NSAPs) are <a href="https://blog.ipspace.net/2024/02/interface-node-addresses/">assigned to <em>nodes</em>, not <em>interfaces</em></a>. OSI protocol suite used <em>variable-length</em> addresses, and according to the (<a href="https://www.rfc-editor.org/rfc/rfc1142.html">poorly formatted copy of</a>) IS-IS specifications, the NET is split into three parts:</p>
+<pre><code>+--------+-----------+----+
+|   Area | System-ID | NS |
++--------+-----------+----+
+</code></pre>
+<ul>
+<li>The NSAP Selector specifies the software entity on the node that should receive the packet (similar to the TCP/UDP/OSPF protocol type within the IPv4 header). IS-IS uses NSAP selector value zero and calls the resulting address Network Entity Title (NET). Thus, the last byte of NET always has to be zero.</li>
+<li>The System ID (node address within an area, similar to the subnet part of an IP address) is one to eight bytes long. Subsequent parts of IS-IS specification assume a 6-byte System ID (12 hexadecimal characters), and that&rsquo;s what all implementations use.</li>
+<li>The Area is whatever is left on the left-hand side of the NET after you take away the rightmost seven bytes.</li>
+</ul>
+<p>The NET is usually formatted as a hexadecimal string (two hexadecimal digits per byte) with two-byte portions (four hexadecimal digits) separated by a dot. The placement of dots is a bit counterintuitive:</p>
+<ul>
+<li>The rightmost dot has to be between the System ID and NSAP Selector.</li>
+<li>Subsequent dots have to be four characters left of the previous dot, resulting in two dots within the System ID and a dot between the node System ID and the IS-IS area.</li>
+</ul>
+<p>For example, the NET we used in this lab (<code>49000100000000004200</code>)has to be written as <code>49.0001.0000.0000.0042.00</code>.</p>
+<p>The area address could have any length<sup id="fnref:MBSL"><a class="footnote-ref" href="#fn:MBSL">4</a></sup> as long as it&rsquo;s specified as a whole number of bytes (an even number of digits). IS-IS doesn&rsquo;t care about the contents of the area address. If two routers have the value in that part of the NET, they belong to the same area; if not, they don&rsquo;t.</p>
+<p>Finally, other ISO standards define the meaning of the leftmost part of a network address (NSAP). The first (leftmost) byte is the Authority and Format Identifier (AFI), and the value <code>49</code> indicates <em>private address space</em> (similar to <a href="https://datatracker.ietf.org/doc/html/rfc1918">RFC 1918</a> IPv4 address space) (see <a href="https://datatracker.ietf.org/doc/html/rfc1629">RFC 1629</a> for more details). Using two bytes as the area ID usually makes sense, and that&rsquo;s why most NETs you find in online examples start with 49.0001 ;)</p>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rtr</td>
+<td>Ethernet1</td>
+<td>x1</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>rtr</td>
+<td>Ethernet2</td>
+<td>x2</td>
+<td>eth1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with Arista EOS running on RTR and FRRouting running on X1 and X2.</p>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>rtr</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>rtr -&gt; x1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>rtr -&gt; x2</td>
+</tr>
+<tr>
+<td><strong>x1</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>x1 -&gt; rtr</td>
+</tr>
+<tr>
+<td><strong>x2</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>x2 -&gt; rtr</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:TMGT">
+<p>Trust me for the moment; we&rsquo;ll discuss them in great detail in subsequent lab exercises.&#160;<a class="footnote-backref" href="#fnref:TMGT" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:DP">
+<p>The <strong>detail</strong> option of the <strong>show ip route</strong> command includes the interface description, and the <code>|begin Priority</code> output filter removes the legend.&#160;<a class="footnote-backref" href="#fnref:DP" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TLV">
+<p>Code/Length/Value: every bit of information starts with a <em>code</em> (one byte), followed by <em>length</em> (one byte) and the actual value. This encoding approach is more commonly called TLV (Type/Length/Value).&#160;<a class="footnote-backref" href="#fnref:TLV" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MBSL">
+<p>There must be some upper limit.&#160;<a class="footnote-backref" href="#fnref:MBSL" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

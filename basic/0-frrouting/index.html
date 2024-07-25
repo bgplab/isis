@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/0-frrouting/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Configuring IS-IS on FRRouting &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Home <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Installation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../1-simple-ipv4/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#configuring-is-is-on-frrouting" class="nav-link">Configuring IS-IS on FRRouting</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#start-the-lab" class="nav-link">Start the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#daemon" class="nav-link">Start the IS-IS Daemon</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#vtysh" class="nav-link">Work with the FRRouting CLI</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#sudo" class="nav-link">To Sudo Or Not to Sudo</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#using-output-filters" class="nav-link">Using Output Filters</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="configuring-is-is-on-frrouting">Configuring IS-IS on FRRouting</h1>
+<p>Most networking devices<sup id="fnref:CL"><a class="footnote-ref" href="#fn:CL">1</a></sup> use a configuration command line interface (CLI) to interact with the end-user. The CLI usually provides <strong>show</strong> commands to inspect the state of the device and a configuration mode that allows the user to configure the device.</p>
+<p>FRRouting is different. It&rsquo;s a suite of application-layer daemons running on Linux. Linux shell is used as the initial CLI. To configure a device that uses FRRouting without an extra CLI wrapper (like VyOS), you usually have to:</p>
+<ul>
+<li>Use standard Linux tools like <em>ifupdown</em> to configure the interfaces;</li>
+<li><a href="#daemon">Edit FRRouting configuration files</a> to start routing protocol daemons</li>
+<li><a href="#vtysh">Start FRRouting configuration shell</a> from the Linux CLI.</li>
+</ul>
+<p>The Linux interfaces and IP addresses will be configured automatically if you start the IS-IS labs with the <strong>netlab up</strong> command. You will have to start the routing protocol daemons in the initial lab exercises if you plan to use FRRouting within virtual machines as the user routers, and you might have to execute <strong>show</strong> commands on Cumulus Linux or FRRouting acting as the external routers. You&rsquo;ll practice both in this lab exercise.</p>
+<p><img alt="Lab topology" src="../topology-frrouting.png" /></p>
+<h2 id="start-the-lab">Start the Lab</h2>
+<p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
+<ul>
+<li>Change directory to <code>basic/0-frrouting</code></li>
+<li>Execute <strong>netlab up</strong> to start a lab with two FRRouting virtual machines or containers (depending on your lab setup). R2 is preconfigured to run IS-IS; if you&rsquo;re using virtual machines, you might have to enable the IS-IS daemon on R1.</li>
+<li>Log into the devices (<code>r1</code> and <code>r2</code>) with the <strong>netlab connect</strong> command.</li>
+</ul>
+<h2 id="daemon">Start the IS-IS Daemon</h2>
+<p>Most network devices start routing daemons when you configure them through the configuration CLI or API. FRRouting is different. To start a routing daemon, you must enable the desired routing daemons in a configuration file and restart the top-level FRRouting process.</p>
+<p>You can check the FRR daemon processes running on your virtual machines with the <code>sudo systemctl status frr.service</code> command. It displays the running FRR daemons and the recent FRR logging messages, for example<sup id="fnref:DEV"><a class="footnote-ref" href="#fn:DEV">2</a></sup>:</p>
+<pre><code class="language-bash">r2(bash)#sudo systemctl status frr.service
+● frr.service - FRRouting
+     Loaded: loaded (/lib/systemd/system/frr.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2024-07-17 17:09:27 UTC; 37s ago
+       Docs: https://frrouting.readthedocs.io/en/latest/setup.html
+    Process: 4051 ExecStart=/usr/lib/frr/frrinit.sh start (code=exited, status=0/SUCCESS)
+   Main PID: 4071 (watchfrr)
+     Status: &quot;FRR Operational&quot;
+      Tasks: 1 (limit: 1049)
+     Memory: 1.8M
+     CGroup: /system.slice/frr.service
+             └─4071 /usr/lib/frr/watchfrr -d -F traditional zebra mgmtd isisd staticd
+
+Jul 17 17:09:27 r2 systemd[1]: Starting FRRouting...
+Jul 17 17:09:27 r2 frrinit.sh[4051]:  * Starting watchfrr with command: '  /usr/lib/frr/watchfrr  -d  -F traditional   zebra mgmtd &gt;
+Jul 17 17:09:27 r2 watchfrr[4071]: [T83RR-8SM5G] watchfrr 10.0.1 starting: vty@0
+Jul 17 17:09:27 r2 watchfrr[4071]: [QDG3Y-BY5TN] zebra state -&gt; up : connect succeeded
+Jul 17 17:09:27 r2 watchfrr[4071]: [QDG3Y-BY5TN] mgmtd state -&gt; up : connect succeeded
+Jul 17 17:09:27 r2 watchfrr[4071]: [QDG3Y-BY5TN] isisd state -&gt; up : connect succeeded
+Jul 17 17:09:27 r2 watchfrr[4071]: [QDG3Y-BY5TN] staticd state -&gt; up : connect succeeded
+Jul 17 17:09:27 r2 watchfrr[4071]: [KWE5Q-QNGFC] all daemons up, doing startup-complete notify
+Jul 17 17:09:27 r2 frrinit.sh[4051]:  * Started watchfrr
+Jul 17 17:09:27 r2 systemd[1]: Started FRRouting.
+</code></pre>
+<p>You cannot use the same command in FRRouting containers as they don&rsquo;t use <code>systemd</code>. The easiest way to find daemons in FRRouting containers is to use the <code>ps -ef|grep frr</code> command<sup id="fnref:UE"><a class="footnote-ref" href="#fn:UE">3</a></sup>. This is the printout you could get when the IS-IS daemon is already running:</p>
+<pre><code class="language-bash">    1 root      0:00 /sbin/tini -- /usr/lib/frr/docker-start
+    7 root      0:00 {docker-start} /bin/bash /usr/lib/frr/docker-start
+   15 root      0:00 /usr/lib/frr/watchfrr zebra mgmtd isisd staticd
+   25 frr       0:00 /usr/lib/frr/zebra -d -F datacenter -A 127.0.0.1 -s 90000000
+   30 frr       0:00 /usr/lib/frr/mgmtd -d -F datacenter
+   32 frr       0:00 /usr/lib/frr/isisd -d -F datacenter -A 127.0.0.1
+   35 frr       0:00 /usr/lib/frr/staticd -d -F datacenter -A 127.0.0.1
+  366 root      0:00 grep frr
+</code></pre>
+<p>The list of FRRouting daemons you want to enable is stored in the <code>/etc/frr/daemons</code> file. To enable the FRRouting IS-IS daemon, you have to:</p>
+<ul>
+<li>Add the <code>isisd=yes</code> line to the <code>/etc/frr/daemons</code> file<sup id="fnref:FRMD"><a class="footnote-ref" href="#fn:FRMD">4</a></sup>.</li>
+<li>Restart FRRouting with the <code>sudo systemctl restart frr.service</code> command (see also: <a href="#sudo">using sudo</a>)</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<ul>
+<li>You cannot change the FRR daemons in FRR containers. Restarting FRR would kill the container. <em>netlab</em> takes care of that and enables all the daemons necessary to complete the lab exercises.</li>
+<li>Restarting FRR daemons wipes out the current (running) configuration. If you want to retain it, save it to the startup configuration with the <em>vtysh</em> <strong>write</strong> command.</li>
+<li>The <strong>write</strong> command saves the running configuration (that you can inspect with <strong>show running-config</strong>) into the <code>/etc/frr/frr.conf</code> file. However, the <strong>show startup-config</strong><sup id="fnref:CLSC"><a class="footnote-ref" href="#fn:CLSC">5</a></sup> does not display the content of that file. Exit <em>vtysh</em> and use the <strong>more /etc/frr/frr.conf</strong> command<sup id="fnref:MNS"><a class="footnote-ref" href="#fn:MNS">6</a></sup> to inspect it.</li>
+</ul>
+</div>
+<p>You could add the required line to the FRRouting daemons file with any text editor<sup id="fnref:TE"><a class="footnote-ref" href="#fn:TE">7</a></sup> or use the following trick:</p>
+<ul>
+<li>Use <strong>sudo bash</strong> to start another Linux shell as the root user</li>
+<li>Use the <strong>echo</strong> command with output redirection to add a line to the <code>/etc/frr/daemons</code> file.</li>
+</ul>
+<pre><code class="language-bash">rtr(bash)#sudo bash
+root@rtr:/# echo 'isis=yes' &gt;&gt;/etc/frr/daemons
+root@rtr:/# exit
+</code></pre>
+<p>After enabling the IS-IS daemon and restarting FRR, you should see the <code>isisd</code> process in the <code>ps -ef</code> printout or the IS-IS daemon mentioned in the <code>sudo systemctl status frr.service</code> printout.</p>
+<h2 id="vtysh">Work with the FRRouting CLI</h2>
+<p>FRRouting suite includes a virtual shell (<em>vtysh</em>) closely resembling industry-standard CLI<sup id="fnref:ISC"><a class="footnote-ref" href="#fn:ISC">8</a></sup>. It has to be started from the Linux command line with the vtysh command. The <code>vtysh</code> CLI has to run as the root user unless you change the FRR-related permissions to allow a regular user to use it. The usual command to start the <em>vtysh</em> is thus <code>sudo vtysh</code> (but see also <a href="#sudo">To Sudo Or Not to Sudo</a>).</p>
+<pre><code class="language-bash">r2(bash)#sudo vtysh
+
+Hello, this is FRRouting (version 9.1_git).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+r2#
+</code></pre>
+<p>Once you started <em>vtysh</em>, you can execute <strong>show</strong> commands to inspect the device state, for example:</p>
+<pre><code class="language-bash">r2(bash)#sudo vtysh
+
+Hello, this is FRRouting (version 9.1_git).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+r2# show ip route
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+C&gt;* 10.0.0.2/32 is directly connected, lo, 00:02:26
+C&gt;* 10.1.0.0/30 is directly connected, eth1, 00:02:26
+</code></pre>
+<p>You can also use the <code>--show</code> option of the <strong>netlab connect</strong> command to execute a single command on a FRR/Cumulus Linux device[^UQ]. For example, to inspect the IS-IS topology database, use <code>netlab connect --show isis database</code>:</p>
+<pre><code>$ netlab connect r2 --show isis database
+Connecting to container clab-frrouting-r2, executing vtysh -c &quot;show isis database&quot;
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r2.00-00             *     81   0x00000001  0xec86    1489    0/0/0
+    1 LSPs
+</code></pre>
+<p>To configure FRRouting daemons, use the <strong>configure</strong> <em>vtysh</em> command and enter configuration commands similar to those you&rsquo;d use on Cisco IOS or Arista EOS:</p>
+<pre><code>r2(bash)#vtysh
+
+Hello, this is FRRouting (version 9.1_git).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+r2# configure
+r2(config)# router isis Gandalf
+r2(config-router)#
+</code></pre>
+<h2 id="sudo">To Sudo Or Not to Sudo</h2>
+<p>The <em>vtysh</em> usually has to run as the <strong>root</strong> user, so you should start it with the <code>sudo vtysh</code> command. Unfortunately, things are never as simple as they look in the Linux world:</p>
+<ul>
+<li>When using SSH, you log into Cumulus Linux or FRRouting virtual machines as a regular user (user <em>vagrant</em> in <em>netlab</em>-created labs) and have to use the <code>sudo</code> command to start <em>vtysh</em>.</li>
+<li>Cumulus Linux and FRR containers run as the <strong>root</strong> user, and you connect to them as the <strong>root</strong> user with the <code>docker exec</code> or <code>netlab connect</code> commands<sup id="fnref:WIDUW"><a class="footnote-ref" href="#fn:WIDUW">9</a></sup>. When working with containers, you can start <em>vtysh</em> without using the <code>sudo</code> command.</li>
+<li>You can execute <code>sudo vtysh</code> as a root user on Cumulus Linux containers but not within an FRR container. The FRR container does not include the <code>sudo</code> command.</li>
+</ul>
+<p><strong>Long story short:</strong></p>
+<ul>
+<li>Use <code>sudo vtysh</code> whenever possible to burn it into your muscle memory.</li>
+<li>Use <code>vtysh</code> if you use FRRouting containers as the lab devices.</li>
+</ul>
+<h2 id="using-output-filters">Using Output Filters</h2>
+<p>Unlike many other network operating systems, FRRouting <code>vtysh</code> does not have output filters. You probably don&rsquo;t need them as you&rsquo;ll be running FRR on top of a Unix-like operating system that supports pipes, but it might be a bit convoluted to use <code>vtysh</code> in a pipe.</p>
+<p>To use the <code>vtysh</code> output in a pipe, you have to execute <code>vtysh</code> and get the results of a <strong>show</strong> command in a single command:</p>
+<ul>
+<li>You could use <code>sudo vtysh -c 'show command'</code> when you&rsquo;re in the <strong>bash</strong> shell of a lab device, for example:</li>
+</ul>
+<pre><code>r2(bash)#vtysh -c 'show isis database'|grep r2
+r2.00-00             *     81   0x00000001  0xec86    1302    0/0/0
+</code></pre>
+<ul>
+<li>Alternatively, you could use the <code>netlab connect --show</code> command to execute a <code>vtysh</code> <strong>show</strong> command on a lab device:</li>
+</ul>
+<pre><code>$ netlab connect r2 -q --show isis database|grep r2
+r2.00-00             *     81   0x00000001  0xec86    1286    0/0/0
+</code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Use <code>netlab connect --quiet --show</code> to omit the <code>Connecting to...</code> message.</p>
+</div>
+<p>The following table contains a mapping between common network operating system filters and Linux CLI commands:</p>
+<table>
+<thead>
+<tr>
+<th>NOS filter</th>
+<th>Linux CLI command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>include</code></td>
+<td><code>grep</code></td>
+</tr>
+<tr>
+<td><code>exclude</code></td>
+<td><code>grep -v</code></td>
+</tr>
+<tr>
+<td><code>begin</code></td>
+<td><code>grep -A 10000</code><sup id="fnref:SLN"><a class="footnote-ref" href="#fn:SLN">10</a></sup></td>
+</tr>
+<tr>
+<td><code>end</code></td>
+<td><code>grep -B 10000</code></td>
+</tr>
+<tr>
+<td><code>section</code></td>
+<td><em>no equivalent</em></td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:CL">
+<p>Including devices based on Linux like Arista EOS, Cisco Nexus OS, or Nokia SR Linux&#160;<a class="footnote-backref" href="#fnref:CL" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:DEV">
+<p>The printout details depend on the Linux and FRR versions, but you&rsquo;ll always be able to determine whether the IS-IS process is running.&#160;<a class="footnote-backref" href="#fnref:DEV" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:UE">
+<p>You can use the same command with FRRouting running in a virtual machine.&#160;<a class="footnote-backref" href="#fnref:UE" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:FRMD">
+<p>See <a href="https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-41/Layer-3/Configuring-FRRouting/">Configuring FRRouting</a> Cumulus Linux documentation for more details.&#160;<a class="footnote-backref" href="#fnref:FRMD" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:CLSC">
+<p>At least on FRRouting version 9.1 and earlier&#160;<a class="footnote-backref" href="#fnref:CLSC" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MNS">
+<p>You <a href="#sudo">might</a> have to prefix it with <strong>sudo</strong>&#160;<a class="footnote-backref" href="#fnref:MNS" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TE">
+<p><code>vi</code> is available in Cumulus Linux containers. <code>vi</code> and <code>nano</code> are available in Cumulus Linux and FRR virtual machines.&#160;<a class="footnote-backref" href="#fnref:TE" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ISC">
+<p>An euphemism for <em>Cisco IOS CLI</em> that is used when you try to avoid nasty encounters with Cisco&rsquo;s legal team.&#160;<a class="footnote-backref" href="#fnref:ISC" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:WIDUW">
+<p>When in doubt, use the <strong>whoami</strong> command.&#160;<a class="footnote-backref" href="#fnref:WIDUW" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SLN">
+<p>The &lsquo;10000&rsquo; parameter specifies the number of lines after the match. Increase it for very long printouts ;)&#160;<a class="footnote-backref" href="#fnref:SLN" title="Jump back to footnote 10 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

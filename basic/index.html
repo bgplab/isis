@@ -6,12 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
-        
-        <link rel="shortcut icon" href="/img/favicon.ico">
-        <title>IS-IS Labs</title>
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/font-awesome.min.css" rel="stylesheet">
-        <link href="/css/base.css" rel="stylesheet">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Overview &#171; IS-IS Labs</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script> 
@@ -20,7 +20,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="/.">IS-IS Labs</a>
+                <a class="navbar-brand" href="..">IS-IS Labs</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
@@ -35,11 +35,11 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="/." class="dropdown-item">Labs Overview</a>
+    <a href=".." class="dropdown-item">Labs Overview</a>
 </li>
                                     
 <li>
-    <a href="/99-about/" class="dropdown-item">About the Project</a>
+    <a href="../99-about/" class="dropdown-item">About the Project</a>
 </li>
                                 </ul>
                             </li>
@@ -48,28 +48,28 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="/1-setup/" class="dropdown-item">Installation and Setup</a>
+    <a href="../1-setup/" class="dropdown-item">Installation and Setup</a>
 </li>
                                     
 <li>
-    <a href="/4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+    <a href="../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown active">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="/basic/" class="dropdown-item">Overview</a>
+    <a href="./" class="dropdown-item active">Overview</a>
 </li>
                                     
 <li>
-    <a href="/basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+    <a href="0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
 </li>
                                     
 <li>
-    <a href="/basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+    <a href="1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
 </li>
                                 </ul>
                             </li>
@@ -78,7 +78,7 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="/3-upcoming/" class="dropdown-item">Overview</a>
+    <a href="../3-upcoming/" class="dropdown-item">Overview</a>
 </li>
                                 </ul>
                             </li>
@@ -91,8 +91,16 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a href="https://github.com/bgplab/isis" class="nav-link"><i class="fa fa-github"></i> GitHub</a>
+                                <a rel="prev" href="../4-codespaces/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
                             </li>
+                            <li class="nav-item">
+                                <a rel="next" href="0-frrouting/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
                     </ul>
                 </div>
             </div>
@@ -100,31 +108,50 @@
 
         <div class="container">
             <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
 
-    <div class="row-fluid">
-      <div id="main-content" class="span12">
-        <h1 id="404-page-not-found" style="text-align: center">404</h1>
-        <p style="text-align: center"><strong>Page not found</strong></p>
-      </div>
-    </div>
+  
+  
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
 
-
+<h1 id="deploy-is-is-in-your-network">Deploy IS-IS in Your Network</h1>
+<p>The first set of the IS-IS labs focuses on the configuration, monitoring, and troubleshooting of basic IS-IS features:</p>
+<ul>
+<li><a href="0-frrouting/">Work with FRRouting</a></li>
+<li>Start the IS-IS Routing for IPv4</li>
+<li>Explore the IS-IS Database (coming soon)</li>
+<li>IS-IS on Point-to-Point Links (coming soon)</li>
+<li>Using IS-IS Metrics (coming soon)</li>
+<li>Dual-Stack IS-IS Routing (coming soon)</li>
+<li>Optimize IS-IS Adjacencies (coming soon)</li>
+<li>Troubleshoot IS-IS Adjacencies (coming soon)</li>
+</ul></div>
             </div>
         </div>
 
         <footer class="col-md-12">
-            <hr>
-                <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
-            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
         </footer>
-        <script src="/js/jquery-3.6.0.min.js"></script>
-        <script src="/js/bootstrap.min.js"></script>
+        <script src="../js/jquery-3.6.0.min.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
         <script>
-            var base_url = "/",
+            var base_url = "..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="/js/base.js"></script>
-        <script src="/search/main.js"></script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

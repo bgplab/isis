@@ -57,6 +57,23 @@
                                 </ul>
                             </li>
                             <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
@@ -135,80 +152,6 @@
   
   
   
-  <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
-    <ul class="nav flex-column">
-        
-    
-    <li class="nav-item" data-level="">
-      
-        <a class="nav-link">Home</a>
-      
-      
-        <ul class="nav flex-column">
-    
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="../99-about/" class="nav-link">About the Project</a>
-      
-      
-    </li>
-    
-        </ul>
-      
-    </li>
-    
-        
-    
-    <li class="nav-item" data-level="">
-      
-        <a class="nav-link">Installation</a>
-      
-      
-        <ul class="nav flex-column">
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="./" class="nav-link">Installation and Setup</a>
-      
-      
-    </li>
-    
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="../4-codespaces/" class="nav-link">Use GitHub Codespaces</a>
-      
-      
-    </li>
-    
-        </ul>
-      
-    </li>
-    
-        
-    
-    <li class="nav-item" data-level="">
-      
-        <a class="nav-link">Upcoming</a>
-      
-      
-        <ul class="nav flex-column">
-    
-    <li class="nav-item" data-level="">
-      
-        <a href="../3-upcoming/" class="nav-link">Overview</a>
-      
-      
-    </li>
-    
-        </ul>
-      
-    </li>
-    
-    </ul>
-  </div>
-  
 </div></div>
                     <div class="col-md-9" role="main">
 
@@ -216,10 +159,10 @@
 <p>It&rsquo;s easiest to use the IS-IS labs with <em><a href="https://netlab.tools/">netlab</a></em>. Still, you can use most of them (potentially with slightly reduced functionality) with any other virtual lab environment or on physical gear. For the rest of this document, we&rsquo;ll assume you decided to use <em>netlab</em>; if you want to set up your lab in some other way, read the <a href="https://bgplabs.net/external/">Manual Setup</a> section of the BGP Labs documentation.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>IS-IS labs work best with <em>netlab</em> release 1.8.3 or later. If you&rsquo;re using an earlier <em>netlab</em> release, please upgrade with <code>pip3 install --upgrade networklab</code>.</p>
+<p>IS-IS labs work best with <em>netlab</em> release 1.8.4 or later. If you&rsquo;re using an earlier <em>netlab</em> release, please upgrade with <code>pip3 install --upgrade networklab</code>.</p>
 </div>
 <h2 id="select-the-network-devices-you-will-work-with">Select the Network Devices You Will Work With</h2>
-<p>You can run FRRouting in all <a href="https://netlab.tools/providers/"><em>netlab</em>-supported virtualization environments</a> (VirtualBox, libvirt, or Docker)<sup id="fnref:CSF"><a class="footnote-ref" href="#fn:CSF">2</a></sup>, and if you want to start practicing IS-IS with minimum hassle, consider using it for all lab devices. You can even <a href="https://blog.ipspace.net/2024/03/netlab-bgp-apple-silicon.html">run FRRouting containers on Macbooks with Apple silicon</a>.</p>
+<p>You can run FRRouting in all <a href="https://netlab.tools/providers/"><em>netlab</em>-supported virtualization environments</a> (VirtualBox, libvirt, or Docker)<sup id="fnref:CSF"><a class="footnote-ref" href="#fn:CSF">2</a></sup>, and if you want to start practicing IS-IS with minimum hassle, consider using FRRouting for all lab devices. You can even <a href="https://blog.ipspace.net/2024/03/netlab-bgp-apple-silicon.html">run FRRouting containers on Macbooks with Apple silicon</a>.</p>
 <p>If you&rsquo;d like to use a more traditional networking device, use any other <a href="https://netlab.tools/platforms/"><em>netlab</em>-supported device</a> for which we implemented <a href="https://netlab.tools/module/isis/#platform-support">basic IS-IS configuration</a> as the device to practice with<sup id="fnref:x86"><a class="footnote-ref" href="#fn:x86">1</a></sup>. I recommend Arista cEOS or Nokia SR Linux containers; they are the easiest ones to install and use.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -227,15 +170,15 @@
 </div>
 <h2 id="select-the-additional-devices-in-your-lab">Select the Additional Devices in Your Lab</h2>
 <p>Some labs use additional routers &ndash; preconfigured devices with which your routers exchange routing information. You won&rsquo;t configure those devices, but you might have to log into them and execute <strong>show</strong> commands.</p>
-<p>The default setup uses FRRouting for additional routers; you can use any other device for which we <a href="https://netlab.tools/module/isis/#platform-support">implemented basic IS-IS configuration</a>. Additional limitations (should they exist) are listed under the <em>Device Requirements</em> section of individual lab exercises.</p>
+<p>The default setup uses FRRouting for additional routers; we also generated all the <strong>show</strong> printouts with FRRouting. Alternatively, you can use any other device for which we <a href="https://netlab.tools/module/isis/#platform-support">implemented basic IS-IS configuration</a> as additional routers. Additional limitations (should they exist) are listed under the <em>Device Requirements</em> section of individual lab exercises.</p>
 <h2 id="select-the-virtualization-environment">Select the Virtualization Environment</h2>
-<p>Now that you know which network device to use, check <a href="https://netlab.tools/platforms/#supported-virtualization-providers">which virtualization environment</a> you can use. I would prefer <em>containerlab</em> over <em>libvirt</em> with <em>virtualbox</em> being a distant third, but that&rsquo;s just me.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>You can also run the IS-IS labs in a <a href="../4-codespaces/">free GitHub Codespace</a>.</p>
-</div>
-<p>A gotcha: You can use <em>virtualbox</em> if you want to run the lab devices as virtual machines on your Windows- or MacOS laptop with Intel CPU, but even then, I&rsquo;d prefer running them in a <a href="https://netlab.tools/install/ubuntu-vm/">Ubuntu VM</a>.</p>
-<p>One more gotcha: your hardware and virtualization software (for example, VirtualBox or VMware Fusion) must support <em>nested virtualization</em> if you want to use <em>libvirt</em> on that Ubuntu VM. You don&rsquo;t need nested virtualization to run Docker containers unless you&rsquo;re using the crazy trick we&rsquo;re forced to use for Juniper vMX or Nokia SR OS &ndash; they&rsquo;re running as a virtual machine <em>within a container</em>.</p>
+<p>Now that you know which network device to use, check <a href="https://netlab.tools/platforms/#supported-virtualization-providers">which virtualization environment</a> you can use. Running IS-IS labs in a <a href="../4-codespaces/">free GitHub Codespace</a> is an excellent starting point, but if you decide to build your own infrastructure, <em>containerlab</em> is easier to set up than <em>libvirt</em>, with <em>virtualbox</em> being a distant third.</p>
+<p>Now for a few gotchas:</p>
+<ul>
+<li>You can use <em>virtualbox</em> if you want to run the lab devices as virtual machines on your Windows- or MacOS laptop with Intel CPU, but even then, I&rsquo;d prefer running them in a <a href="https://netlab.tools/install/ubuntu-vm/">Ubuntu VM</a>.</li>
+<li>Your hardware and virtualization software (for example, VirtualBox or VMware Fusion) must support <em>nested virtualization</em> if you want to use <em>libvirt</em> on that Ubuntu VM.</li>
+<li>You don&rsquo;t need nested virtualization to run Docker containers unless you&rsquo;re using the crazy trick we&rsquo;re forced to use for Juniper vMX or Nokia SR OS &ndash; they&rsquo;re running as a virtual machine <em>within a container</em>.</li>
+</ul>
 <h2 id="software-installation">Software Installation</h2>
 <p>Based on the choices you made, you&rsquo;ll find the installation instructions in one of these documents:</p>
 <ul>
@@ -257,7 +200,7 @@
 </ul>
 <p>After you get a local copy of the repository:</p>
 <ul>
-<li>If needed, edit the <code>defaults.yml</code> file in the top directory to set your preferred network device and virtualization environment. For example, I&rsquo;m using the following settings to run the labs with Arista EOS containers while using FRR as the external BGP feeds:</li>
+<li>If needed, edit the <code>defaults.yml</code> file in the top directory to set your preferred network device and virtualization environment. For example, I&rsquo;m using the following settings to run the labs with Arista EOS containers while using FRRouting as the external IS-IS routers:</li>
 </ul>
 <pre><code>device: eos             # Change to your preferred network device
 provider: clab          # Change to virtualbox or libvirt if needed
@@ -267,7 +210,7 @@ groups:
     device: frr         # Change to your preferred external router
 </code></pre>
 <ul>
-<li>In a terminal window, change the current directory to one of the lab directories (for example, <code>basic/1-session</code>), and execute <strong>netlab up</strong>.</li>
+<li>In a terminal window, change the current directory to one of the lab directories (for example, <code>basic/1-simple-ipv4</code>), and execute <strong>netlab up</strong>.</li>
 <li>Wait for the lab to start and use <strong>netlab connect</strong> to connect to individual lab devices</li>
 <li>Have fun.</li>
 <li>When you&rsquo;re done, collect the device configurations with <strong>netlab collect</strong> (if you want to save them) and shut down the lab with <strong>netlab down</strong></li>
@@ -278,7 +221,7 @@ groups:
 <hr />
 <ol>
 <li id="fn:x86">
-<p>In that case, you will have to run the labs on a device with an x86 CPU (Intel or AMD).&#160;<a class="footnote-backref" href="#fnref:x86" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>Most network devices require an x86 CPU. You must run the labs on a device with an x86 CPU (Intel or AMD) to use them.&#160;<a class="footnote-backref" href="#fnref:x86" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:CSF">
 <p>There is no official FRR virtual machine image &ndash; <em>netlab</em> has to download and install FRR on a Ubuntu VM whenever you start an <code>frr</code> node as a virtual machine. Using FRR containers is faster and consumes way less bandwidth or memory.&#160;<a class="footnote-backref" href="#fnref:CSF" title="Jump back to footnote 2 in the text">&#8617;</a></p>
