@@ -1,0 +1,21 @@
+# Configure a BGP session with an external BGP speaker
+
+defaults.sources.extra: [ ../../defaults.yml ]
+name: frrouting
+defaults.device: frr
+
+nodes:
+  r1:
+  r2:
+    module: [ isis ]
+
+links:
+- r1:
+  r2:
+  isis.passive: False
+
+message: |
+  The "Configuring IS-IS on FRRouting" lab is ready. Connect to the lab
+  devices with the "netlab connect" command.
+
+  Good luck!

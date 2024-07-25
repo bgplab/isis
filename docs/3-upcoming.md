@@ -1,22 +1,8 @@
 # Upcoming Labs
 
-We just started the project, and all we can show is a list of ideas. Here they are:
+The [first few labs are already online](index.md); the list of ideas is much longer. Here they are:
 
 ## Getting Started
-
-Working with FRRouting
-: * Similar to the [corresponding BGP lab](https://bgplabs.net/basic/0-frrouting/), explain FRRouting basics to people who have never seen a routing daemon running on Linux.
-
-Start the IS-IS Routing
-: * Configure an IS-IS routing process
-  * Assign an NET
-  * Enable dynamic hostnames
-  * Enable adjacency logging
-  * Set the IS type to level-2-only
-  * Enable IS-IS on interfaces
-  * Make interfaces point-to-point interfaces
-  * Explain other sane defaults and point the user to exercises covering them
-  * Explain the basic validation commands (show isis adjacency, show ip route)
 
 Explore the IS-IS Database
 : * Describe the basics of the IS-IS database (LSPs)
@@ -55,7 +41,7 @@ Troubleshoot IS-IS Adjacencies
 Passive IS-IS Interfaces
 : * Explain the need for passive interfaces
   * Configure passive IS-IS interfaces
-  * If available, disable the advertisement of inter-router prefixes
+  * If available, turn off the advertisement of inter-router prefixes
 
 Influence the Designated IS Election
 : * Explain the need for DIS priority

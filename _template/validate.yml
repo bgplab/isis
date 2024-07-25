@@ -1,0 +1,16 @@
+# Validate the "..." lab
+---
+adj:
+  description: Check IS-IS adjacencies
+  nodes: [ x1, x2 ]
+  plugin: isis_neighbor('rtr',level='L2',area='49.0001')
+
+pfx_x1:
+  description: Check for X1 loopback on X2
+  nodes: [ x2 ]
+  plugin: isis_prefix(pfx=nodes.x1.loopback.ipv4,level='2')
+
+pfx_x2:
+  description: Check for X2 loopback on X1
+  nodes: [ x1 ]
+  plugin: isis_prefix(pfx=nodes.x2.loopback.ipv4,level='2')

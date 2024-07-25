@@ -1,0 +1,28 @@
+# Configure IS-IS Routing for IPv4
+
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: simple_ipv4
+plugin: [ check_validate ]
+
+isis.area: '49.0001'
+
+groups:
+  external:
+    members: [ x1, x2 ]
+    module: [ isis ]
+
+nodes:
+  rtr:
+  x1:
+  x2:
+
+links: [ rtr-x1, rtr-x2 ]
+_include: [ validate.yml ]
+
+message: |
+  The "Configure IS-IS Routing for IPv4" lab is ready. Connect to your router
+  with "netlab connect rtr".
+
+  Good luck!

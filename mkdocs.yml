@@ -20,6 +20,10 @@ nav:
 - Installation:
   - 1-setup.md
   - 4-codespaces.md
+- Basics:
+  - Overview: basic/index.md
+  - basic/0-frrouting.md
+  - basic/1-simple-ipv4.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md
