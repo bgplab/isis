@@ -9,6 +9,13 @@ site_description: Hands-on IS-IS labs using virtual devices
 site_author: Ivan Pepelnjak, ipSpace.net AG
 extra:
   toc_sidebar: False
+  nav:
+    'Overview': ''
+    'Installation': '1-setup'
+    'GitHub Codespaces': '4-codespaces'
+    'Upcoming Labs': '3-upcoming'
+    'About': '99-about'
+
 copyright: (C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)
 plugins:
 - search

@@ -6,7 +6,7 @@ In 2023, I started the [Open-Source BGP Labs project](https://bgplabs.net/) to r
 
 As I was involved in a similar project in the 1990s, it wasn't hard to persuade me to start a similar series of "_IS-IS from rookie to hero_" lab exercises. Welcome to the [Open-Source IS-IS Configuration Labs](https://isis.bgplabs.net/) project.
 
-The project uses _[netlab](https://netlab.tools)_[^HT] to set up the labs and FRRouting containers or a [few other devices](1-setup.md#select-the-additional-devices-in-your-lab) as external BGP routers. You can use [whatever networking devices](1-setup.md#select-the-network-devices-you-will-work-with) you wish to work on, and if they happen to be supported by _netlab_, you'll get lab topology and basic device configuration for each lab set up in seconds[^XR]. Most lab exercises using external devices include device configurations for the external routers for people who love wasting time with GUI.
+The project uses _[netlab](https://netlab.tools)_[^HT] to set up the labs and FRRouting containers or a [few other devices](1-setup.md#select-the-additional-devices-in-your-lab) as external IS-IS routers. You can use [whatever networking devices](1-setup.md#select-the-network-devices-you-will-work-with) you wish to work on, and if they happen to be supported by _netlab_, you'll get lab topology and basic device configuration for each lab set up in seconds[^XR]. Most lab exercises using external devices include device configurations for the external routers for people who love wasting time with GUI.
 
 You'll find the lab topology files and initial device configurations in a [GitHub repository](https://github.com/bgplab/isis), but you might [explore the lab exercises first](https://isis.bgplabs.net/).
 
