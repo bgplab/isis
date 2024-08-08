@@ -71,6 +71,10 @@
 <li>
     <a href="./" class="dropdown-item active">Configure IS-IS Routing for IPv4</a>
 </li>
+                                    
+<li>
+    <a href="../2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown">
@@ -96,7 +100,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                <a rel="next" href="../2-explore/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -248,6 +252,7 @@ Priority Codes:
  I L2     10.0.0.3/32 [115/20]
            via 10.1.0.6, Ethernet2 rtr -&gt; x2
 </code></pre>
+<p><strong>Next:</strong> <a href="../2-explore/">Explore IS-IS Data Structures</a>. That lab uses the same topology and device configurations, so you can keep going without restarting the lab.</p>
 <h2 id="bg">Background Information</h2>
 <p>IS-IS was designed to be the routing protocol for the ISO/OSI protocol stack. Its name is derived from ISO terminology: IS stands for Intermediate System (the device also known as <em>router</em>, <em>gateway</em> or <em>layer-3 switch</em>). Thus, IS-IS is the protocol that runs between Intermediate Systems.</p>
 <p>While ISO designed IS-IS to be used with CLNP, its data structures (everything is CLV<sup id="fnref:TLV"><a class="footnote-ref" href="#fn:TLV">3</a></sup>-based) made it easy to extend, and so IETF quickly specified how to use IS-IS for IPv4 and (later) IPv6 routing.</p>

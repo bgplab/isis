@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/2-explore/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Explore IS-IS Data Structures &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Home <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Installation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Explore IS-IS Data Structures</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../1-simple-ipv4/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#explore-is-is-data-structures" class="nav-link">Explore IS-IS Data Structures</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#explore-router-configuration" class="nav-link">Explore Router Configuration</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#explore-is-is-adjacencies" class="nav-link">Explore IS-IS Adjacencies</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#explore-is-is-database" class="nav-link">Explore IS-IS Database</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#frag" class="nav-link">LSP Fragments</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="explore-is-is-data-structures">Explore IS-IS Data Structures</h1>
+<p>You&rsquo;ll explore IS-IS adjacencies and the IS-IS topology database in this lab. We&rsquo;ll use the topology from the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise:</p>
+<p><img alt="Lab topology" src="../topology-simple-ipv4.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a>.</p>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
+<ul>
+<li>Change directory to <code>basic/2-explore</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into your device (RTR) with <strong>netlab connect rtr</strong></li>
+</ul>
+<h2 id="explore-router-configuration">Explore Router Configuration</h2>
+<p>Unless you&rsquo;re absolutely sure how your router is configured, always start with a high-level overview of IS-IS settings, usually displayed with a command like <strong>show isis summary</strong>.</p>
+<p>The most significant bits of information include:</p>
+<ul>
+<li><strong>NET</strong>, which can be split into <strong>area</strong> and <strong>system ID</strong>. Some devices display NET; others display the IS-IS area and the system ID as independent components.</li>
+<li>The address families (IPv4, IPv6)</li>
+<li>Router type: intra-area router (level-1), inter-area router (level-2) or multi-level router<sup id="fnref:ABR"><a class="footnote-ref" href="#fn:ABR">1</a></sup> (level-1-2).</li>
+</ul>
+<p>Try to find the above information in the printout produced by FRRouting and Arista cEOS:</p>
+<p class="code-caption">Basic IS-IS information displayed by FRRouting<br /></p>
+<pre><code>$ netlab connect rtr --show isis summary
+vrf             : default
+Process Id      : 32
+System Id       : 0000.0000.0001
+Up time         : 00:00:15 ago
+Number of areas : 1
+Area Gandalf:
+  Net: 49.0001.0000.0000.0001.00
+  TX counters per PDU type:
+     L2 IIH: 2
+    P2P IIH: 14
+     L2 LSP: 8
+    L2 CSNP: 4
+    L2 PSNP: 4
+   LSP RXMT: 0
+  RX counters per PDU type:
+    P2P IIH: 14
+     L2 LSP: 4
+    L2 CSNP: 4
+    L2 PSNP: 4
+  Drop counters per PDU type:
+  Advertise high metrics: Disabled
+  Level-2:
+    LSP0 regenerated: 2
+         LSPs purged: 0
+    SPF:
+      minimum interval  : 1
+    IPv4 route computation:
+      last run elapsed  : 00:00:13 ago
+      last run duration : 152 usec
+      run count         : 2
+</code></pre>
+<p class="code-caption">Basic IS-IS information displayed by Arista cEOS<br /></p>
+<pre><code>rtr&gt;show isis summary
+
+IS-IS Instance: Gandalf VRF: default
+  Instance ID: 0
+  System ID: 0000.0000.0001, administratively enabled
+  Router ID: IPv4: 10.0.0.1
+  Hostname: rtr
+  Multi Topology disabled, not attached
+  IPv4 Preference: Level 1: 115, Level 2: 115
+  IPv6 Preference: Level 1: 115, Level 2: 115
+  IS-Type: Level 2, Number active interfaces: 3
+  Routes IPv4 only
+  LSP size maximum: Level 1: 1492, Level 2: 1492
+  Interval Type           Max Wait Initial Wait Hold Interval
+  ----------------------- -------- ------------ -------------
+  LSP generation interval      5 s        50 ms         50 ms
+  SPF interval             2000 ms      1000 ms       1000 ms
+  Current SPF hold interval(ms): Level 1: 0, Level 2: 2000
+  Last Level 2 SPF run 7 seconds ago
+  CSNP generation interval: 10 seconds
+  Dynamic Flooding: Disabled
+  Authentication mode: Level 1: None, Level 2: None
+  Graceful Restart: Disabled, Graceful Restart Helper: Enabled
+  Area addresses: 49.0001
+  level 2: number DIS interfaces: 0, LSDB size: 3
+    Area Leader: None
+    Overload Bit is not set.
+  Redistributed Level 1 routes: 0 limit: Not Configured
+  Redistributed Level 2 routes: 0 limit: Not Configured
+</code></pre>
+<h2 id="explore-is-is-adjacencies">Explore IS-IS Adjacencies</h2>
+<p>IS-IS high-level principles are similar to OSPF ones:</p>
+<ul>
+<li>A hello protocol is used to discover neighbors (unlike OSPF, which uses IP, IS-IS uses a dedicated layer-3 protocol).</li>
+<li>Once the neighbors are discovered, an adjacency is established with them.</li>
+<li>Neighbors exchange their topology database information and any missing topology database records.</li>
+</ul>
+<p>Examining IS-IS neighbors is thus the next logical step after examining the local IS-IS parameters; the command to use is often <strong>show isis neighbor</strong>. You should be looking for the following information:</p>
+<ul>
+<li>The local interface</li>
+<li>Neighbor name or system ID. Most modern IS-IS implementations display neighbor names<sup id="fnref:RFC5301"><a class="footnote-ref" href="#fn:RFC5301">2</a></sup>.</li>
+<li>The state of adjacency (it should be <em>Up</em> on point-to-point links)</li>
+<li>The type of adjacency: intra-area adjacency (level-1), inter-area adjacency (level-2) or multi-level adjacency (level-1-2)<sup id="fnref:MLNA"><a class="footnote-ref" href="#fn:MLNA">4</a></sup>.</li>
+<li>Remote MAC address (SNPA<sup id="fnref:SNPA"><a class="footnote-ref" href="#fn:SNPA">3</a></sup>). The remote MAC address is sometimes displayed as <code>2020.2020.2020</code> on point-to-point links.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>All routers in your lab are configured as level-2 routers and should have only level-2 adjacencies.</p>
+</div>
+<p>Try to extract the above information from the printouts generated by FRRouting and Arista cEOS:</p>
+<p class="code-caption">IS-IS neighbors displayed by FRRouting<br /></p>
+<pre><code>$ netlab connect rtr --show isis neighbor
+Area Gandalf:
+  System Id           Interface   L  State        Holdtime SNPA
+ x1                  eth1        2  Up            29       2020.2020.2020
+ x2                  eth2        2  Up            29       2020.2020.2020
+</code></pre>
+<p class="code-caption">IS-IS neighbors displayed by Arista cEOS<br /></p>
+<pre><code>rtr&gt;show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  x1               L2   Ethernet1          P2P               UP    29          00
+Gandalf   default  x2               L2   Ethernet2          P2P               UP    29          00
+</code></pre>
+<p>Sometimes, you have to dig deeper and display neighbor details; a typical command to display those details is <strong>show isis neighbor detail</strong>. The details include:</p>
+<ul>
+<li>The address families supported by the neighbor (IPv4, IPv6)</li>
+<li>Neighbor&rsquo;s area address and interface IPv4/IPv6 address.</li>
+<li>Neighbor health statistics, including the number of flaps and the remaining hold timer.</li>
+</ul>
+<p>Extract the above information from the printouts generated by FRRouting and Arista cEOS.</p>
+<p class="code-caption">The IS-IS neighbor details displayed by FRRouting<br /></p>
+<pre><code>$ netlab connect rtr --show isis neighbor detail
+Area Gandalf:
+ x1
+    Interface: eth1, Level: 2, State: Up, Expires in 28s
+    Adjacency flaps: 1, Last: 1m22s ago
+    Circuit type: L2, Speaks: IPv4
+    SNPA: 2020.2020.2020
+    Area Address(es):
+      49.0001
+    IPv4 Address(es):
+      10.1.0.2
+
+ x2
+    Interface: eth2, Level: 2, State: Up, Expires in 27s
+    Adjacency flaps: 1, Last: 1m22s ago
+    Circuit type: L2, Speaks: IPv4
+    SNPA: 2020.2020.2020
+    Area Address(es):
+      49.0001
+    IPv4 Address(es):
+      10.1.0.6
+</code></pre>
+<p class="code-caption">The IS-IS neighbor details displayed by Arista cEOS<br /></p>
+<pre><code>rtr&gt;show isis neighbors detail
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  x1               L2   Ethernet1          P2P               UP    29          00
+  Area addresses: 49.0001
+  SNPA: P2P
+  Router ID: 0.0.0.0
+  Advertised Hold Time: 30
+  State Changed: 00:02:19 ago at 2024-08-08 10:46:49
+  IPv4 Interface Address: 10.1.0.2
+  IPv6 Interface Address: none
+  Interface name: Ethernet1
+  Graceful Restart: Not Supported
+  Supported Address Families: IPv4
+  Neighbor Supported Address Families: IPv4
+</code></pre>
+<h2 id="explore-is-is-database">Explore IS-IS Database</h2>
+<p>Like OSPF, IS-IS uses a <em>topology database</em> &ndash; a distributed, eventually consistent database shared among all routers in an area or among all inter-area routers.</p>
+<p>Unlike OSPF, where an ABR could have topology information for multiple areas, IS-IS uses a simpler two-level approach:</p>
+<ul>
+<li>Routers participating in intra-area routing (level-1 and level-1-2 routers) share a level-1 link-state database containing intra-area topology and prefixes.</li>
+<li>Level-1-2 and level-2 routers (inter-area routers) share a level-2 link-state database containing inter-area topology and prefixes from all IS-IS areas.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>All routers in your lab are configured as level-2 routers and thus share only the level-2 link-state database<sup id="fnref:MLL"><a class="footnote-ref" href="#fn:MLL">5</a></sup>.</p>
+</div>
+<p>OSPF stores various bits of topology information in multiple types of Link State Advertisements (LSA). IS-IS stores all information generated by a single router in a single Link State Information Packet (LSP) unless it has too much information for a single LSP, in which case it generates multiple LSP fragments (<a href="#frag">more details</a>).</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>IS-IS cannot fragment LSPs in transit; the maximum LSP size must never exceed the lowest MTU of any link in the IS-IS network. IS-IS contains no mechanism to dynamically detect the minimum network-wide MTU; you have to set the maximum LSP size with a router configuration command similar to <strong>lsp-mtu</strong>.</p>
+</div>
+<p>The identifier of an IS-IS LSP is always in the format <code>router-id.lsp-id.fragment-id</code>. The <code>router-id</code> is the NET (although you can usually use hostnames), the <code>lsp-id</code> becomes relevant on multi-access links (we&rsquo;ll get there in another lab exercise), and the <code>fragment-id</code> is the sequence number of the LSP fragment.</p>
+<p>You can inspect the IS-IS topology database with a command similar to <strong>show isis database</strong>. The short printout usually lists the LSPs (their ID), the LSP length, their sequence number, and their remaining lifetime.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>A quickly increasing LSP sequence number might indicate routing instabilities.</p>
+</div>
+<p class="code-caption">The IS-IS topology database overview displayed by FRRouting<br /></p>
+<pre><code>$ netlab connect rtr --show isis database
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+rtr.00-00            *    113   0x00000002  0x902e    1626    0/0/0
+x1.00-00                   92   0x00000002  0x23a0    1659    0/0/0
+x2.00-00                   92   0x00000002  0xc8f0    1633    0/0/0
+    3 LSPs
+</code></pre>
+<p class="code-caption">The IS-IS topology database overview displayed by Arista cEOS<br /></p>
+<pre><code>rtr&gt;show isis database
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    rtr.00-00                     2  26795  1042    119 L2  0000.0000.0001.00-00  &lt;&gt;
+    x1.00-00                      2   9120  1610     92 L2  0000.0000.0002.00-00  &lt;&gt;
+    x2.00-00                      2  51440  1610     92 L2  0000.0000.0003.00-00  &lt;&gt;
+</code></pre>
+<p>You can inspect the contents of an IS-IS LSP with a command similar to <strong>show isis database detail</strong>. Each IS-IS LSP contains numerous data items encoded as Type-Length-Value triplets. The TLV values are usually displayed in a human-friendly format; you&rsquo;d have to use a packet capture tool like <strong>tcpdump</strong> or <strong>wireshark</strong> to see the dirty details.</p>
+<p>The recognized IS-IS data types are collected in the <a href="https://www.iana.org/assignments/isis-tlv-codepoints/isis-tlv-codepoints.xhtml">IANA IS-IS TLV Codepoints</a> registry; you&rsquo;d usually see the following TLVs in a modern IPv4 network:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">TLV</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Area address</td>
+</tr>
+<tr>
+<td style="text-align: right;">137</td>
+<td>Hostname</td>
+</tr>
+<tr>
+<td style="text-align: right;">242</td>
+<td>Router capabilities</td>
+</tr>
+<tr>
+<td style="text-align: right;">129</td>
+<td>Supported protocols (IPv4/IPv6)</td>
+</tr>
+<tr>
+<td style="text-align: right;">22</td>
+<td>Extended IS Reachability<sup id="fnref:WM"><a class="footnote-ref" href="#fn:WM">6</a></sup><br>The cost to reach adjacent routers</td>
+</tr>
+<tr>
+<td style="text-align: right;">132</td>
+<td>IPv4 Interface Address</td>
+</tr>
+<tr>
+<td style="text-align: right;">135</td>
+<td>IPv4 Extended Reachability<br>The cost of a connected prefix</td>
+</tr>
+</tbody>
+</table>
+<p>This is how FRRouting and Arista cEOS display the LSP information:</p>
+<p class="code-caption">LSP content displayed by FRRouting<br /></p>
+<pre><code>$ netlab connect rtr --show isis database detail rtr.00-00
+Connecting to container clab-explore-rtr, executing vtysh -c &quot;show isis database detail rtr.00-00&quot;
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+rtr.00-00            *    113   0x00000002  0x902e    1589    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: rtr
+  TE Router ID: 10.0.0.1
+  Router Capability: 10.0.0.1 , D:0, S:0
+  Extended Reachability: 0000.0000.0002.00 (Metric: 10)
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.1
+  Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+</code></pre>
+<p class="code-caption">LSP content displayed by Arista EOS<br /></p>
+<pre><code>rtr&gt;show isis database rtr.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    rtr.00-00                     2  26795  1001    119 L2  0000.0000.0001.00-00  &lt;&gt;
+      LSP generation remaining wait time: 0 ms
+      Time remaining until refresh: 701 s
+      NLPID: 0xCC(IPv4)
+      Hostname: rtr
+      Area addresses: 49.0001
+      Interface address: 10.1.0.5
+      Interface address: 10.1.0.1
+      Interface address: 10.0.0.1
+      IS Neighbor          : x1.00               Metric: 10
+      IS Neighbor          : x2.00               Metric: 10
+      Reachability         : 10.1.0.4/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.1/32 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.1 Flags: []
+        Area leader priority: 250 algorithm: 0
+</code></pre>
+<p>The LSP information is used to build a topology graph that the SPF algorithm uses to find the lowest cost path to every known IP prefix:</p>
+<ul>
+<li>The LSPs are nodes in the topology graph</li>
+<li>The <strong>‌Extended IS Reachability</strong> TLV describes the unidirectional links in the topology graph</li>
+<li>The <strong>Extended IP Reachability</strong> TLVs describe leaf nodes (IP prefixes) attached to the LSPs</li>
+</ul>
+<p>In the first phase, the SPF algorithm finds the shortest path to every LSP in the topology graph; in the second phase, it finds the minimum cost path toward every prefix advertised by other routers.</p>
+<h2 id="frag">LSP Fragments</h2>
+<p>You rarely see LSP fragments in small networks, but it&rsquo;s pretty easy to generate them by lowering the maximum LSP size. For example, if we reduce the LSP size on <strong>rtr</strong> to 256, we&rsquo;ll get two fragments:</p>
+<pre><code>rtr# show isis database
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+rtr.00-00            *     67   0x00000024  0xe3a6    1648    0/0/0
+rtr.00-01            *     75   0x00000006  0xa54b    1648    0/0/0
+x1.00-00                   92   0x00000017  0xf8b5    1288    0/0/0
+x2.00-00                   92   0x00000018  0x9c07    1043    0/0/0
+</code></pre>
+<p>The LSP fragments contain the same information as the original LSP, only split across multiple smaller database objects:</p>
+<pre><code>rtr# show isis database detail rtr.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+rtr.00-00            *     67   0x00000024  0xe3a6    1590    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: rtr
+  TE Router ID: 10.0.0.1
+  Router Capability: 10.0.0.1 , D:0, S:0
+  Extended Reachability: 0000.0000.0002.00 (Metric: 10)
+
+rtr# show isis database detail rtr.00-01
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+rtr.00-01            *     75   0x00000006  0xa54b    1589    0/0/0
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.1
+  Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+</code></pre>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rtr</td>
+<td>Ethernet1</td>
+<td>x1</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>rtr</td>
+<td>Ethernet2</td>
+<td>x2</td>
+<td>eth1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with Arista EOS running on RTR and FRRouting running on X1 and X2.</p>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>rtr</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>rtr -&gt; x1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>rtr -&gt; x2</td>
+</tr>
+<tr>
+<td><strong>x1</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>x1 -&gt; rtr</td>
+</tr>
+<tr>
+<td><strong>x2</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>x2 -&gt; rtr</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:ABR">
+<p>Similar, but not exactly equivalent to OSPF ABR&#160;<a class="footnote-backref" href="#fnref:ABR" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:RFC5301">
+<p>Router names are advertised using the Dynamic Hostname TLV defined in <a href="https://www.rfc-editor.org/rfc/rfc5301.html">RFC 5301</a>.&#160;<a class="footnote-backref" href="#fnref:RFC5301" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SNPA">
+<p>Subnetwork point of attachment &ndash; a fancy OSI name for a MAC address.&#160;<a class="footnote-backref" href="#fnref:SNPA" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MLNA">
+<p>We&rsquo;re using <strong>level-2-only</strong> routers in the initial lab exercises. We&rsquo;ll explore multi-level routing in one of the more advanced exercises.&#160;<a class="footnote-backref" href="#fnref:MLNA" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MLL">
+<p>We&rsquo;ll cover multi-level IS-IS routing in another lab exercise.&#160;<a class="footnote-backref" href="#fnref:MLL" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:WM">
+<p>Also known as Wide Metrics (covered in another lab exercise).&#160;<a class="footnote-backref" href="#fnref:WM" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
