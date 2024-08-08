@@ -1,0 +1,28 @@
+# Configure IS-IS Routing for IPv4
+
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: explore
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+
+groups:
+  external:
+    members: [ x1, x2 ]
+
+nodes:
+  rtr:
+  x1:
+  x2:
+
+links: [ rtr-x1, rtr-x2 ]
+
+message: |
+  The "Explore IS-IS Data Structures" lab is ready. Connect to your router
+  with "netlab connect rtr".
+
+  Good luck!

@@ -94,6 +94,8 @@ Priority Codes:
            via 10.1.0.6, Ethernet2 rtr -> x2
 ```
 
+**Next:** [Explore IS-IS Data Structures](2-explore.md). That lab uses the same topology and device configurations, so you can keep going without restarting the lab.
+
 ## Background Information {#bg}
 
 IS-IS was designed to be the routing protocol for the ISO/OSI protocol stack. Its name is derived from ISO terminology: IS stands for Intermediate System (the device also known as *router*, *gateway* or *layer-3 switch*). Thus, IS-IS is the protocol that runs between Intermediate Systems.

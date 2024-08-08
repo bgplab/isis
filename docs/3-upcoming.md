@@ -4,10 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Getting Started
 
-Explore the IS-IS Database
-: * Describe the basics of the IS-IS database (LSPs)
-  * Examine an LSP and its components (adjacencies, prefixes, metrics)
-
 IS-IS on Point-to-Point Links
 : * Explore how long it takes for IS-IS to establish adjacency
   * Examine the IS-IS database; notice the pseudonodes and DIS.

@@ -31,6 +31,7 @@ nav:
   - Overview: basic/index.md
   - basic/0-frrouting.md
   - basic/1-simple-ipv4.md
+  - basic/2-explore.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md
