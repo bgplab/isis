@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/3-p2p/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>IS-IS on Point-to-Point Links &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Home <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Installation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">IS-IS on Point-to-Point Links</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../2-explore/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#is-is-on-point-to-point-links" class="nav-link">IS-IS on Point-to-Point Links</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#point-to-point-and-multi-access-links" class="nav-link">Point-to-Point and Multi-Access Links</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#exploring-multi-access-database-structures" class="nav-link">Exploring Multi-Access Database Structures</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#using-point-to-point-links" class="nav-link">Using Point-to-Point Links</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#three-way-handshake" class="nav-link">Three-Way Handshake</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="is-is-on-point-to-point-links">IS-IS on Point-to-Point Links</h1>
+<p>In the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise, I told you to configure the links as point-to-point links and promised a detailed explanation in a follow-up lab exercise. We got that far; let&rsquo;s see why using point-to-point links on Ethernet interfaces makes sense.</p>
+<p>To keep things simple, we&rsquo;ll use the simplest possible lab topology: two routers connected with a single link.</p>
+<p><img alt="Lab topology" src="../topology-frrouting.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a>.</p>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
+<ul>
+<li>Change directory to <code>basic/3-p2p</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into lab devices with <strong>netlab connect</strong></li>
+</ul>
+<h2 id="point-to-point-and-multi-access-links">Point-to-Point and Multi-Access Links</h2>
+<p>Like OSPF, IS-IS supports point-to-point (P2P) and multi-access links. Point-to-point links were traditionally used on P2P WAN links; all other media types (LAN, but also multi-access WAN like Frame Relay) used multi-access links. That&rsquo;s still the default behavior you get on most platforms.</p>
+<p>Multi-access links have two drawbacks when compared to point-to-point links:</p>
+<ul>
+<li>The IS-IS topology database contains extra objects (LSPs) describing LAN links.</li>
+<li>The routers on a multi-access link must elect a Designated Intermediate System<sup id="fnref:DIS"><a class="footnote-ref" href="#fn:DIS">1</a></sup>, prolonging the adjacency establishment process<sup id="fnref:OCT"><a class="footnote-ref" href="#fn:OCT">2</a></sup>. Like OSPF, the election process considers router priority and its System ID. Unlike OSPF, there is no Backup DIS in IS-IS; routers connected to a multi-access link elect a new DIS when the current one is gone.</li>
+</ul>
+<h2 id="exploring-multi-access-database-structures">Exploring Multi-Access Database Structures</h2>
+<p>It&rsquo;s time to get our hands dirty. Log into one of the lab devices and examine its IS-IS database. You should get a printout similar to this one. Please note an extra LSP (the description of the LAN subnet generated by R2):</p>
+<pre><code>r1# show isis database
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *     92   0x00000005  0xc392    1164    0/0/0
+r2.00-00                   92   0x00000005  0x60ef    1167    0/0/0
+r2.74-00                   51   0x00000003  0x5202    1239    0/0/0
+</code></pre>
+<p>Let&rsquo;s inspect the extra LSP. It looks very similar to an OSPF type-2 LSA:</p>
+<ul>
+<li>It describes links from the LAN segment to individual routers.</li>
+<li>Unlike OSPF type-2 LSA, it does not contain the LAN prefix.</li>
+</ul>
+<pre><code>r1# show isis database detail r2.74-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r2.74-00                   51   0x00000003  0x5202    1130    0/0/0
+  Extended Reachability: 0000.0000.0002.00 (Metric: 0)
+  Extended Reachability: 0000.0000.0001.00 (Metric: 0)
+</code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The core IS-IS data structures are protocol-agnostic. Protocol-specific prefixes are advertised as part of the router LSP.</p>
+</div>
+<p>Not surprisingly, the routers connected to the LAN segment advertise their links to the LAN segment and the LAN IPv4 prefix. This is what R1 has to say:</p>
+<pre><code>r1# show isis database detail r1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *     92   0x00000006  0xc193    1780    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: r1
+  TE Router ID: 10.0.0.1
+  Router Capability: 10.0.0.1 , D:0, S:0
+  Extended Reachability: 0000.0000.0002.74 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.1
+  Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+</code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It&rsquo;s worth noting that the router LSP does not specify the interface on which a particular IP prefix is; it just claims that the router knows how to reach the prefix with the specified cost. That&rsquo;s enough to find the optimum paths to all prefixes in the network<sup id="fnref:PLER"><a class="footnote-ref" href="#fn:PLER">3</a></sup></p>
+</div>
+<h2 id="using-point-to-point-links">Using Point-to-Point Links</h2>
+<p>Core Ethernet links in modern networks are usually point-to-point links<sup id="fnref:CE"><a class="footnote-ref" href="#fn:CE">4</a></sup> between routers<sup id="fnref:L3S"><a class="footnote-ref" href="#fn:L3S">5</a></sup>. Modeling those links as multi-access networks makes no sense, yet most IS-IS implementations use that approach on all LAN interfaces.</p>
+<p>Use an interface configuration command similar to <strong>isis network point-to-point</strong> to tell IS-IS to treat an interface like a point-to-point link. Do that on both routers in your network. </p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>While changing the interface type, you might observe logging/error messages similar to <code>p2p hello on non p2p circuit</code> or <code>lan hello on non broadcast circuit</code><sup id="fnref:TM"><a class="footnote-ref" href="#fn:TM">6</a></sup>.</p>
+</div>
+<p>Let&rsquo;s inspect the IS-IS topology database after the change. As expected, it contains two LSPs (one per router).</p>
+<pre><code>r1# show isis database
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *     92   0x00000008  0x5d6a    1598    0/0/0
+r2.00-00                   92   0x00000009  0xd4ec    1558    0/0/0
+</code></pre>
+<p>The LSPs describe the direct connection between the routers. For example, R1 claims it&rsquo;s directly connected to R2<sup id="fnref:HNM"><a class="footnote-ref" href="#fn:HNM">7</a></sup>:</p>
+<pre><code>r1# show isis database detail r1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: r1
+  TE Router ID: 10.0.0.1
+  Router Capability: 10.0.0.1 , D:0, S:0
+  Extended Reachability: 0000.0000.0002.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.1
+  Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+</code></pre>
+<h2 id="three-way-handshake">Three-Way Handshake</h2>
+<p>Original IS-IS specifications used a simple HELLO protocol: whenever a router received an Intermediate System Hello (ISH) from an adjacent router, it assumed the adjacent router could be reached, resulting in miserable failures on unidirectional links<sup id="fnref:MFMD"><a class="footnote-ref" href="#fn:MFMD">8</a></sup>.</p>
+<p>That hurdle was removed with the three-way handshake defined in <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>. That RFC specifies a new IS-IS option (Point-to-Point Three-Way Adjacency) that contains the System ID of the adjacent device, allowing IS-IS routers to verify they have a two-way communication<sup id="fnref:3WO"><a class="footnote-ref" href="#fn:3WO">9</a></sup>.</p>
+<p>Modern IS-IS implementations use the three-way handshake by default. Still, you might have to turn it off to interoperate with an older device (or a device with ancient defaults) with an interface command similar to <strong>no isis three-way-handshake</strong><sup id="fnref:NAA"><a class="footnote-ref" href="#fn:NAA">10</a></sup>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A mismatch in the three-way handshake setting could have bizarre results. For example, turning it off on a FRRouting device results in one of the neighbors having a fully operational IS-IS adjacency while, at the same time, the other neighbor claims it can see no neighbors. To make matters worse, that often happens only after the IS-IS adjacency has been lost and would have to be re-established.</p>
+</div>
+<p>As the last task in this lab, try out how your devices react to a three-way-handshake mismatch (assuming you can configure it):</p>
+<ul>
+<li>Turn it off on one of the routers.</li>
+<li>Clear the IS-IS adjacency with a command similar to <strong>clear isis neighbor</strong></li>
+<li>Enjoy the confusing logging messages.</li>
+</ul>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>eth1</td>
+<td>r2</td>
+<td>eth1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r2</td>
+</tr>
+<tr>
+<td><strong>r2</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; r1</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:DIS">
+<p><em>Intermediate System</em> is an OSI-compliant word for a router. OSPF would call DIS a DR.&#160;<a class="footnote-backref" href="#fnref:DIS" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:OCT">
+<p>And consequently, the overall convergence time after a link recovery.&#160;<a class="footnote-backref" href="#fnref:OCT" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:PLER">
+<p>The proof is left as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref:PLER" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:CE">
+<p>A major exception: routers connected to a Carrier Ethernet E-LAN service.&#160;<a class="footnote-backref" href="#fnref:CE" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:L3S">
+<p>The devices also known as <em>layer-3 switches</em> in marketing collaterals.&#160;<a class="footnote-backref" href="#fnref:L3S" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TM">
+<p>On many network devices, you must enable message logging on terminal sessions with a command similar to <strong>terminal monitor</strong>.&#160;<a class="footnote-backref" href="#fnref:TM" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:HNM">
+<p>FRR printouts are a bit inconsistent. Router names are displayed in high-level printouts, while the detailed printouts contain system IDs. Use the <strong>show isis hostname</strong> command to display the mapping between system IDs and hostnames.&#160;<a class="footnote-backref" href="#fnref:HNM" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MFMD">
+<p>See the introduction section of <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a> for more details.&#160;<a class="footnote-backref" href="#fnref:MFMD" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3WO">
+<p>OSPF has had similar functionality since its early days. Its hello packet contains the list of neighbors a router can see on an interface.&#160;<a class="footnote-backref" href="#fnref:3WO" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+<li id="fn:NAA">
+<p>RFC 5303 was published in 2008, and recent IS-IS implementations, for example, Arista EOS, no longer have that nerd knob.&#160;<a class="footnote-backref" href="#fnref:NAA" title="Jump back to footnote 10 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
