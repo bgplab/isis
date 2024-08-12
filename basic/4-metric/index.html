@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
-        <link rel="canonical" href="https://isis.bgplabs.net/basic/3-p2p/">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/4-metric/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>IS-IS on Point-to-Point Links &#171; IS-IS Labs</title>
+  <title>Using IS-IS Metrics &#171; IS-IS Labs</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -77,11 +77,11 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active">IS-IS on Point-to-Point Links</a>
+    <a href="../3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
 </li>
                                     
 <li>
-    <a href="../4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+    <a href="./" class="dropdown-item active">Using IS-IS Metrics</a>
 </li>
                                 </ul>
                             </li>
@@ -103,12 +103,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../2-explore/" class="nav-link">
+                                <a rel="prev" href="../3-p2p/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../4-metric/" class="nav-link">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -136,7 +136,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
       <ul class="nav flex-column">
           
-      <li class="nav-item" data-level="1"><a href="#is-is-on-point-to-point-links" class="nav-link">IS-IS on Point-to-Point Links</a>
+      <li class="nav-item" data-level="1"><a href="#using-is-is-metrics" class="nav-link">Using IS-IS Metrics</a>
         <ul class="nav flex-column">
       <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
         <ul class="nav flex-column">
@@ -146,19 +146,19 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#point-to-point-and-multi-access-links" class="nav-link">Point-to-Point and Multi-Access Links</a>
+      <li class="nav-item" data-level="2"><a href="#initial-routing-tables" class="nav-link">Initial Routing Tables</a>
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#exploring-multi-access-database-structures" class="nav-link">Exploring Multi-Access Database Structures</a>
+      <li class="nav-item" data-level="2"><a href="#changing-the-is-is-interface-metric" class="nav-link">Changing the IS-IS Interface Metric</a>
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#using-point-to-point-links" class="nav-link">Using Point-to-Point Links</a>
+      <li class="nav-item" data-level="2"><a href="#verifying-the-change" class="nav-link">Verifying the Change</a>
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#three-way-handshake" class="nav-link">Three-Way Handshake</a>
+      <li class="nav-item" data-level="2"><a href="#narrow-wide-and-transitional-metrics" class="nav-link">Narrow, Wide, and Transitional Metrics</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -185,120 +185,147 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="is-is-on-point-to-point-links">IS-IS on Point-to-Point Links</h1>
-<p>In the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise, I told you to configure the links as point-to-point links and promised a detailed explanation in a follow-up lab exercise. We got that far; let&rsquo;s see why using point-to-point links on Ethernet interfaces makes sense.</p>
-<p>To keep things simple, we&rsquo;ll use the simplest possible lab topology: two routers connected with a single link.</p>
-<p><img alt="Lab topology" src="../topology-frrouting.png" /></p>
+<h1 id="using-is-is-metrics">Using IS-IS Metrics</h1>
+<p>Like OSPF, IS-IS uses interface costs (called <em>metrics</em>) to calculate the best path toward destination IP prefixes. Unlike OSPF, the default metrics are fixes (usually set to 10) and do not reflect the interface bandwidth.</p>
+<p>For example, in the following topology, using the default IS-IS settings, the traffic between R1 and R3 would use the direct low-speed link. We&rsquo;ll fix that in this lab exercise.</p>
+<p><img alt="Lab topology" src="../topology-triangle.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
 <p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a>.</p>
 <h2 id="starting-the-lab">Starting the Lab</h2>
 <p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
 <ul>
-<li>Change directory to <code>basic/3-p2p</code></li>
+<li>Change directory to <code>basic/4-metric</code></li>
 <li>Execute <strong>netlab up</strong></li>
 <li>Log into lab devices with <strong>netlab connect</strong></li>
 </ul>
-<h2 id="point-to-point-and-multi-access-links">Point-to-Point and Multi-Access Links</h2>
-<p>Like OSPF, IS-IS supports point-to-point (P2P) and multi-access links. Point-to-point links were traditionally used on P2P WAN links; all other media types (LAN, but also multi-access WAN like Frame Relay) used multi-access links. That&rsquo;s still the default behavior you get on most platforms.</p>
-<p>Multi-access links have two drawbacks when compared to point-to-point links:</p>
-<ul>
-<li>The IS-IS topology database contains extra objects (LSPs) describing LAN links.</li>
-<li>The routers on a multi-access link must elect a Designated Intermediate System<sup id="fnref:DIS"><a class="footnote-ref" href="#fn:DIS">1</a></sup>, prolonging the adjacency establishment process<sup id="fnref:OCT"><a class="footnote-ref" href="#fn:OCT">2</a></sup>. Like OSPF, the election process considers router priority and its System ID. Unlike OSPF, there is no Backup DIS in IS-IS; routers connected to a multi-access link elect a new DIS when the current one is gone.</li>
-</ul>
-<h2 id="exploring-multi-access-database-structures">Exploring Multi-Access Database Structures</h2>
-<p>It&rsquo;s time to get our hands dirty. Log into one of the lab devices and examine its IS-IS database. You should get a printout similar to this one. Please note an extra LSP (the description of the LAN subnet generated by R2):</p>
-<pre><code>r1# show isis database
-Area Gandalf:
-IS-IS Level-2 link-state database:
-LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
-r1.00-00             *     92   0x00000005  0xc392    1164    0/0/0
-r2.00-00                   92   0x00000005  0x60ef    1167    0/0/0
-r2.74-00                   51   0x00000003  0x5202    1239    0/0/0
+<h2 id="initial-routing-tables">Initial Routing Tables</h2>
+<p>Check the routing tables on R1 and R3 and verify that they use the direct (low-bandwidth) link. R1 should use the first Ethernet interface to reach R2 and the second Ethernet interface to reach R3.</p>
+<p>This is the printout you should get on FRRouting<sup id="fnref:LPLB"><a class="footnote-ref" href="#fn:LPLB">1</a></sup>:</p>
+<pre><code>r1# show ip route 10.0.0.0/24 longer-prefixes
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+L * 10.0.0.1/32 is directly connected, lo, 00:00:58
+C&gt;* 10.0.0.1/32 is directly connected, lo, 00:00:58
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.2, eth1, weight 1, 00:00:55
+I&gt;* 10.0.0.3/32 [115/20] via 10.1.0.10, eth2, weight 1, 00:00:55
 </code></pre>
-<p>Let&rsquo;s inspect the extra LSP. It looks very similar to an OSPF type-2 LSA:</p>
+<p>The cost to reach 10.0.0.2/32 and 10.0.0.3/32 is 20 (when using FRRouting):</p>
 <ul>
-<li>It describes links from the LAN segment to individual routers.</li>
-<li>Unlike OSPF type-2 LSA, it does not contain the LAN prefix.</li>
+<li>The cost of the connection between R1 and R2 (or R1 and R3) is 10.</li>
+<li>R2 and R3 advertise the loopback prefixes with a cost of 10 (this detail may vary across different implementations).</li>
 </ul>
-<pre><code>r1# show isis database detail r2.74-00
-Area Gandalf:
-IS-IS Level-2 link-state database:
-LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
-r2.74-00                   51   0x00000003  0x5202    1130    0/0/0
-  Extended Reachability: 0000.0000.0002.00 (Metric: 0)
-  Extended Reachability: 0000.0000.0001.00 (Metric: 0)
-</code></pre>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>The core IS-IS data structures are protocol-agnostic. Protocol-specific prefixes are advertised as part of the router LSP.</p>
-</div>
-<p>Not surprisingly, the routers connected to the LAN segment advertise their links to the LAN segment and the LAN IPv4 prefix. This is what R1 has to say:</p>
+<p>You can check these details in the IS-IS topology database:</p>
+<p class="code-caption">R1 LSP &ndash; note the Extended Reachability metric toward R2 and R3<br /></p>
 <pre><code>r1# show isis database detail r1.00-00
 Area Gandalf:
 IS-IS Level-2 link-state database:
 LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
-r1.00-00             *     92   0x00000006  0xc193    1780    0/0/0
-  Protocols Supported: IPv4
-  Area Address: 49.0001
-  Hostname: r1
-  TE Router ID: 10.0.0.1
-  Router Capability: 10.0.0.1 , D:0, S:0
-  Extended Reachability: 0000.0000.0002.74 (Metric: 10)
-  IPv4 Interface Address: 10.0.0.1
-  Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
-  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
-</code></pre>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>It&rsquo;s worth noting that the router LSP does not specify the interface on which a particular IP prefix is; it just claims that the router knows how to reach the prefix with the specified cost. That&rsquo;s enough to find the optimum paths to all prefixes in the network<sup id="fnref:PLER"><a class="footnote-ref" href="#fn:PLER">3</a></sup></p>
-</div>
-<h2 id="using-point-to-point-links">Using Point-to-Point Links</h2>
-<p>Core Ethernet links in modern networks are usually point-to-point links<sup id="fnref:CE"><a class="footnote-ref" href="#fn:CE">4</a></sup> between routers<sup id="fnref:L3S"><a class="footnote-ref" href="#fn:L3S">5</a></sup>. Modeling those links as multi-access networks makes no sense, yet most IS-IS implementations use that approach on all LAN interfaces.</p>
-<p>Use an interface configuration command similar to <strong>isis network point-to-point</strong> to tell IS-IS to treat an interface like a point-to-point link. Do that on both routers in your network. </p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>While changing the interface type, you might observe logging/error messages similar to <code>p2p hello on non p2p circuit</code> or <code>lan hello on non broadcast circuit</code><sup id="fnref:TM"><a class="footnote-ref" href="#fn:TM">6</a></sup>.</p>
-</div>
-<p>Let&rsquo;s inspect the IS-IS topology database after the change. As expected, it contains two LSPs (one per router).</p>
-<pre><code>r1# show isis database
-Area Gandalf:
-IS-IS Level-2 link-state database:
-LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
-r1.00-00             *     92   0x00000008  0x5d6a    1598    0/0/0
-r2.00-00                   92   0x00000009  0xd4ec    1558    0/0/0
-</code></pre>
-<p>The LSPs describe the direct connection between the routers. For example, R1 claims it&rsquo;s directly connected to R2<sup id="fnref:HNM"><a class="footnote-ref" href="#fn:HNM">7</a></sup>:</p>
-<pre><code>r1# show isis database detail r1.00-00
-Area Gandalf:
-IS-IS Level-2 link-state database:
-LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
-r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
+r1.00-00             *    112   0x00000003  0xc5aa    1093    0/0/0
   Protocols Supported: IPv4
   Area Address: 49.0001
   Hostname: r1
   TE Router ID: 10.0.0.1
   Router Capability: 10.0.0.1 , D:0, S:0
   Extended Reachability: 0000.0000.0002.00 (Metric: 10)
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
   IPv4 Interface Address: 10.0.0.1
   Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
   Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.8/30 (Metric: 10)
 </code></pre>
-<p><strong>Next:</strong> <a href="../4-metric/">Using IS-IS Metrics</a></p>
-<h2 id="three-way-handshake">Three-Way Handshake</h2>
-<p>Original IS-IS specifications used a simple HELLO protocol: whenever a router received an Intermediate System Hello (ISH) from an adjacent router, it assumed the adjacent router could be reached, resulting in miserable failures on unidirectional links<sup id="fnref:MFMD"><a class="footnote-ref" href="#fn:MFMD">8</a></sup>.</p>
-<p>That hurdle was removed with the three-way handshake defined in <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>. That RFC specifies a new IS-IS option (Point-to-Point Three-Way Adjacency) that contains the System ID of the adjacent device, allowing IS-IS routers to verify they have a two-way communication<sup id="fnref:3WO"><a class="footnote-ref" href="#fn:3WO">9</a></sup>.</p>
-<p>Modern IS-IS implementations use the three-way handshake by default. Still, you might have to turn it off to interoperate with an older device (or a device with ancient defaults) with an interface command similar to <strong>no isis three-way-handshake</strong><sup id="fnref:NAA"><a class="footnote-ref" href="#fn:NAA">10</a></sup>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>A mismatch in the three-way handshake setting could have bizarre results. For example, turning it off on a FRRouting device results in one of the neighbors having a fully operational IS-IS adjacency while, at the same time, the other neighbor claims it can see no neighbors. To make matters worse, that often happens only after the IS-IS adjacency has been lost and would have to be re-established.</p>
-</div>
-<p>As the last task in this lab, try out how your devices react to a three-way-handshake mismatch (assuming you can configure it):</p>
+<p class="code-caption">R2 LSP &ndash; note the Extended IP Reachability metric for 10.0.0.2/32<br /></p>
+<pre><code>r1# show isis database detail r2.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r2.00-00                  112   0x00000003  0xfb73    1049    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: r2
+  TE Router ID: 10.0.0.2
+  Router Capability: 10.0.0.2 , D:0, S:0
+  Extended Reachability: 0000.0000.0001.00 (Metric: 10)
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.2
+  Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+</code></pre>
+<h2 id="changing-the-is-is-interface-metric">Changing the IS-IS Interface Metric</h2>
+<p>You can change the IS-IS interface metric with an interface configuration command similar to <strong>isis metric</strong><sup id="fnref:L1L2M"><a class="footnote-ref" href="#fn:L1L2M">2</a></sup>. Change the metric on the R1-R3 link to 50 (you have to make the change on both ends of the link).</p>
+<h2 id="verifying-the-change">Verifying the Change</h2>
+<p>After the change, R1 should use the first Ethernet interface to reach R3&rsquo;s loopback address. This is the printout you should get on FRRouting:</p>
+<pre><code>r1# show ip route 10.0.0.0/24 longer-prefixes
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+L * 10.0.0.1/32 is directly connected, lo, 00:32:08
+C&gt;* 10.0.0.1/32 is directly connected, lo, 00:32:08
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.2, eth1, weight 1, 00:32:05
+I&gt;* 10.0.0.3/32 [115/30] via 10.1.0.2, eth1, weight 1, 00:02:53
+</code></pre>
+<h2 id="narrow-wide-and-transitional-metrics">Narrow, Wide, and Transitional Metrics</h2>
+<p>Did you notice the <em>Extended Reachability</em> and <em>Extended IP Reachability</em> headings in the LSP printouts? Here&rsquo;s the full story:</p>
 <ul>
-<li>Turn it off on one of the routers.</li>
-<li>Clear the IS-IS adjacency with a command similar to <strong>clear isis neighbor</strong></li>
-<li>Enjoy the confusing logging messages.</li>
+<li>Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost could not exceed 1023<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">3</a></sup>. Today, we call those metrics <strong>narrow</strong> metrics.</li>
+<li>When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. <a href="https://www.rfc-editor.org/rfc/rfc3784">RFC 3784</a> defined 24-bit metrics (we call them <strong>wide</strong> metrics). That&rsquo;s what most implementations use today.</li>
+<li>Some networks had to transition from <em>narrow</em> to <em>wide</em> metrics, and the solution was to advertise both sets of metrics until all devices in the network understand <em>wide</em> metrics. Some vendors call that approach <em>transition</em> metrics.</li>
 </ul>
-<p><strong>Next:</strong> <a href="../4-metric/">Using IS-IS Metrics</a></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>I haven&rsquo;t seen an IS-IS implementation that would not understand the <em>narrow</em> metrics, and all recent implementations support <em>wide</em> metrics (they&rsquo;ve been around for 20 years). You have to use the <em>transition</em> metrics only when you have an ancient device in your network that does not understand the <em>wide</em> metrics.</p>
+</div>
+<p>Let&rsquo;s try to reproduce the world we lived in around the turn of the millennium. FRRouting has a <strong>metric-style</strong> router configuration command. Let&rsquo;s set it to <strong>narrow</strong> on R1 and see what happens to the R1 LSP:</p>
+<pre><code>r1# show isis database detail r1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *    116   0x00000005  0x4857    1781    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  IS Reachability: 0000.0000.0002.00 (Metric: 10)
+  IS Reachability: 0000.0000.0003.00 (Metric: 50)
+  Hostname: r1
+  Router Capability: 10.0.0.1 , D:0, S:0
+  IP Reachability: 10.0.0.1/32 (Metric: 10)
+  IP Reachability: 10.1.0.0/30 (Metric: 10)
+  IP Reachability: 10.1.0.8/30 (Metric: 50)
+  IPv4 Interface Address: 10.0.0.1
+</code></pre>
+<p>As you can see, R1 replaced the <em>Extended Reachability</em> metric with the <em>IS Reachability</em> metric and the <em>Extended IP Reachability</em> metric with the <em>IP Reachability metric</em>. It also wouldn&rsquo;t allow you to increase the metric on the R1-R3 link above 63.</p>
+<p>Finally, let&rsquo;s set the metric style to <em>transition</em> and observe the changes in R1 LSP. As expected, the LSP contains two sets of metrics for every link and IP prefix.</p>
+<pre><code>r1# sh isis database detail r1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *    175   0x0000000a  0x7dab    1785    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  IS Reachability: 0000.0000.0002.00 (Metric: 10)
+  IS Reachability: 0000.0000.0003.00 (Metric: 50)
+  Hostname: r1
+  TE Router ID: 10.0.0.1
+  Router Capability: 10.0.0.1 , D:0, S:0
+  Extended Reachability: 0000.0000.0002.00 (Metric: 10)
+  Extended Reachability: 0000.0000.0003.00 (Metric: 50)
+  IP Reachability: 10.0.0.1/32 (Metric: 10)
+  IP Reachability: 10.1.0.0/30 (Metric: 10)
+  IP Reachability: 10.1.0.8/30 (Metric: 50)
+  IPv4 Interface Address: 10.0.0.1
+  Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.8/30 (Metric: 50)
+</code></pre>
+<p>And now you know the whole story behind the IS-IS metric types. I hope you&rsquo;ll never see <em>narrow</em> or <em>transition</em> metric styles in a live network, and if you do (for example, due to ancient vendor defaults), consider changing that to <em>wide</em>.</p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -316,6 +343,18 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <td>eth1</td>
 <td>r2</td>
 <td>eth1</td>
+</tr>
+<tr>
+<td>r2</td>
+<td>eth2</td>
+<td>r3</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>eth2</td>
+<td>r3</td>
+<td>eth2</td>
 </tr>
 </tbody>
 </table>
@@ -343,6 +382,12 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <td>r1 -&gt; r2</td>
 </tr>
 <tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.9/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r3</td>
+</tr>
+<tr>
 <td><strong>r2</strong></td>
 <td style="text-align: right;">10.0.0.2/32</td>
 <td style="text-align: right;"></td>
@@ -354,40 +399,43 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <td style="text-align: right;"></td>
 <td>r2 -&gt; r1</td>
 </tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; r3</td>
+</tr>
+<tr>
+<td><strong>r3</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>r3 -&gt; r2</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.10/30</td>
+<td style="text-align: right;"></td>
+<td>r3 -&gt; r1</td>
+</tr>
 </tbody>
 </table>
 <div class="footnote">
 <hr />
 <ol>
-<li id="fn:DIS">
-<p><em>Intermediate System</em> is an OSI-compliant word for a router. OSPF would call DIS a DR.&#160;<a class="footnote-backref" href="#fnref:DIS" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:LPLB">
+<p>I&rsquo;m using the <strong>show ip route longer-prefixes</strong> command to display just the loopbacks that happen to be in the 10.0.0.0/24 address space.&#160;<a class="footnote-backref" href="#fnref:LPLB" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn:OCT">
-<p>And consequently, the overall convergence time after a link recovery.&#160;<a class="footnote-backref" href="#fnref:OCT" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:L1L2M">
+<p>IS-IS can use different metrics for L1 and L2 adjacencies. Don&rsquo;t waste your time on that detail, and I hope you&rsquo;ll never see a network using it outside of a CCIE lab.&#160;<a class="footnote-backref" href="#fnref:L1L2M" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn:PLER">
-<p>The proof is left as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref:PLER" title="Jump back to footnote 3 in the text">&#8617;</a></p>
-</li>
-<li id="fn:CE">
-<p>A major exception: routers connected to a Carrier Ethernet E-LAN service.&#160;<a class="footnote-backref" href="#fnref:CE" title="Jump back to footnote 4 in the text">&#8617;</a></p>
-</li>
-<li id="fn:L3S">
-<p>The devices also known as <em>layer-3 switches</em> in marketing collaterals.&#160;<a class="footnote-backref" href="#fnref:L3S" title="Jump back to footnote 5 in the text">&#8617;</a></p>
-</li>
-<li id="fn:TM">
-<p>On many network devices, you must enable message logging on terminal sessions with a command similar to <strong>terminal monitor</strong>.&#160;<a class="footnote-backref" href="#fnref:TM" title="Jump back to footnote 6 in the text">&#8617;</a></p>
-</li>
-<li id="fn:HNM">
-<p>FRR printouts are a bit inconsistent. Router names are displayed in high-level printouts, while the detailed printouts contain system IDs. Use the <strong>show isis hostname</strong> command to display the mapping between system IDs and hostnames.&#160;<a class="footnote-backref" href="#fnref:HNM" title="Jump back to footnote 7 in the text">&#8617;</a></p>
-</li>
-<li id="fn:MFMD">
-<p>See the introduction section of <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a> for more details.&#160;<a class="footnote-backref" href="#fnref:MFMD" title="Jump back to footnote 8 in the text">&#8617;</a></p>
-</li>
-<li id="fn:3WO">
-<p>OSPF has had similar functionality since its early days. Its hello packet contains the list of neighbors a router can see on an interface.&#160;<a class="footnote-backref" href="#fnref:3WO" title="Jump back to footnote 9 in the text">&#8617;</a></p>
-</li>
-<li id="fn:NAA">
-<p>RFC 5303 was published in 2008, and recent IS-IS implementations, for example, Arista EOS, no longer have that nerd knob.&#160;<a class="footnote-backref" href="#fnref:NAA" title="Jump back to footnote 10 in the text">&#8617;</a></p>
+<li id="fn:SPF">
+<p>Supposedly, someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
