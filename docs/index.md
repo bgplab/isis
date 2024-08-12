@@ -23,7 +23,7 @@ The initial lab exercises will help you configure basic IS-IS features:
 * [Work with FRRouting](basic/0-frrouting.md) (optional)
 * [Start the IS-IS Routing for IPv4](basic/1-simple-ipv4.md)
 * [Explore IS-IS Data Structures](basic/2-explore.md)
-* IS-IS on Point-to-Point Links (coming soon)
+* [IS-IS on Point-to-Point Links](basic/3-p2p.md)
 * Using IS-IS Metrics (coming soon)
 * Dual-Stack IS-IS Routing (coming soon)
 * Optimize IS-IS Adjacencies (coming soon)

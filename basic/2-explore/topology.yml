@@ -1,4 +1,4 @@
-# Configure IS-IS Routing for IPv4
+# Explore IS-IS Data Structures
 
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 1.8.4

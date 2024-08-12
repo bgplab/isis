@@ -4,13 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Getting Started
 
-IS-IS on Point-to-Point Links
-: * Explore how long it takes for IS-IS to establish adjacency
-  * Examine the IS-IS database; notice the pseudonodes and DIS.
-  * Change a link to a point-to-point link
-  * Configure 3-way handshake if available
-  * Examine the changes in adjacency setup time and the reduced information in the topology database (no pseudonode).
-
 Using IS-IS Metrics
 : * Change IS-IS metrics to avoid a backup link
   * Explain narrow and wide metrics.

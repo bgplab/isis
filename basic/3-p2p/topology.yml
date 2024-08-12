@@ -1,0 +1,24 @@
+# IS-IS on Point-to-Point Links
+
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: explore
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+
+nodes:
+  r1:
+  r2:
+
+links:
+- r1:
+  r2:
+  isis.network_type: False
+
+message: |
+  The "IS-IS on Point-to-Point Links" lab is ready. Connect to your devices
+  with "netlab connect".

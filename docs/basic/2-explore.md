@@ -375,6 +375,8 @@ rtr.00-01            *     75   0x00000006  0xa54b    1589    0/0/0
   Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
 ```
 
+**Next:** [IS-IS on Point-to-Point Links](3-p2p.md)
+
 ## Reference Information
 
 ### Lab Wiring

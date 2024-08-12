@@ -7,6 +7,7 @@ The labs cover:
 * [Work with FRRouting](basic/0-frrouting)
 * [Start the IS-IS Routing for IPv4](basic/1-simple-ipv4)
 * [Explore IS-IS Data Structures](basic/2-explore)
+* [IS-IS on Point-to-Point Links](basic/3-p2p)
 
 Other labs are still under development. Follow [blog.ipspace.net](https://blog.ipspace.net/) or [Ivan Pepelnjak on LinkedIn](https://www.linkedin.com/in/ivanpepelnjak/) to find out when they will be ready.
 
