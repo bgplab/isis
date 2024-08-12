@@ -33,6 +33,7 @@ nav:
   - basic/1-simple-ipv4.md
   - basic/2-explore.md
   - basic/3-p2p.md
+  - basic/4-metric.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md

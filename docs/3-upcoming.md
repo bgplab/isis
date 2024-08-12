@@ -4,11 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Getting Started
 
-Using IS-IS Metrics
-: * Change IS-IS metrics to avoid a backup link
-  * Explain narrow and wide metrics.
-  * If available, test the transitional and wide metrics
-
 Dual-Stack IS-IS Routing
 : * Enable IS-IS for IPv4 and IPv6
   * Explore single-topology and multi-topology behavior
