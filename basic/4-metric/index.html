@@ -83,6 +83,10 @@
 <li>
     <a href="./" class="dropdown-item active">Using IS-IS Metrics</a>
 </li>
+                                    
+<li>
+    <a href="../5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown">
@@ -108,7 +112,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                <a rel="next" href="../5-ipv6/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -198,6 +202,7 @@
 <li>Execute <strong>netlab up</strong></li>
 <li>Log into lab devices with <strong>netlab connect</strong></li>
 </ul>
+<p>You&rsquo;ll get a lab with IPv4 addresses and basic IS-IS configurations on all devices. According to the recommendations from the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise, the routers are level-2-only routers, and the links are configured as point-to-point links.</p>
 <h2 id="initial-routing-tables">Initial Routing Tables</h2>
 <p>Check the routing tables on R1 and R3 and verify that they use the direct (low-bandwidth) link. R1 should use the first Ethernet interface to reach R2 and the second Ethernet interface to reach R3.</p>
 <p>This is the printout you should get on FRRouting<sup id="fnref:LPLB"><a class="footnote-ref" href="#fn:LPLB">1</a></sup>:</p>
@@ -257,7 +262,7 @@ r2.00-00                  112   0x00000003  0xfb73    1049    0/0/0
   Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
 </code></pre>
 <h2 id="changing-the-is-is-interface-metric">Changing the IS-IS Interface Metric</h2>
-<p>You can change the IS-IS interface metric with an interface configuration command similar to <strong>isis metric</strong><sup id="fnref:L1L2M"><a class="footnote-ref" href="#fn:L1L2M">2</a></sup>. Change the metric on the R1-R3 link to 50 (you have to make the change on both ends of the link).</p>
+<p>You can change the IS-IS interface metric with an interface configuration command similar to <strong>isis metric</strong><sup id="fnref:L1L2M"><a class="footnote-ref" href="#fn:L1L2M">2</a></sup>. Change the metric on the R1-R3 link to 50 (you must make the change on both ends).</p>
 <h2 id="verifying-the-change">Verifying the Change</h2>
 <p>After the change, R1 should use the first Ethernet interface to reach R3&rsquo;s loopback address. This is the printout you should get on FRRouting:</p>
 <pre><code>r1# show ip route 10.0.0.0/24 longer-prefixes
@@ -326,6 +331,7 @@ r1.00-00             *    175   0x0000000a  0x7dab    1785    0/0/0
   Extended IP Reachability: 10.1.0.8/30 (Metric: 50)
 </code></pre>
 <p>And now you know the whole story behind the IS-IS metric types. I hope you&rsquo;ll never see <em>narrow</em> or <em>transition</em> metric styles in a live network, and if you do (for example, due to ancient vendor defaults), consider changing that to <em>wide</em>.</p>
+<p><strong>Next:</strong> <a href="../5-ipv6/">Dual-Stack (IPv4+IPv6) IS-IS Routing</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
