@@ -25,7 +25,7 @@ The initial lab exercises will help you configure basic IS-IS features:
 * [Explore IS-IS Data Structures](basic/2-explore.md)
 * [IS-IS on Point-to-Point Links](basic/3-p2p.md)
 * [Using IS-IS Metrics](basic/4-metric.md)
-* Dual-Stack IS-IS Routing (coming soon)
+* [Dual-Stack (IPv4+IPv6) IS-IS Routing](basic/5-ipv6.md)
 * Optimize IS-IS Adjacencies (coming soon)
 * Troubleshoot IS-IS Adjacencies (coming soon)
 

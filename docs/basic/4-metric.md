@@ -18,6 +18,8 @@ Assuming you already [set up your lab infrastructure](../1-setup.md):
 * Execute **netlab up**
 * Log into lab devices with **netlab connect**
 
+You'll get a lab with IPv4 addresses and basic IS-IS configurations on all devices. According to the recommendations from the [Configure IS-IS Routing for IPv4](1-simple-ipv4.md) lab exercise, the routers are level-2-only routers, and the links are configured as point-to-point links.
+
 ## Initial Routing Tables
 
 Check the routing tables on R1 and R3 and verify that they use the direct (low-bandwidth) link. R1 should use the first Ethernet interface to reach R2 and the second Ethernet interface to reach R3.
@@ -92,7 +94,7 @@ r2.00-00                  112   0x00000003  0xfb73    1049    0/0/0
 
 ## Changing the IS-IS Interface Metric
 
-You can change the IS-IS interface metric with an interface configuration command similar to **isis metric**[^L1L2M]. Change the metric on the R1-R3 link to 50 (you have to make the change on both ends of the link).
+You can change the IS-IS interface metric with an interface configuration command similar to **isis metric**[^L1L2M]. Change the metric on the R1-R3 link to 50 (you must make the change on both ends).
 
 [^L1L2M]: IS-IS can use different metrics for L1 and L2 adjacencies. Don't waste your time on that detail, and I hope you'll never see a network using it outside of a CCIE lab.
 
@@ -177,6 +179,8 @@ r1.00-00             *    175   0x0000000a  0x7dab    1785    0/0/0
 ```
 
 And now you know the whole story behind the IS-IS metric types. I hope you'll never see *narrow* or *transition* metric styles in a live network, and if you do (for example, due to ancient vendor defaults), consider changing that to *wide*.
+
+**Next:** [Dual-Stack (IPv4+IPv6) IS-IS Routing](5-ipv6.md)
 
 ## Reference Information
 

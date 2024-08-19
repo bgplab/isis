@@ -1,0 +1,31 @@
+# Dual-Stack IS-IS Routing
+---
+defaults.sources.extra: [ ../../defaults.yml, ../../defaults-ipv6.yml ]
+version: 1.8.4
+
+name: ipv6
+
+isis.area: '49.0001'
+isis.type: level-2
+isis.af:
+  ipv4: True
+  ipv6: False
+
+module: [ isis ]
+
+nodes:
+  r1:
+  r2:
+  r3:
+
+links:
+- r1:
+  r2:
+- r2:
+    ipv6: False
+  r3:
+    ipv6: False
+
+message: |
+  The "Dual-Stack IS-IS Routing" lab is ready. Connect to your devices
+  with "netlab connect".

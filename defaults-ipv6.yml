@@ -1,5 +1,5 @@
 ---
 addressing:
-  p2p.ipv6: 2001:db8:42::/48
+  p2p.ipv6: True
   loopback.ipv6: 2001:db8:cafe::/48
   lan.ipv6: 2001:db8:21::/48

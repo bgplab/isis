@@ -4,10 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Getting Started
 
-Dual-Stack IS-IS Routing
-: * Enable IS-IS for IPv4 and IPv6
-  * Explore single-topology and multi-topology behavior
-
 Optimize IS-IS Adjacencies
 : * Change the IS-type to L2-only
   * Explain the difference between L1+L2 and L2-only adjacencies

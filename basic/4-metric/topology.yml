@@ -1,9 +1,9 @@
 # Using IS-IS Metrics
-
+---
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 1.8.4
 
-name: explore
+name: metric
 
 isis.area: '49.0001'
 isis.type: level-2

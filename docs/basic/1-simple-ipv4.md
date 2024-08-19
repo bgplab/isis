@@ -18,6 +18,8 @@ Assuming you already [set up your lab infrastructure](../1-setup.md):
 * Execute **netlab up**
 * Log into your device (RTR) with **netlab connect rtr** and verify that the IP addresses are configured on all its interfaces.
 
+You'll get a lab with IPv4 addresses configured on all interfaces and IS-IS routing configured on X1 and X2 but not on RTR.
+
 ## Configuration Tasks
 
 The minimal IS-IS configuration process has three or four steps:

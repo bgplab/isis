@@ -16,6 +16,8 @@ Assuming you already [set up your lab infrastructure](../1-setup.md):
 * Execute **netlab up**
 * Log into your device (RTR) with **netlab connect rtr**
 
+You'll get a lab with IPv4 addresses and IS-IS routing configured on all lab devices.
+
 ## Explore Router Configuration
 
 Unless you're absolutely sure how your router is configured, always start with a high-level overview of IS-IS settings, usually displayed with a command like **show isis summary**.

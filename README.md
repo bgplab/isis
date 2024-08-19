@@ -9,6 +9,7 @@ The labs cover:
 * [Explore IS-IS Data Structures](basic/2-explore)
 * [IS-IS on Point-to-Point Links](basic/3-p2p)
 * [Using IS-IS Metrics](basic/4-metric)
+* [Dual-Stack (IPv4+IPv6) IS-IS Routing](basic/5-ipv6)
 
 Other labs are still under development. Follow [blog.ipspace.net](https://blog.ipspace.net/) or [Ivan Pepelnjak on LinkedIn](https://www.linkedin.com/in/ivanpepelnjak/) to find out when they will be ready.
 
