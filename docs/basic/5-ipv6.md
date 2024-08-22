@@ -290,6 +290,8 @@ L>* 2001:db8:cafe:2::1/128 is directly connected, lo, 00:43:33
 C>* fe80::/64 is directly connected, eth1, 00:43:32
 ```
 
+**Next:** [Optimize Simple IS-IS Deployments](6-level-2.md)
+
 ## Behind the Scenes
 
 Multi-topology IS-IS routing modifies two aspects of IS-IS. The IS-IS hello packets carry additional TLVs describing the topologies enabled on the sending router. You can see them if you inspect the IS-IS neighbor details:

@@ -2,20 +2,6 @@
 
 The [first few labs are already online](index.md); the list of ideas is much longer. Here they are:
 
-## Getting Started
-
-Optimize IS-IS Adjacencies
-: * Change the IS-type to L2-only
-  * Explain the difference between L1+L2 and L2-only adjacencies
-
-Troubleshoot IS-IS Adjacencies
-: This lab will include the most common mistakes that prevent an IS-IS adjacency from forming, including:
-
-  * MTU mismatch
-  * L1/L2 mismatch
-  * Area mismatch on L1 adjacency
-  * 3-way handshake on point-to-point links
-
 ## Configure IS-IS Features
 
 Passive IS-IS Interfaces
@@ -54,3 +40,14 @@ Configure IS-IS Fast Reroute Using TI-LFA
 
 Using IS-IS with SRv6
 : * Build a BGP-free IPv6 core using SRv6 for end-to-end transport
+
+## Troubleshooting
+
+Troubleshoot IS-IS Adjacencies
+: This lab will include the most common mistakes that prevent an IS-IS adjacency from forming, including:
+
+  * MTU mismatch
+  * L1/L2 mismatch
+  * Area mismatch on L1 adjacency
+  * 3-way handshake on point-to-point links
+

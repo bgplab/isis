@@ -110,7 +110,7 @@ IS-IS high-level principles are similar to OSPF ones:
 * Once the neighbors are discovered, an adjacency is established with them.
 * Neighbors exchange their topology database information and any missing topology database records.
 
-Examining IS-IS neighbors is thus the next logical step after examining the local IS-IS parameters; the command to use is often **show isis neighbor**. You should be looking for the following information:
+Examining IS-IS neighbors is thus the next logical step after examining the local IS-IS parameters; the command to use is often **show isis neighbor** (or **show isis adjacency**). You should be looking for the following information:
 
 * The local interface
 * Neighbor name or system ID. Most modern IS-IS implementations display neighbor names[^RFC5301].

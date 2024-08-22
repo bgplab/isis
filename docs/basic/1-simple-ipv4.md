@@ -52,11 +52,11 @@ You can use the **netlab validate** command if you're using *netlab* release 1.8
 
 You should also do basic validation on your device:
 
-* Inspect IS-IS adjacencies with a command similar to **show isis neighbors**. Your router should have level-2 adjacencies with X1 and X2; this is the printout you should get on Arista EOS:
+* Inspect IS-IS adjacencies with a command similar to **show isis neighbors** or **show isis adjacency**. Your router should have level-2 adjacencies with X1 and X2; this is the printout you should get on FRRouting:
 
+IS-IS neighbors (FRRouting)
+{.code-caption}
 ```
-rtr#show isis neighbors
-
 rtr# show isis neighbor
 Area SomeTag:
   System Id           Interface   L  State        Holdtime SNPA
@@ -66,6 +66,8 @@ Area SomeTag:
 
 * Inspect the IP routing table and verify that you can see three loopback prefixes (10.0.0.1/32 through 10.0.0.3/32). This is the printout you should get on FRRouting
 
+IS-IS routes in the IPv4 routing table (FRRouting)
+{.code-caption}
 ```
 rtr# show ip route isis
 Codes: K - kernel route, C - connected, L - local, S - static,
@@ -85,6 +87,8 @@ FRRouting uses the IP routing table as the repository of *all routes*, not just 
 
 [^DP]: The **detail** option of the **show ip route** command includes the interface description, and the `|begin Priority` output filter removes the legend.
 
+IS-IS routes in IPv4 routing table on Arista EOS
+{.code-caption}
 ```
 rtr#show ip route isis detail|begin Priority
 Priority Codes:

@@ -1,0 +1,31 @@
+# Optimize Simple IS-IS Deployments
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: level2
+
+isis.area: '49.0001'
+isis.type: level-1-2
+
+module: [ isis ]
+
+nodes:
+  r1:
+  r2:
+  r3:
+
+links:
+- r1:
+  r2:
+  bandwidth: 100000
+- r2:
+  r3:
+  bandwidth: 100000
+- r1:
+  r3:
+  bandwidth: 10000
+
+message: |
+  The "Optimize Simple IS-IS Deployments" lab is ready. Connect to your devices
+  with "netlab connect".

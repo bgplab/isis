@@ -10,6 +10,7 @@ The labs cover:
 * [IS-IS on Point-to-Point Links](basic/3-p2p)
 * [Using IS-IS Metrics](basic/4-metric)
 * [Dual-Stack (IPv4+IPv6) IS-IS Routing](basic/5-ipv6)
+* [Optimize Simple IS-IS Deployments](basic/6-level-2)
 
 Other labs are still under development. Follow [blog.ipspace.net](https://blog.ipspace.net/) or [Ivan Pepelnjak on LinkedIn](https://www.linkedin.com/in/ivanpepelnjak/) to find out when they will be ready.
 
