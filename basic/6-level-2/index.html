@@ -307,13 +307,13 @@ r2.00-00                  112   0x00000002  0xfd72    1528    0/0/0
   Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
   Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
 </code></pre>
-<p><strong>End result:</strong> Even without information propagation between level-1 and level-2 routing, the routers consume twice as much memory for the IS-IS topology database. More importantly<sup id="fnref:WCR"><a class="footnote-ref" href="#fn:WCR">10</a></sup>, every change in the network triggers two SPF<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">9</a></sup> runs (one for level-1 topology, one for level-2 topology) with identical results (because every router advertises every prefix in level-1 and level-2 topologies). One of those results is thrown away; within an area, level-1 information takes precedence over level-2 information.</p>
+<p><strong>End result:</strong> Even without information propagation between level-1 and level-2 routing, the routers consume twice as much memory for the IS-IS topology database. More importantly<sup id="fnref:WCR"><a class="footnote-ref" href="#fn:WCR">10</a></sup>, every change in the network triggers two SPF<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">9</a></sup> runs (one for level-1 topology, one for level-2 topology) with identical results (because every router advertises every prefix in level-1 and level-2 topologies). One of those results is thrown away; within an area, level-1 information takes precedence over level-2 information<sup id="fnref:L1P"><a class="footnote-ref" href="#fn:L1P">11</a></sup>.</p>
 <h2 id="worst-case-exploding-information">Worst Case: Exploding Information</h2>
 <p>Most IS-IS implementations <a href="https://datatracker.ietf.org/doc/html/rfc1195">follow the rules from RFC 1195</a>:</p>
 <blockquote>
-<p>Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area.</p>
+<p>Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area<sup id="fnref:UFF"><a class="footnote-ref" href="#fn:UFF">12</a></sup>.</p>
 </blockquote>
-<p>Now, imagine you&rsquo;re using an implementation that follows the RFC1195 rules in a single-area network where every router runs level-1 and level-2 routing. Every router advertises every reachable intra-area IP prefix in its level-2 LSP, resulting in humongous level-2 LSPs<sup id="fnref:ONB"><a class="footnote-ref" href="#fn:ONB">11</a></sup>.</p>
+<p>Now, imagine you&rsquo;re using an implementation that follows the RFC1195 rules in a single-area network where every router runs level-1 and level-2 routing. Every router advertises every reachable intra-area IP prefix in its level-2 LSP, resulting in humongous level-2 LSPs<sup id="fnref:ONB"><a class="footnote-ref" href="#fn:ONB">13</a></sup>.</p>
 <p>All those level-2 prefixes would needlessly increase the overhead of level-2 SPFs (and the results of the level-2 SPF would be ignored anyway). Even worse, every change in the network topology that would change the cost of at least one prefix would result in changed level-2 LSPs that would be flooded across the whole network, triggering even more level-2 SPF runs.</p>
 <p><strong>Takeaway:</strong> In a single-area IS-IS network, never run <em>level-1</em> and <em>level-2</em> routing in parallel.</p>
 <p>You can reproduce that behavior with most IS-IS implementations. Start the lab and explore the contents of a level-1 LSP and corresponding level-2 LSP. This is what you would get on Arista cEOS:</p>
@@ -362,7 +362,7 @@ IS-IS Instance: Gandalf VRF: default
         Area leader priority: 250 algorithm: 0
 </code></pre>
 <h2 id="configure-is-is-router-type">Configure IS-IS Router Type</h2>
-<p>By now, you probably agree that running <em>level-1</em> routing and <em>level-2</em> routing in parallel<sup id="fnref:ALN"><a class="footnote-ref" href="#fn:ALN">12</a></sup> does not make sense. Is it better to run just <em>level-1</em> routing or just <em>level-2</em> routing? I would go with <em>level-2</em> routing; things will keep working even if you decide to split your network into smaller areas sometime in the future.</p>
+<p>By now, you probably agree that running <em>level-1</em> routing and <em>level-2</em> routing in parallel<sup id="fnref:ALN"><a class="footnote-ref" href="#fn:ALN">14</a></sup> does not make sense. Is it better to run just <em>level-1</em> routing or just <em>level-2</em> routing? I would go with <em>level-2</em> routing; things will keep working even if you decide to split your network into smaller areas sometime in the future.</p>
 <p>It&rsquo;s time to get our hands dirty. After exploring the IS-IS database structures, configure all routers in your network to be level-2 routers with a router configuration command similar to <strong>is-type level-2</strong>.</p>
 <h2 id="validation">Validation</h2>
 <p>Examine the IS-IS adjacencies on all links in your network. All IS-IS neighbors should have level-2 adjacency:</p>
@@ -514,11 +514,18 @@ r3.00-00                  112   0x00000007  0xfb62    1701    0/0/0
 <li id="fn:WCR">
 <p>In the world of cheap RAM&#160;<a class="footnote-backref" href="#fnref:WCR" title="Jump back to footnote 10 in the text">&#8617;</a></p>
 </li>
+<li id="fn:L1P">
+<p>See <a href="https://datatracker.ietf.org/doc/html/rfc5302#section-3.2">section 3.2 of RFC 5302</a> for more details.&#160;<a class="footnote-backref" href="#fnref:L1P" title="Jump back to footnote 11 in the text">&#8617;</a></p>
+</li>
+<li id="fn:UFF">
+<p><a href="https://datatracker.ietf.org/doc/html/rfc5302">RFC 5302</a> provides a slightly stricter interpretation in <a href="https://datatracker.ietf.org/doc/html/rfc5302#section-3.3">section 3.3</a>: a L1L2 router SHOULD only advertise in their L2 LSP those L1 routes that they use for forwarding themselves. They SHOULD NOT<br />
+unconditionally advertise into L2 all prefixes from LSPs in the L1 database.&#160;<a class="footnote-backref" href="#fnref:UFF" title="Jump back to footnote 12 in the text">&#8617;</a></p>
+</li>
 <li id="fn:ONB">
-<p>OSPF would do the same thing if you configured virtual backbone links across a single-area OSPF network&#160;<a class="footnote-backref" href="#fnref:ONB" title="Jump back to footnote 11 in the text">&#8617;</a></p>
+<p>OSPF would do the same thing if you configured virtual backbone links across a single-area OSPF network&#160;<a class="footnote-backref" href="#fnref:ONB" title="Jump back to footnote 13 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ALN">
-<p>On all links in your network. In a network using multi-level IS-IS routing, you might have to run level-1 routing and level-2 routing on some core links (but you wouldn&rsquo;t do that on each link).&#160;<a class="footnote-backref" href="#fnref:ALN" title="Jump back to footnote 12 in the text">&#8617;</a></p>
+<p>On all links in your network. In a network using multi-level IS-IS routing, you might have to run level-1 routing and level-2 routing on some core links (but you wouldn&rsquo;t do that on each link).&#160;<a class="footnote-backref" href="#fnref:ALN" title="Jump back to footnote 14 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
