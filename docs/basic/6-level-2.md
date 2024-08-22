@@ -145,17 +145,22 @@ r2.00-00                  112   0x00000002  0xfd72    1528    0/0/0
   Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
 ```
 
-**End result:** Even without information propagation between level-1 and level-2 routing, the routers consume twice as much memory for the IS-IS topology database. More importantly[^WCR], every change in the network triggers two SPF[^SPF] runs (one for level-1 topology, one for level-2 topology) with identical results (because every router advertises every prefix in level-1 and level-2 topologies). One of those results is thrown away; within an area, level-1 information takes precedence over level-2 information.
+**End result:** Even without information propagation between level-1 and level-2 routing, the routers consume twice as much memory for the IS-IS topology database. More importantly[^WCR], every change in the network triggers two SPF[^SPF] runs (one for level-1 topology, one for level-2 topology) with identical results (because every router advertises every prefix in level-1 and level-2 topologies). One of those results is thrown away; within an area, level-1 information takes precedence over level-2 information[^L1P].
 
 [^SPF]: [Shortest-Path First](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm); the algorithm used to find the lowest-cost paths in a weighted graph
 
 [^WCR]: In the world of cheap RAM
 
+[^L1P]: See [section 3.2 of RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302#section-3.2) for more details.
+
 ## Worst Case: Exploding Information
 
 Most IS-IS implementations [follow the rules from RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195):
 
-> Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area.
+> Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area[^UFF].
+
+[^UFF]: [RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302) provides a slightly stricter interpretation in [section 3.3](https://datatracker.ietf.org/doc/html/rfc5302#section-3.3): a L1L2 router SHOULD only advertise in their L2 LSP those L1 routes that they use for forwarding themselves. They SHOULD NOT
+unconditionally advertise into L2 all prefixes from LSPs in the L1 database.
 
 Now, imagine you're using an implementation that follows the RFC1195 rules in a single-area network where every router runs level-1 and level-2 routing. Every router advertises every reachable intra-area IP prefix in its level-2 LSP, resulting in humongous level-2 LSPs[^ONB].
 
