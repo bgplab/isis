@@ -87,6 +87,10 @@
 <li>
     <a href="../5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
 </li>
+                                    
+<li>
+    <a href="../6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown">
@@ -288,7 +292,9 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
   Extended IP Reachability: 10.0.0.1/32 (Metric: 10)
   Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
 </code></pre>
-<p><strong>Next:</strong> <a href="../4-metric/">Using IS-IS Metrics</a></p>
+<p><strong>Next:</strong><br />
+* <a href="../4-metric/">Using IS-IS Metrics</a><br />
+* <a href="../6-level-2/">Optimize Simple IS-IS Deployments</a></p>
 <h2 id="three-way-handshake">Three-Way Handshake</h2>
 <p>Original IS-IS specifications used a simple HELLO protocol: whenever a router received an Intermediate System Hello (ISH) from an adjacent router, it assumed the adjacent router could be reached, resulting in miserable failures on unidirectional links<sup id="fnref:MFMD"><a class="footnote-ref" href="#fn:MFMD">8</a></sup>.</p>
 <p>That hurdle was removed with the three-way handshake defined in <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>. That RFC specifies a new IS-IS option (Point-to-Point Three-Way Adjacency) that contains the System ID of the adjacent device, allowing IS-IS routers to verify they have a two-way communication<sup id="fnref:3WO"><a class="footnote-ref" href="#fn:3WO">9</a></sup>.</p>
@@ -303,7 +309,9 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <li>Clear the IS-IS adjacency with a command similar to <strong>clear isis neighbor</strong></li>
 <li>Enjoy the confusing logging messages.</li>
 </ul>
-<p><strong>Next:</strong> <a href="../4-metric/">Using IS-IS Metrics</a></p>
+<p><strong>Next:</strong><br />
+* <a href="../4-metric/">Using IS-IS Metrics</a><br />
+* <a href="../6-level-2/">Optimize Simple IS-IS Deployments</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>

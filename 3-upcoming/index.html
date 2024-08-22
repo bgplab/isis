@@ -87,6 +87,10 @@
 <li>
     <a href="../basic/5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
 </li>
+                                    
+<li>
+    <a href="../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown active">
@@ -107,7 +111,7 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../basic/5-ipv6/" class="nav-link">
+                                <a rel="prev" href="../basic/6-level-2/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
@@ -142,15 +146,15 @@
           
       <li class="nav-item" data-level="1"><a href="#upcoming-labs" class="nav-link">Upcoming Labs</a>
         <ul class="nav flex-column">
-      <li class="nav-item" data-level="2"><a href="#getting-started" class="nav-link">Getting Started</a>
-        <ul class="nav flex-column">
-        </ul>
-      </li>
       <li class="nav-item" data-level="2"><a href="#configure-is-is-features" class="nav-link">Configure IS-IS Features</a>
         <ul class="nav flex-column">
         </ul>
       </li>
       <li class="nav-item" data-level="2"><a href="#advanced-labs" class="nav-link">Advanced Labs</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#troubleshooting" class="nav-link">Troubleshooting</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -206,24 +210,6 @@
 
 <h1 id="upcoming-labs">Upcoming Labs</h1>
 <p>The <a href="../">first few labs are already online</a>; the list of ideas is much longer. Here they are:</p>
-<h2 id="getting-started">Getting Started</h2>
-<dl>
-<dt>Optimize IS-IS Adjacencies</dt>
-<dd>
-<ul>
-<li>Change the IS-type to L2-only</li>
-<li>Explain the difference between L1+L2 and L2-only adjacencies</li>
-</ul>
-</dd>
-<dt>Troubleshoot IS-IS Adjacencies</dt>
-<dd>This lab will include the most common mistakes that prevent an IS-IS adjacency from forming, including:</dd>
-</dl>
-<ul>
-<li>MTU mismatch</li>
-<li>L1/L2 mismatch</li>
-<li>Area mismatch on L1 adjacency</li>
-<li>3-way handshake on point-to-point links</li>
-</ul>
 <h2 id="configure-is-is-features">Configure IS-IS Features</h2>
 <dl>
 <dt>Passive IS-IS Interfaces</dt>
@@ -294,7 +280,18 @@
 <li>Build a BGP-free IPv6 core using SRv6 for end-to-end transport</li>
 </ul>
 </dd>
-</dl></div>
+</dl>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<dl>
+<dt>Troubleshoot IS-IS Adjacencies</dt>
+<dd>This lab will include the most common mistakes that prevent an IS-IS adjacency from forming, including:</dd>
+</dl>
+<ul>
+<li>MTU mismatch</li>
+<li>L1/L2 mismatch</li>
+<li>Area mismatch on L1 adjacency</li>
+<li>3-way handshake on point-to-point links</li>
+</ul></div>
             </div>
         </div>
 

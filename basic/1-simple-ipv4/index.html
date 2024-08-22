@@ -87,6 +87,10 @@
 <li>
     <a href="../5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
 </li>
+                                    
+<li>
+    <a href="../6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown">
@@ -229,11 +233,10 @@
 <p><img alt="" src="../validate-simple-ipv4.png" /></p>
 <p>You should also do basic validation on your device:</p>
 <ul>
-<li>Inspect IS-IS adjacencies with a command similar to <strong>show isis neighbors</strong>. Your router should have level-2 adjacencies with X1 and X2; this is the printout you should get on Arista EOS:</li>
+<li>Inspect IS-IS adjacencies with a command similar to <strong>show isis neighbors</strong> or <strong>show isis adjacency</strong>. Your router should have level-2 adjacencies with X1 and X2; this is the printout you should get on FRRouting:</li>
 </ul>
-<pre><code>rtr#show isis neighbors
-
-rtr# show isis neighbor
+<p class="code-caption">IS-IS neighbors (FRRouting)<br /></p>
+<pre><code>rtr# show isis neighbor
 Area SomeTag:
   System Id           Interface   L  State        Holdtime SNPA
  x1                  eth1        2  Up            29       2020.2020.2020
@@ -242,6 +245,7 @@ Area SomeTag:
 <ul>
 <li>Inspect the IP routing table and verify that you can see three loopback prefixes (10.0.0.1/32 through 10.0.0.3/32). This is the printout you should get on FRRouting</li>
 </ul>
+<p class="code-caption">IS-IS routes in the IPv4 routing table (FRRouting)<br /></p>
 <pre><code>rtr# show ip route isis
 Codes: K - kernel route, C - connected, L - local, S - static,
        R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
@@ -256,6 +260,7 @@ I   10.1.0.0/30 [115/20] via 10.1.0.2, eth1 inactive, weight 1, 00:00:47
 I   10.1.0.4/30 [115/20] via 10.1.0.6, eth2 inactive, weight 1, 00:00:18
 </code></pre>
 <p>FRRouting uses the IP routing table as the repository of <em>all routes</em>, not just the <em>best routes</em>, so it displays the <em>inactive</em> IS-IS routes. Other network devices, for example Arista EOS<sup id="fnref:DP"><a class="footnote-ref" href="#fn:DP">2</a></sup>, display just the <em>active</em> IS-IS routes:</p>
+<p class="code-caption">IS-IS routes in IPv4 routing table on Arista EOS<br /></p>
 <pre><code>rtr#show ip route isis detail|begin Priority
 Priority Codes:
        PL - Priority low, PM - Priority medium, PH - Priority high

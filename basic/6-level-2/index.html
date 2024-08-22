@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/basic/6-level-2/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Optimize Simple IS-IS Deployments &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Home <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Installation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="../3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
+</li>
+                                    
+<li>
+    <a href="../4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+</li>
+                                    
+<li>
+    <a href="../5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Optimize Simple IS-IS Deployments</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../5-ipv6/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#optimize-simple-is-is-deployments" class="nav-link">Optimize Simple IS-IS Deployments</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#level-1-and-level-2-routing-in-is-is" class="nav-link">Level-1 and Level-2 Routing in IS-IS</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#best-scenario-duplicate-information" class="nav-link">Best Scenario: Duplicate Information</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#worst-case-exploding-information" class="nav-link">Worst Case: Exploding Information</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configure-is-is-router-type" class="nav-link">Configure IS-IS Router Type</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="optimize-simple-is-is-deployments">Optimize Simple IS-IS Deployments</h1>
+<p>In the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise, I told you to configure the routers as <em>level-2 intermediate systems</em> and promised a detailed explanation in a follow-up lab exercise. It&rsquo;s time to open that can of worms.</p>
+<p>To keep things simple, we&rsquo;ll use a simple lab topology: three routers connected into a triangle.</p>
+<p><img alt="Lab topology" src="../topology-triangle.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a>.</p>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
+<ul>
+<li>Change directory to <code>basic/6-level-2</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into lab devices with <strong>netlab connect</strong></li>
+</ul>
+<p>You&rsquo;ll get a lab with IPv4 addresses and minimal IS-IS configurations on all devices.</p>
+<h2 id="level-1-and-level-2-routing-in-is-is">Level-1 and Level-2 Routing in IS-IS</h2>
+<p>The link-state routing protocols (IS-IS and OSPF) were designed to run on devices that were two orders of magnitude<sup id="fnref:OOM"><a class="footnote-ref" href="#fn:OOM">1</a></sup> slower than what we have today<sup id="fnref:4MH"><a class="footnote-ref" href="#fn:4MH">2</a></sup> and had three orders of magnitude less memory<sup id="fnref:LM"><a class="footnote-ref" href="#fn:LM">3</a></sup>. The routing protocol designers were rightfully worried about scalability challenges and implemented features that would allow them to build large networks:</p>
+<ul>
+<li>OSPF uses areas connected via a backbone area.</li>
+<li>IS-IS uses areas (level-1 routing) connected via an overlay inter-area routing topology (level-2 routing).</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>In a follow-up lab exercise, we&rsquo;ll discuss the details of multi-level routing. Today, we&rsquo;ll focus on the implications of using level-1 and level-2 routing on the same devices.</p>
+</div>
+<p>The IS-IS multi-level routing rules are simple:</p>
+<ul>
+<li>An area is a contiguous set of routers with NETs that differ only in system IDs (everything left of the system ID is the same).</li>
+<li>Level-1 (intra-area) routers know the topology of their area but not what&rsquo;s in other areas.</li>
+<li>Level-2 (inter-area) routers know the inter-area topology but not the details of individual areas.</li>
+<li>Level-1-2 routers are like OSPF Area Border Routers. They know the topology of their area<sup id="fnref:SA"><a class="footnote-ref" href="#fn:SA">4</a></sup> and the inter-area topology. They also summarize intra-area reachability information (prefixes and costs) and advertise them into the inter-area topology (similar to what OSPF ABRs do).</li>
+<li>Contrary to OSPF (where an interface belongs to a single area), IS-IS routers could establish level-1 and level-2 adjacencies over the same interface.</li>
+<li>Level-1 routing and level-2 routing are entirely separate. While they use a shared adjacency<sup id="fnref:SHALSP"><a class="footnote-ref" href="#fn:SHALSP">5</a></sup>, they use different topology databases.</li>
+</ul>
+<p>Every router in an IS-IS network can be a <em>level-1 router</em>, a <em>level-2 router</em>, or a <em>level-1-2 router</em>. Furthermore, you could limit the adjacencies a router forms over individual interfaces (we&rsquo;ll leave this topic for another day).</p>
+<p>Now for the sad part: the default router type in most implementations is a <em>level-1-2</em> router. Let&rsquo;s assume we have a reasonably small network<sup id="fnref:RSN"><a class="footnote-ref" href="#fn:RSN">6</a></sup> and don&rsquo;t use areas. Could the default setting hurt us?</p>
+<h2 id="best-scenario-duplicate-information">Best Scenario: Duplicate Information</h2>
+<p>FRRouting is one of those implementations where running level-1 and level-2 routing in parallel causes only minor damage. As of August 2024, the <a href="https://github.com/FRRouting/frr/issues/12793">FRRouting IS-IS implementation is incomplete</a> and cannot distribute intra-area (level-1) information into inter-area (level-2) LSPs or vice versa<sup id="fnref:NML"><a class="footnote-ref" href="#fn:NML">7</a></sup>. Regardless, it&rsquo;s worth exploring this behavior, as other devices might have similar defaults<sup id="fnref:NXOS"><a class="footnote-ref" href="#fn:NXOS">8</a></sup>.</p>
+<p>If you start our lab with FRRouting nodes, you can observe <em>level 3</em> adjacencies (that&rsquo;s how FRRouting says &ldquo;level-1-2&rdquo;). The neighbor details confirm that the circuit type is L1L2 &ndash; we&rsquo;re running level-1 and level-2 routing with IS-IS neighbors.</p>
+<pre><code>r1# show isis neighbor detail
+Area Gandalf:
+ r2
+    Interface: eth1, Level: 3, State: Up, Expires in 28s
+    Adjacency flaps: 2, Last: 25s ago
+    Circuit type: L1L2, Speaks: IPv4
+    SNPA: 2020.2020.2020
+    Area Address(es):
+      49.0001
+    IPv4 Address(es):
+      10.1.0.2
+
+ r3
+    Interface: eth2, Level: 3, State: Up, Expires in 27s
+    Adjacency flaps: 2, Last: 25s ago
+    Circuit type: L1L2, Speaks: IPv4
+    SNPA: 2020.2020.2020
+    Area Address(es):
+      49.0001
+    IPv4 Address(es):
+      10.1.0.10
+</code></pre>
+<p>As expected, the routers have two IS-IS databases with duplicate information (the LSPs might have the exact same size):</p>
+<pre><code>r1# show isis data
+Area Gandalf:
+IS-IS Level-1 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *    112   0x00000002  0xcf99    1630    1/0/0
+r2.00-00                  112   0x00000002  0x0662    1638    1/0/0
+r3.00-00                  112   0x00000002  0x0e4d    1622    1/0/0
+    3 LSPs
+
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *    112   0x00000002  0xc7a9    1642    0/0/0
+r2.00-00                  112   0x00000002  0xfd72    1622    0/0/0
+r3.00-00                  112   0x00000002  0x065d    1630    0/0/0
+    3 LSPs
+</code></pre>
+<p>Inspecting a level-1 LSP and a corresponding level-2 LSP confirms the duplication of information:</p>
+<pre><code>r1# show isis database detail r2.00-00
+Area Gandalf:
+IS-IS Level-1 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r2.00-00                  112   0x00000002  0x0662    1544    1/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: r2
+  TE Router ID: 10.0.0.2
+  Router Capability: 10.0.0.2 , D:0, S:0
+  Extended Reachability: 0000.0000.0001.00 (Metric: 10)
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.2
+  Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r2.00-00                  112   0x00000002  0xfd72    1528    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0001
+  Hostname: r2
+  TE Router ID: 10.0.0.2
+  Router Capability: 10.0.0.2 , D:0, S:0
+  Extended Reachability: 0000.0000.0001.00 (Metric: 10)
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.2
+  Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+  Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+</code></pre>
+<p><strong>End result:</strong> Even without information propagation between level-1 and level-2 routing, the routers consume twice as much memory for the IS-IS topology database. More importantly<sup id="fnref:WCR"><a class="footnote-ref" href="#fn:WCR">10</a></sup>, every change in the network triggers two SPF<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">9</a></sup> runs (one for level-1 topology, one for level-2 topology) with identical results (because every router advertises every prefix in level-1 and level-2 topologies). One of those results is thrown away; within an area, level-1 information takes precedence over level-2 information.</p>
+<h2 id="worst-case-exploding-information">Worst Case: Exploding Information</h2>
+<p>Most IS-IS implementations <a href="https://datatracker.ietf.org/doc/html/rfc1195">follow the rules from RFC 1195</a>:</p>
+<blockquote>
+<p>Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area.</p>
+</blockquote>
+<p>Now, imagine you&rsquo;re using an implementation that follows the RFC1195 rules in a single-area network where every router runs level-1 and level-2 routing. Every router advertises every reachable intra-area IP prefix in its level-2 LSP, resulting in humongous level-2 LSPs<sup id="fnref:ONB"><a class="footnote-ref" href="#fn:ONB">11</a></sup>.</p>
+<p>All those level-2 prefixes would needlessly increase the overhead of level-2 SPFs (and the results of the level-2 SPF would be ignored anyway). Even worse, every change in the network topology that would change the cost of at least one prefix would result in changed level-2 LSPs that would be flooded across the whole network, triggering even more level-2 SPF runs.</p>
+<p><strong>Takeaway:</strong> In a single-area IS-IS network, never run <em>level-1</em> and <em>level-2</em> routing in parallel.</p>
+<p>You can reproduce that behavior with most IS-IS implementations. Start the lab and explore the contents of a level-1 LSP and corresponding level-2 LSP. This is what you would get on Arista cEOS:</p>
+<pre><code>r1&gt;show isis database r2.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 1 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r2.00-00                      3  60631  1044    118 L2  0000.0000.0002.00-00  &lt;&gt;
+      Remaining lifetime received: 1199 s Modified to: 1200 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r2
+      Area addresses: 49.0001
+      Interface address: 10.1.0.5
+      Interface address: 10.1.0.2
+      Interface address: 10.0.0.2
+      IS Neighbor          : r1.00               Metric: 10
+      IS Neighbor          : r3.00               Metric: 10
+      Reachability         : 10.1.0.4/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.2 Flags: []
+        Area leader priority: 250 algorithm: 0
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r2.00-00                      4  53131  1044    147 L2  0000.0000.0002.00-00  &lt;&gt;
+      Remaining lifetime received: 1199 s Modified to: 1200 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r2
+      Area addresses: 49.0001
+      Interface address: 10.1.0.5
+      Interface address: 10.1.0.2
+      Interface address: 10.0.0.2
+      IS Neighbor          : r1.00               Metric: 10
+      IS Neighbor          : r3.00               Metric: 10
+      Reachability         : 10.0.0.1/32 Metric: 20 Type: 1 Up
+      Reachability         : 10.1.0.8/30 Metric: 20 Type: 1 Up
+      Reachability         : 10.0.0.3/32 Metric: 20 Type: 1 Up
+      Reachability         : 10.1.0.4/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.2 Flags: []
+        Area leader priority: 250 algorithm: 0
+</code></pre>
+<h2 id="configure-is-is-router-type">Configure IS-IS Router Type</h2>
+<p>By now, you probably agree that running <em>level-1</em> routing and <em>level-2</em> routing in parallel<sup id="fnref:ALN"><a class="footnote-ref" href="#fn:ALN">12</a></sup> does not make sense. Is it better to run just <em>level-1</em> routing or just <em>level-2</em> routing? I would go with <em>level-2</em> routing; things will keep working even if you decide to split your network into smaller areas sometime in the future.</p>
+<p>It&rsquo;s time to get our hands dirty. After exploring the IS-IS database structures, configure all routers in your network to be level-2 routers with a router configuration command similar to <strong>is-type level-2</strong>.</p>
+<h2 id="validation">Validation</h2>
+<p>Examine the IS-IS adjacencies on all links in your network. All IS-IS neighbors should have level-2 adjacency:</p>
+<pre><code>r1# sh isis neighbor
+Area Gandalf:
+  System Id           Interface   L  State        Holdtime SNPA
+ r2                  eth1        2  Up            30       2020.2020.2020
+ r3                  eth2        2  Up            29       2020.2020.2020
+</code></pre>
+<p>The IS-IS database should not have any level-1 information:</p>
+<pre><code>r1# show isis database
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+r1.00-00             *    112   0x00000005  0xc1ac    1644    0/0/0
+r2.00-00                  112   0x00000006  0xf576    1713    0/0/0
+r3.00-00                  112   0x00000007  0xfb62    1701    0/0/0
+    3 LSPs
+</code></pre>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>eth1</td>
+<td>r2</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>r2</td>
+<td>eth2</td>
+<td>r3</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>eth2</td>
+<td>r3</td>
+<td>eth2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r2</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.9/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r3</td>
+</tr>
+<tr>
+<td><strong>r2</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; r1</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; r3</td>
+</tr>
+<tr>
+<td><strong>r3</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>r3 -&gt; r2</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.10/30</td>
+<td style="text-align: right;"></td>
+<td>r3 -&gt; r1</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:OOM">
+<p><a href="https://en.wikipedia.org/wiki/Order_of_magnitude">100 times</a>&#160;<a class="footnote-backref" href="#fnref:OOM" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4MH">
+<p>The Cisco 2500 router had a 20 MHz CPU. Most general-purpose CPUs today use a clock frequency above 2 GHz (ignoring for the moment that they can also do much more in a single clock cycle).&#160;<a class="footnote-backref" href="#fnref:4MH" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:LM">
+<p>The Cisco 2500 router had up to 16 MB of memory. Most modern routers have at least 8 GB of (much faster) RAM.&#160;<a class="footnote-backref" href="#fnref:LM" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SA">
+<p>Contrary to OSPF, an IS-IS router can belong to a single area (ignoring the overlapping areas exception).&#160;<a class="footnote-backref" href="#fnref:SA" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SHALSP">
+<p>That shared adjacency is advertised as two adjacencies (extended reachability TLV), one in level-1 LSP and another in level-2 LSP.&#160;<a class="footnote-backref" href="#fnref:SHALSP" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:RSN">
+<p>ISPs were running networks with hundreds of routers in an IS-IS area in the 1990s. Most everyone agrees that (assuming you&rsquo;re using a decent implementation) it&rsquo;s OK to run a few hundred routers in a relatively stable IS-IS area (TLDR: It Depends™️)&#160;<a class="footnote-backref" href="#fnref:RSN" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:NML">
+<p>You cannot use FRRouting as a level-1-2 router in a network that uses multi-level IS-IS routing.&#160;<a class="footnote-backref" href="#fnref:NML" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:NXOS">
+<p>Cisco Nexus OS does not distribute level-1 information into level-2 LSPs unless you configure <strong>distribute level-1 into level-2</strong> within an IS-IS router address family.&#160;<a class="footnote-backref" href="#fnref:NXOS" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SPF">
+<p><a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Shortest-Path First</a>; the algorithm used to find the lowest-cost paths in a weighted graph&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+<li id="fn:WCR">
+<p>In the world of cheap RAM&#160;<a class="footnote-backref" href="#fnref:WCR" title="Jump back to footnote 10 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ONB">
+<p>OSPF would do the same thing if you configured virtual backbone links across a single-area OSPF network&#160;<a class="footnote-backref" href="#fnref:ONB" title="Jump back to footnote 11 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ALN">
+<p>On all links in your network. In a network using multi-level IS-IS routing, you might have to run level-1 routing and level-2 routing on some core links (but you wouldn&rsquo;t do that on each link).&#160;<a class="footnote-backref" href="#fnref:ALN" title="Jump back to footnote 12 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

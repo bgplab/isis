@@ -87,6 +87,10 @@
 <li>
     <a href="../5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
 </li>
+                                    
+<li>
+    <a href="../6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
                                 </ul>
                             </li>
                             <li class="dropdown">
@@ -282,7 +286,7 @@ IS-IS Instance: Gandalf VRF: default
 <li>Once the neighbors are discovered, an adjacency is established with them.</li>
 <li>Neighbors exchange their topology database information and any missing topology database records.</li>
 </ul>
-<p>Examining IS-IS neighbors is thus the next logical step after examining the local IS-IS parameters; the command to use is often <strong>show isis neighbor</strong>. You should be looking for the following information:</p>
+<p>Examining IS-IS neighbors is thus the next logical step after examining the local IS-IS parameters; the command to use is often <strong>show isis neighbor</strong> (or <strong>show isis adjacency</strong>). You should be looking for the following information:</p>
 <ul>
 <li>The local interface</li>
 <li>Neighbor name or system ID. Most modern IS-IS implementations display neighbor names<sup id="fnref:RFC5301"><a class="footnote-ref" href="#fn:RFC5301">2</a></sup>.</li>
