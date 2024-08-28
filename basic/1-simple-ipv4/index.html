@@ -205,14 +205,14 @@
 <li>Execute <strong>netlab up</strong></li>
 <li>Log into your device (RTR) with <strong>netlab connect rtr</strong> and verify that the IP addresses are configured on all its interfaces.</li>
 </ul>
-<p>You&rsquo;ll get a lab with IPv4 addresses configured on all interfaces and IS-IS routing configured on X1 and X2 but not on RTR.</p>
+<p>You&rsquo;ll get a lab with IPv4 addresses configured on all interfaces and IS-IS routing configured on X1 and X2 but not  RTR.</p>
 <h2 id="configuration-tasks">Configuration Tasks</h2>
 <p>The minimal IS-IS configuration process has three or four steps:</p>
 <ul>
-<li>Start an IS-IS routing process with a global configuration command similar to <strong>router is-is</strong>. You might have to specify a <em>routing process tag</em> &ndash; usually a meaningless string, considering that many network devices can&rsquo;t run more than one IS-IS instance.</li>
+<li>Start an IS-IS routing process with a global configuration command similar to <strong>router isis</strong>. You might have to specify a <em>routing process tag</em> &ndash; a string that identifies the IS-IS instance in other configuration commands.</li>
 <li>Assign a CLNS address (NET &ndash; Network Entity Title) to the IS-IS routing process with a routing configuration command similar to <strong>net <em>address</em></strong> (<a href="#bg">more details</a>). The NET assigned to your router is <code>49.0001.0000.0000.0042.00</code></li>
-<li>Some devices want you to configure which <em>address families</em> (IPv4 or IPv6) you want to route with IS-IS. The router configuration command to do that is often <strong>address-family ipv4</strong>.</li>
 <li>Enable IS-IS routing for IPv4 on individual interfaces with an interface configuration command similar to <strong>ip router isis <em>tag</em></strong> or <strong>isis enable <em>tag</em></strong>.</li>
+<li>Some devices also want you to configure which <em>address families</em> (IPv4 or IPv6) you want to route with IS-IS. The router configuration command to do that is often <strong>address-family ipv4</strong>.</li>
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -221,7 +221,7 @@
 <p>Unfortunately, most IS-IS implementations are ancient and use defaults that might have made sense decades ago. You should also configure the following parameters<sup id="fnref:TMGT"><a class="footnote-ref" href="#fn:TMGT">1</a></sup>:</p>
 <ul>
 <li>Configure the links with two nodes attached to them as point-to-point links with an interface configuration command similar to <strong>isis network point-to-point</strong>.</li>
-<li>Configure your router to be a Level-2-Only router with the router configuration command similar to <strong>is-type level-2-only</strong>.</li>
+<li>Configure your router to be a Level-2-Only router with the router configuration command similar to <strong>is-type level-2-only</strong><sup id="fnref:NCC"><a class="footnote-ref" href="#fn:NCC">2</a></sup>.</li>
 </ul>
 <p>Finally, make sure your configuration includes these settings:</p>
 <ul>
@@ -231,7 +231,7 @@
 <h2 id="validation">Validation</h2>
 <p>You can use the <strong>netlab validate</strong> command if you&rsquo;re using <em>netlab</em> release 1.8.4 or later and run FRRouting on the external routers. This is the printout you should get after completing the lab exercise:</p>
 <p><img alt="" src="../validate-simple-ipv4.png" /></p>
-<p>You should also do basic validation on your device:</p>
+<p>You should also do basic manual validation on your device:</p>
 <ul>
 <li>Inspect IS-IS adjacencies with a command similar to <strong>show isis neighbors</strong> or <strong>show isis adjacency</strong>. Your router should have level-2 adjacencies with X1 and X2; this is the printout you should get on FRRouting:</li>
 </ul>
@@ -243,7 +243,43 @@ Area SomeTag:
  x2                  eth2        2  Up            30       2020.2020.2020
 </code></pre>
 <ul>
-<li>Inspect the IP routing table and verify that you can see three loopback prefixes (10.0.0.1/32 through 10.0.0.3/32). This is the printout you should get on FRRouting</li>
+<li>If your device has commands similar to <strong>show isis topology</strong>, <strong>show isis network topology</strong>, or <strong>show isis route</strong>, use them to display the shortest paths to other routers and the best IS-IS paths.</li>
+</ul>
+<p class="code-caption">IS-IS network topology (first part of the printout) and IPv4 routing table on FRRouting<br /></p>
+<pre><code>rtr# show isis route
+Area SomeTag:
+IS-IS paths to level-2 routers that speak IP
+Vertex               Type         Metric Next-Hop             Interface Parent
+rtr
+10.1.0.0/30          IP internal  0                                     rtr(4)
+10.1.0.4/30          IP internal  0                                     rtr(4)
+x1                   TE-IS        10     x1                   eth1      rtr(4)
+x2                   TE-IS        10     x2                   eth2      rtr(4)
+10.0.0.2/32          IP TE        20     x1                   eth1      x1(4)
+10.1.0.0/30          IP TE        20     x1                   eth1      x1(4)
+10.0.0.3/32          IP TE        20     x2                   eth2      x2(4)
+10.1.0.4/30          IP TE        20     x2                   eth2      x2(4)
+
+IS-IS L2 IPv4 routing table:
+
+ Prefix       Metric  Interface  Nexthop   Label(s)
+ ----------------------------------------------------
+ 10.0.0.2/32  20      eth1       10.1.0.2  -
+ 10.0.0.3/32  20      eth2       10.1.0.6  -
+ 10.1.0.0/30  20      eth1       10.1.0.2  -
+ 10.1.0.4/30  20      eth2       10.1.0.6  -
+</code></pre>
+<p class="code-caption">IS-IS network topology on Arista EOS<br /></p>
+<pre><code>rtr&gt;show isis network topology
+
+IS-IS Instance: SomeTag VRF: default
+  IS-IS paths to level-2 routers
+    System Id        Metric   IA Metric Next-Hop         Interface                SNPA
+    x1               10       0         x1               Ethernet1                P2P
+    x2               10       0         x2               Ethernet2                P2P
+</code></pre>
+<ul>
+<li>Finally, inspect the IP routing table and verify that you can see three loopback prefixes (10.0.0.1/32 through 10.0.0.3/32). This is the printout you should get on FRRouting</li>
 </ul>
 <p class="code-caption">IS-IS routes in the IPv4 routing table (FRRouting)<br /></p>
 <pre><code>rtr# show ip route isis
@@ -259,7 +295,7 @@ I&gt;* 10.0.0.3/32 [115/20] via 10.1.0.6, eth2, weight 1, 00:00:18
 I   10.1.0.0/30 [115/20] via 10.1.0.2, eth1 inactive, weight 1, 00:00:47
 I   10.1.0.4/30 [115/20] via 10.1.0.6, eth2 inactive, weight 1, 00:00:18
 </code></pre>
-<p>FRRouting uses the IP routing table as the repository of <em>all routes</em>, not just the <em>best routes</em>, so it displays the <em>inactive</em> IS-IS routes. Other network devices, for example Arista EOS<sup id="fnref:DP"><a class="footnote-ref" href="#fn:DP">2</a></sup>, display just the <em>active</em> IS-IS routes:</p>
+<p>FRRouting uses the IP routing table as the repository of <em>all routes</em>, not just the <em>best routes</em>, so it displays the <em>inactive</em> IS-IS routes. Other network devices, for example Arista EOS<sup id="fnref:DP"><a class="footnote-ref" href="#fn:DP">3</a></sup>, display just the <em>active</em> IS-IS routes:</p>
 <p class="code-caption">IS-IS routes in IPv4 routing table on Arista EOS<br /></p>
 <pre><code>rtr#show ip route isis detail|begin Priority
 Priority Codes:
@@ -272,16 +308,16 @@ Priority Codes:
 </code></pre>
 <p><strong>Next:</strong> <a href="../2-explore/">Explore IS-IS Data Structures</a>. That lab uses the same topology and device configurations, so you can keep going without restarting the lab.</p>
 <h2 id="bg">Background Information</h2>
-<p>IS-IS was designed to be the routing protocol for the ISO/OSI protocol stack. Its name is derived from ISO terminology: IS stands for Intermediate System (the device also known as <em>router</em>, <em>gateway</em> or <em>layer-3 switch</em>). Thus, IS-IS is the protocol that runs between Intermediate Systems.</p>
-<p>While ISO designed IS-IS to be used with CLNP, its data structures (everything is CLV<sup id="fnref:TLV"><a class="footnote-ref" href="#fn:TLV">3</a></sup>-based) made it easy to extend, and so IETF quickly specified how to use IS-IS for IPv4 and (later) IPv6 routing.</p>
-<p>IS-IS does not run on top of another layer-3 protocol like OSPF or BGP run on top of IP; it uses <a href="https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/">a separate layer-3 protocol and a dedicated 802.1 SAP</a>. You cannot use the standard IP access control mechanisms with IS-IS; on the other hand, it&rsquo;s impossible to spoof IS-IS messages if the intruder does not have access to the underlying layer-2 infrastructure.</p>
-<p>IS-IS addressing follows the OSI addressing principles. Network addresses (Network Service Access Points &ndash; NSAPs) are <a href="https://blog.ipspace.net/2024/02/interface-node-addresses/">assigned to <em>nodes</em>, not <em>interfaces</em></a>. OSI protocol suite used <em>variable-length</em> addresses, and according to the (<a href="https://www.rfc-editor.org/rfc/rfc1142.html">poorly formatted copy of</a>) IS-IS specifications, the NET is split into three parts:</p>
+<p>IS-IS was designed to be the routing protocol for the ISO/OSI protocol stack. Its name is derived from ISO terminology: IS stands for Intermediate System (the device also known as <em>router</em>, <em>gateway</em> or <em>layer-3 switch</em>). Thus, IS-IS is the protocol that runs between Intermediate Systems (in other words, the router-to-router protocol).</p>
+<p>While ISO designed IS-IS to be used with CLNP, its data structures (everything is CLV<sup id="fnref:TLV"><a class="footnote-ref" href="#fn:TLV">4</a></sup>-based) made it easy to extend, and so IETF quickly specified how to use IS-IS for IPv4 and (later) IPv6 routing.</p>
+<p>IS-IS does not run on top of another layer-3 protocol like OSPF or BGP run on top of IP; it is an independent protocol at layer-3 and uses a dedicated 802.1 SAP (<a href="https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/">more details</a>). You cannot use the standard IP access control mechanisms with IS-IS; on the other hand, it&rsquo;s impossible to spoof IS-IS messages if the intruder does not have access to the underlying layer-2 infrastructure.</p>
+<p>IS-IS addressing follows the OSI addressing principles. Network addresses (Network Service Access Points &ndash; NSAPs) are <a href="https://blog.ipspace.net/2024/02/interface-node-addresses/">assigned to <em>nodes</em>, not <em>interfaces</em></a>. OSI protocol suite used <em>variable-length</em> addresses, and according to the (<a href="https://www.rfc-editor.org/rfc/rfc1142.html">poorly formatted copy of</a>) IS-IS specifications, the NET is split into three parts (you&rsquo;ll find more details in <a href="https://www.rfc-editor.org/rfc/rfc1237">RFC 1237</a>):</p>
 <pre><code>+--------+-----------+----+
 |   Area | System-ID | NS |
 +--------+-----------+----+
 </code></pre>
 <ul>
-<li>The NSAP Selector specifies the software entity on the node that should receive the packet (similar to the TCP/UDP/OSPF protocol type within the IPv4 header). IS-IS uses NSAP selector value zero and calls the resulting address Network Entity Title (NET). Thus, the last byte of NET always has to be zero.</li>
+<li>The NSAP Selector (the last byte) specifies the software entity on the node that should receive the packet (similar to the TCP/UDP/OSPF protocol type within the IPv4 header). IS-IS uses NSAP selector value zero and calls the resulting address Network Entity Title (NET). Thus, the last byte of NET always has to be zero.</li>
 <li>The System ID (node address within an area, similar to the subnet part of an IP address) is one to eight bytes long. Subsequent parts of IS-IS specification assume a 6-byte System ID (12 hexadecimal characters), and that&rsquo;s what all implementations use.</li>
 <li>The Area is whatever is left on the left-hand side of the NET after you take away the rightmost seven bytes.</li>
 </ul>
@@ -291,8 +327,8 @@ Priority Codes:
 <li>Subsequent dots have to be four characters left of the previous dot, resulting in two dots within the System ID and a dot between the node System ID and the IS-IS area.</li>
 </ul>
 <p>For example, the NET we used in this lab (<code>49000100000000004200</code>)has to be written as <code>49.0001.0000.0000.0042.00</code>.</p>
-<p>The area address could have any length<sup id="fnref:MBSL"><a class="footnote-ref" href="#fn:MBSL">4</a></sup> as long as it&rsquo;s specified as a whole number of bytes (an even number of digits). IS-IS doesn&rsquo;t care about the contents of the area address. If two routers have the value in that part of the NET, they belong to the same area; if not, they don&rsquo;t.</p>
-<p>Finally, other ISO standards define the meaning of the leftmost part of a network address (NSAP). The first (leftmost) byte is the Authority and Format Identifier (AFI), and the value <code>49</code> indicates <em>private address space</em> (similar to <a href="https://datatracker.ietf.org/doc/html/rfc1918">RFC 1918</a> IPv4 address space) (see <a href="https://datatracker.ietf.org/doc/html/rfc1629">RFC 1629</a> for more details). Using two bytes as the area ID usually makes sense, and that&rsquo;s why most NETs you find in online examples start with 49.0001 ;)</p>
+<p>The area address could have any length<sup id="fnref:MBSL"><a class="footnote-ref" href="#fn:MBSL">5</a></sup> as long as it&rsquo;s specified as a whole number of bytes (an even number of digits). IS-IS doesn&rsquo;t care about the contents of the area address. If two routers have the value in that part of the NET, they belong to the same area; if not, they don&rsquo;t.</p>
+<p>Finally, other ISO standards define the meaning of the leftmost part of a network address (NSAP). The first (leftmost) byte is the Authority and Format Identifier (AFI), and the value <code>49</code> indicates <em>private address space</em> (similar to <a href="https://datatracker.ietf.org/doc/html/rfc1918">RFC 1918</a> IPv4 address space) (see <a href="https://datatracker.ietf.org/doc/html/rfc1629">RFC 1629</a> for more details). Using two bytes as the area ID usually makes sense, and that&rsquo;s why most NETs you find in online examples start with 49.0001 ;)<sup id="fnref:EDAD"><a class="footnote-ref" href="#fn:EDAD">6</a></sup></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -381,14 +417,20 @@ Priority Codes:
 <li id="fn:TMGT">
 <p>Trust me for the moment; we&rsquo;ll discuss them in great detail in subsequent lab exercises.&#160;<a class="footnote-backref" href="#fnref:TMGT" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
+<li id="fn:NCC">
+<p>You don&rsquo;t have to configure the interface <strong>circuit-type</strong> once you configured the device to be a <strong>level-2-only</strong> router. A <strong>level-2-only</strong> router will never send level-1 hellos.&#160;<a class="footnote-backref" href="#fnref:NCC" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
 <li id="fn:DP">
-<p>The <strong>detail</strong> option of the <strong>show ip route</strong> command includes the interface description, and the <code>|begin Priority</code> output filter removes the legend.&#160;<a class="footnote-backref" href="#fnref:DP" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>The <strong>detail</strong> option of the <strong>show ip route</strong> command includes the interface description, and the <code>|begin Priority</code> output filter removes the legend.&#160;<a class="footnote-backref" href="#fnref:DP" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:TLV">
-<p>Code/Length/Value: every bit of information starts with a <em>code</em> (one byte), followed by <em>length</em> (one byte) and the actual value. This encoding approach is more commonly called TLV (Type/Length/Value).&#160;<a class="footnote-backref" href="#fnref:TLV" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>Code/Length/Value: every bit of information starts with a <em>code</em> (one byte), followed by <em>length</em> (one byte) and the actual value. This encoding approach is more commonly called TLV (Type/Length/Value).&#160;<a class="footnote-backref" href="#fnref:TLV" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 <li id="fn:MBSL">
-<p>There must be some upper limit.&#160;<a class="footnote-backref" href="#fnref:MBSL" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>There must be some upper limit.&#160;<a class="footnote-backref" href="#fnref:MBSL" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:EDAD">
+<p>In the early days of IS-IS, when people still believed that the OSI protocol stack (with CLNS at layer-3) might win the protocol wars, service providers used official NSAP prefixes allocated by government agencies (see <a href="https://www.rfc-editor.org/rfc/rfc1237">RFC 1237 for details</a>). CLNS is long gone, and we only need NETs to address IS-IS routers. Area 49.0001 is good enough for that. You can also use Area 51 if you&rsquo;re so inclined (yes, it works; IS-IS does not care about the contents of the area field).&#160;<a class="footnote-backref" href="#fnref:EDAD" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
