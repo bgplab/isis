@@ -36,10 +36,16 @@ Unfortunately, most IS-IS implementations are ancient and use defaults that migh
 
 [^TMGT]: Trust me for the moment; we'll discuss them in great detail in subsequent lab exercises.
 
-* Configure the links with two nodes attached to them as point-to-point links with an interface configuration command similar to **isis network point-to-point**.
-* Configure your router to be a Level-2-Only router with the router configuration command similar to **is-type level-2-only**[^NCC].
+* Configure the links with two nodes attached to them as point-to-point links with an interface configuration command similar to **isis network point-to-point** (more details in [IS-IS on Point-to-Point Links](3-p2p.md))
+* Configure your router to be a Level-2-Only router with the router configuration command similar to **is-type level-2-only**[^NCC] (more details in [Optimize Simple IS-IS Deployments](6-level-2.md)).
+* On some devices, you'll have to configure *wide* metrics with a router configuration command similar to **metric-style wide**[^MSW] (more details in [Using IS-IS Metrics](4-metric.md)).
+* Finally, you might have to configure the standard point-to-point three-way handshake on Cisco IOSv[^PS3W]. The interface configuration command to do that is **‌isis three-way-handshake ietf**.
 
 [^NCC]: You don't have to configure the interface **circuit-type** once you configured the device to be a **level-2-only** router. A **level-2-only** router will never send level-1 hellos.
+
+[^PS3W]: The IOSv image on which I had to do that was obviously ancient but still 13 years younger than the [RFC 3373](https://datatracker.ietf.org/doc/html/rfc3373) that standardized the three-way handshake.
+
+[^MSW]: As crazy as it sounds, some devices still use the ancient *narrow* metrics as the default setting 20 years after the *wide* metrics were defined in [RFC 3784](https://www.rfc-editor.org/rfc/rfc3784).
 
 Finally, make sure your configuration includes these settings:
 
