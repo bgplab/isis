@@ -220,8 +220,10 @@
 </div>
 <p>Unfortunately, most IS-IS implementations are ancient and use defaults that might have made sense decades ago. You should also configure the following parameters<sup id="fnref:TMGT"><a class="footnote-ref" href="#fn:TMGT">1</a></sup>:</p>
 <ul>
-<li>Configure the links with two nodes attached to them as point-to-point links with an interface configuration command similar to <strong>isis network point-to-point</strong>.</li>
-<li>Configure your router to be a Level-2-Only router with the router configuration command similar to <strong>is-type level-2-only</strong><sup id="fnref:NCC"><a class="footnote-ref" href="#fn:NCC">2</a></sup>.</li>
+<li>Configure the links with two nodes attached to them as point-to-point links with an interface configuration command similar to <strong>isis network point-to-point</strong> (more details in <a href="../3-p2p/">IS-IS on Point-to-Point Links</a>)</li>
+<li>Configure your router to be a Level-2-Only router with the router configuration command similar to <strong>is-type level-2-only</strong><sup id="fnref:NCC"><a class="footnote-ref" href="#fn:NCC">2</a></sup> (more details in <a href="../6-level-2/">Optimize Simple IS-IS Deployments</a>).</li>
+<li>On some devices, you&rsquo;ll have to configure <em>wide</em> metrics with a router configuration command similar to <strong>metric-style wide</strong><sup id="fnref:MSW"><a class="footnote-ref" href="#fn:MSW">4</a></sup> (more details in <a href="../4-metric/">Using IS-IS Metrics</a>).</li>
+<li>Finally, you might have to configure the standard point-to-point three-way handshake on Cisco IOSv<sup id="fnref:PS3W"><a class="footnote-ref" href="#fn:PS3W">3</a></sup>. The interface configuration command to do that is <strong>‌isis three-way-handshake ietf</strong>.</li>
 </ul>
 <p>Finally, make sure your configuration includes these settings:</p>
 <ul>
@@ -295,7 +297,7 @@ I&gt;* 10.0.0.3/32 [115/20] via 10.1.0.6, eth2, weight 1, 00:00:18
 I   10.1.0.0/30 [115/20] via 10.1.0.2, eth1 inactive, weight 1, 00:00:47
 I   10.1.0.4/30 [115/20] via 10.1.0.6, eth2 inactive, weight 1, 00:00:18
 </code></pre>
-<p>FRRouting uses the IP routing table as the repository of <em>all routes</em>, not just the <em>best routes</em>, so it displays the <em>inactive</em> IS-IS routes. Other network devices, for example Arista EOS<sup id="fnref:DP"><a class="footnote-ref" href="#fn:DP">3</a></sup>, display just the <em>active</em> IS-IS routes:</p>
+<p>FRRouting uses the IP routing table as the repository of <em>all routes</em>, not just the <em>best routes</em>, so it displays the <em>inactive</em> IS-IS routes. Other network devices, for example Arista EOS<sup id="fnref:DP"><a class="footnote-ref" href="#fn:DP">5</a></sup>, display just the <em>active</em> IS-IS routes:</p>
 <p class="code-caption">IS-IS routes in IPv4 routing table on Arista EOS<br /></p>
 <pre><code>rtr#show ip route isis detail|begin Priority
 Priority Codes:
@@ -309,7 +311,7 @@ Priority Codes:
 <p><strong>Next:</strong> <a href="../2-explore/">Explore IS-IS Data Structures</a>. That lab uses the same topology and device configurations, so you can keep going without restarting the lab.</p>
 <h2 id="bg">Background Information</h2>
 <p>IS-IS was designed to be the routing protocol for the ISO/OSI protocol stack. Its name is derived from ISO terminology: IS stands for Intermediate System (the device also known as <em>router</em>, <em>gateway</em> or <em>layer-3 switch</em>). Thus, IS-IS is the protocol that runs between Intermediate Systems (in other words, the router-to-router protocol).</p>
-<p>While ISO designed IS-IS to be used with CLNP, its data structures (everything is CLV<sup id="fnref:TLV"><a class="footnote-ref" href="#fn:TLV">4</a></sup>-based) made it easy to extend, and so IETF quickly specified how to use IS-IS for IPv4 and (later) IPv6 routing.</p>
+<p>While ISO designed IS-IS to be used with CLNP, its data structures (everything is CLV<sup id="fnref:TLV"><a class="footnote-ref" href="#fn:TLV">6</a></sup>-based) made it easy to extend, and so IETF quickly specified how to use IS-IS for IPv4 and (later) IPv6 routing.</p>
 <p>IS-IS does not run on top of another layer-3 protocol like OSPF or BGP run on top of IP; it is an independent protocol at layer-3 and uses a dedicated 802.1 SAP (<a href="https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/">more details</a>). You cannot use the standard IP access control mechanisms with IS-IS; on the other hand, it&rsquo;s impossible to spoof IS-IS messages if the intruder does not have access to the underlying layer-2 infrastructure.</p>
 <p>IS-IS addressing follows the OSI addressing principles. Network addresses (Network Service Access Points &ndash; NSAPs) are <a href="https://blog.ipspace.net/2024/02/interface-node-addresses/">assigned to <em>nodes</em>, not <em>interfaces</em></a>. OSI protocol suite used <em>variable-length</em> addresses, and according to the (<a href="https://www.rfc-editor.org/rfc/rfc1142.html">poorly formatted copy of</a>) IS-IS specifications, the NET is split into three parts (you&rsquo;ll find more details in <a href="https://www.rfc-editor.org/rfc/rfc1237">RFC 1237</a>):</p>
 <pre><code>+--------+-----------+----+
@@ -327,8 +329,8 @@ Priority Codes:
 <li>Subsequent dots have to be four characters left of the previous dot, resulting in two dots within the System ID and a dot between the node System ID and the IS-IS area.</li>
 </ul>
 <p>For example, the NET we used in this lab (<code>49000100000000004200</code>)has to be written as <code>49.0001.0000.0000.0042.00</code>.</p>
-<p>The area address could have any length<sup id="fnref:MBSL"><a class="footnote-ref" href="#fn:MBSL">5</a></sup> as long as it&rsquo;s specified as a whole number of bytes (an even number of digits). IS-IS doesn&rsquo;t care about the contents of the area address. If two routers have the value in that part of the NET, they belong to the same area; if not, they don&rsquo;t.</p>
-<p>Finally, other ISO standards define the meaning of the leftmost part of a network address (NSAP). The first (leftmost) byte is the Authority and Format Identifier (AFI), and the value <code>49</code> indicates <em>private address space</em> (similar to <a href="https://datatracker.ietf.org/doc/html/rfc1918">RFC 1918</a> IPv4 address space) (see <a href="https://datatracker.ietf.org/doc/html/rfc1629">RFC 1629</a> for more details). Using two bytes as the area ID usually makes sense, and that&rsquo;s why most NETs you find in online examples start with 49.0001 ;)<sup id="fnref:EDAD"><a class="footnote-ref" href="#fn:EDAD">6</a></sup></p>
+<p>The area address could have any length<sup id="fnref:MBSL"><a class="footnote-ref" href="#fn:MBSL">7</a></sup> as long as it&rsquo;s specified as a whole number of bytes (an even number of digits). IS-IS doesn&rsquo;t care about the contents of the area address. If two routers have the value in that part of the NET, they belong to the same area; if not, they don&rsquo;t.</p>
+<p>Finally, other ISO standards define the meaning of the leftmost part of a network address (NSAP). The first (leftmost) byte is the Authority and Format Identifier (AFI), and the value <code>49</code> indicates <em>private address space</em> (similar to <a href="https://datatracker.ietf.org/doc/html/rfc1918">RFC 1918</a> IPv4 address space) (see <a href="https://datatracker.ietf.org/doc/html/rfc1629">RFC 1629</a> for more details). Using two bytes as the area ID usually makes sense, and that&rsquo;s why most NETs you find in online examples start with 49.0001 ;)<sup id="fnref:EDAD"><a class="footnote-ref" href="#fn:EDAD">8</a></sup></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -420,17 +422,23 @@ Priority Codes:
 <li id="fn:NCC">
 <p>You don&rsquo;t have to configure the interface <strong>circuit-type</strong> once you configured the device to be a <strong>level-2-only</strong> router. A <strong>level-2-only</strong> router will never send level-1 hellos.&#160;<a class="footnote-backref" href="#fnref:NCC" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
+<li id="fn:PS3W">
+<p>The IOSv image on which I had to do that was obviously ancient but still 13 years younger than the <a href="https://datatracker.ietf.org/doc/html/rfc3373">RFC 3373</a> that standardized the three-way handshake.&#160;<a class="footnote-backref" href="#fnref:PS3W" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MSW">
+<p>As crazy as it sounds, some devices still use the ancient <em>narrow</em> metrics as the default setting 20 years after the <em>wide</em> metrics were defined in <a href="https://www.rfc-editor.org/rfc/rfc3784">RFC 3784</a>.&#160;<a class="footnote-backref" href="#fnref:MSW" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
 <li id="fn:DP">
-<p>The <strong>detail</strong> option of the <strong>show ip route</strong> command includes the interface description, and the <code>|begin Priority</code> output filter removes the legend.&#160;<a class="footnote-backref" href="#fnref:DP" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>The <strong>detail</strong> option of the <strong>show ip route</strong> command includes the interface description, and the <code>|begin Priority</code> output filter removes the legend.&#160;<a class="footnote-backref" href="#fnref:DP" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 <li id="fn:TLV">
-<p>Code/Length/Value: every bit of information starts with a <em>code</em> (one byte), followed by <em>length</em> (one byte) and the actual value. This encoding approach is more commonly called TLV (Type/Length/Value).&#160;<a class="footnote-backref" href="#fnref:TLV" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>Code/Length/Value: every bit of information starts with a <em>code</em> (one byte), followed by <em>length</em> (one byte) and the actual value. This encoding approach is more commonly called TLV (Type/Length/Value).&#160;<a class="footnote-backref" href="#fnref:TLV" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
 <li id="fn:MBSL">
-<p>There must be some upper limit.&#160;<a class="footnote-backref" href="#fnref:MBSL" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<p>There must be some upper limit.&#160;<a class="footnote-backref" href="#fnref:MBSL" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 <li id="fn:EDAD">
-<p>In the early days of IS-IS, when people still believed that the OSI protocol stack (with CLNS at layer-3) might win the protocol wars, service providers used official NSAP prefixes allocated by government agencies (see <a href="https://www.rfc-editor.org/rfc/rfc1237">RFC 1237 for details</a>). CLNS is long gone, and we only need NETs to address IS-IS routers. Area 49.0001 is good enough for that. You can also use Area 51 if you&rsquo;re so inclined (yes, it works; IS-IS does not care about the contents of the area field).&#160;<a class="footnote-backref" href="#fnref:EDAD" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+<p>In the early days of IS-IS, when people still believed that the OSI protocol stack (with CLNS at layer-3) might win the protocol wars, service providers used official NSAP prefixes allocated by government agencies (see <a href="https://www.rfc-editor.org/rfc/rfc1237">RFC 1237 for details</a>). CLNS is long gone, and we only need NETs to address IS-IS routers. Area 49.0001 is good enough for that. You can also use Area 51 if you&rsquo;re so inclined (yes, it works; IS-IS does not care about the contents of the area field).&#160;<a class="footnote-backref" href="#fnref:EDAD" title="Jump back to footnote 8 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
