@@ -1,6 +1,6 @@
 # Using IS-IS Metrics
 
-Like OSPF, IS-IS uses interface costs (called *metrics*) to calculate the best path toward destination IP prefixes. Unlike OSPF, the default metrics are fixes (usually set to 10) and do not reflect the interface bandwidth.
+Like OSPF, IS-IS uses interface costs (called *link metrics*) to calculate the best path toward destination IP prefixes. Unlike OSPF, the default metrics are fixed (usually set to 10) and do not reflect the interface bandwidth.
 
 For example, in the following topology, using the default IS-IS settings, the traffic between R1 and R3 would use the direct low-speed link. We'll fix that in this lab exercise.
 
@@ -121,15 +121,18 @@ I>* 10.0.0.3/32 [115/30] via 10.1.0.2, eth1, weight 1, 00:02:53
 
 Did you notice the *Extended Reachability* and *Extended IP Reachability* headings in the LSP printouts? Here's the full story:
 
-* Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost could not exceed 1023[^SPF]. Today, we call those metrics **narrow** metrics.
-* When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. [RFC 3784](https://www.rfc-editor.org/rfc/rfc3784) defined 24-bit metrics (we call them **wide** metrics). That's what most implementations use today.
-* Some networks had to transition from *narrow* to *wide* metrics, and the solution was to advertise both sets of metrics until all devices in the network understand *wide* metrics. Some vendors call that approach *transition* metrics.
+* Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost (*path cost*) could not exceed 1023[^SPF]. Today, we call those metrics **narrow** metrics.
+* When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. [RFC 3784](https://www.rfc-editor.org/rfc/rfc3784) defined 24-bit metrics (we call them **wide** metrics). That's what most deployments use today.
+* All existing IS-IS networks that wanted to use the *wide* metrics had to transition from *narrow* to *wide* metrics, usually while keeping the network operational. The solution was to advertise both sets of metrics until all network devices understand *wide* metrics. Some vendors call that approach *transition* metrics.
 
-[^SPF]: Supposedly, someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.
+[^SPF]: Someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.
 
 !!! tip
-    I haven't seen an IS-IS implementation that would not understand the *narrow* metrics, and all recent implementations support *wide* metrics (they've been around for 20 years). You have to use the *transition* metrics only when you have an ancient device in your network that does not understand the *wide* metrics.
-    
+    I haven't seen an IS-IS implementation that doesn't understand the *narrow* metrics, and all recent implementations support *wide* metrics (they've been around for 20 years). Sadly, many devices use *narrow* metrics as the default; you should immediately change that to *wide*.
+
+!!! warning
+    You'll get weird results if some devices in your network support only *narrow* metrics while others advertise only *wide* metrics. If you have devices that do not understand the *wide* metrics, keep using the *narrow* metrics; otherwise, ensure all devices use only *wide* metrics.
+
 Let's try to reproduce the world we lived in around the turn of the millennium. FRRouting has a **metric-style** router configuration command. Let's set it to **narrow** on R1 and see what happens to the R1 LSP:
 
 ```
