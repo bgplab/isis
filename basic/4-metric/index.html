@@ -194,7 +194,7 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="using-is-is-metrics">Using IS-IS Metrics</h1>
-<p>Like OSPF, IS-IS uses interface costs (called <em>metrics</em>) to calculate the best path toward destination IP prefixes. Unlike OSPF, the default metrics are fixes (usually set to 10) and do not reflect the interface bandwidth.</p>
+<p>Like OSPF, IS-IS uses interface costs (called <em>link metrics</em>) to calculate the best path toward destination IP prefixes. Unlike OSPF, the default metrics are fixed (usually set to 10) and do not reflect the interface bandwidth.</p>
 <p>For example, in the following topology, using the default IS-IS settings, the traffic between R1 and R3 would use the direct low-speed link. We&rsquo;ll fix that in this lab exercise.</p>
 <p><img alt="Lab topology" src="../topology-triangle.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
@@ -285,13 +285,17 @@ I&gt;* 10.0.0.3/32 [115/30] via 10.1.0.2, eth1, weight 1, 00:02:53
 <h2 id="narrow-wide-and-transitional-metrics">Narrow, Wide, and Transitional Metrics</h2>
 <p>Did you notice the <em>Extended Reachability</em> and <em>Extended IP Reachability</em> headings in the LSP printouts? Here&rsquo;s the full story:</p>
 <ul>
-<li>Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost could not exceed 1023<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">3</a></sup>. Today, we call those metrics <strong>narrow</strong> metrics.</li>
-<li>When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. <a href="https://www.rfc-editor.org/rfc/rfc3784">RFC 3784</a> defined 24-bit metrics (we call them <strong>wide</strong> metrics). That&rsquo;s what most implementations use today.</li>
-<li>Some networks had to transition from <em>narrow</em> to <em>wide</em> metrics, and the solution was to advertise both sets of metrics until all devices in the network understand <em>wide</em> metrics. Some vendors call that approach <em>transition</em> metrics.</li>
+<li>Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost (<em>path cost</em>) could not exceed 1023<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">3</a></sup>. Today, we call those metrics <strong>narrow</strong> metrics.</li>
+<li>When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. <a href="https://www.rfc-editor.org/rfc/rfc3784">RFC 3784</a> defined 24-bit metrics (we call them <strong>wide</strong> metrics). That&rsquo;s what most deployments use today.</li>
+<li>All existing IS-IS networks that wanted to use the <em>wide</em> metrics had to transition from <em>narrow</em> to <em>wide</em> metrics, usually while keeping the network operational. The solution was to advertise both sets of metrics until all network devices understand <em>wide</em> metrics. Some vendors call that approach <em>transition</em> metrics.</li>
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>I haven&rsquo;t seen an IS-IS implementation that would not understand the <em>narrow</em> metrics, and all recent implementations support <em>wide</em> metrics (they&rsquo;ve been around for 20 years). You have to use the <em>transition</em> metrics only when you have an ancient device in your network that does not understand the <em>wide</em> metrics.</p>
+<p>I haven&rsquo;t seen an IS-IS implementation that doesn&rsquo;t understand the <em>narrow</em> metrics, and all recent implementations support <em>wide</em> metrics (they&rsquo;ve been around for 20 years). Sadly, many devices use <em>narrow</em> metrics as the default; you should immediately change that to <em>wide</em>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You&rsquo;ll get weird results if some devices in your network support only <em>narrow</em> metrics while others advertise only <em>wide</em> metrics. If you have devices that do not understand the <em>wide</em> metrics, keep using the <em>narrow</em> metrics; otherwise, ensure all devices use only <em>wide</em> metrics.</p>
 </div>
 <p>Let&rsquo;s try to reproduce the world we lived in around the turn of the millennium. FRRouting has a <strong>metric-style</strong> router configuration command. Let&rsquo;s set it to <strong>narrow</strong> on R1 and see what happens to the R1 LSP:</p>
 <pre><code>r1# show isis database detail r1.00-00
@@ -445,7 +449,7 @@ r1.00-00             *    175   0x0000000a  0x7dab    1785    0/0/0
 <p>IS-IS can use different metrics for L1 and L2 adjacencies. Don&rsquo;t waste your time on that detail, and I hope you&rsquo;ll never see a network using it outside of a CCIE lab.&#160;<a class="footnote-backref" href="#fnref:L1L2M" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:SPF">
-<p>Supposedly, someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>Someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
