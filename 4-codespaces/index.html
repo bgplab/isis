@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,9 +10,13 @@
         <link rel="shortcut icon" href="../img/favicon.ico">
   <title>Use GitHub Codespaces &#171; IS-IS Labs</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
-        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script> 
     </head>
@@ -22,7 +26,7 @@
             <div class="container">
                 <a class="navbar-brand" href="..">IS-IS Labs</a>
                 <!-- Expander button -->
-                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -30,8 +34,8 @@
                 <div id="navbar-collapse" class="navbar-collapse collapse">
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Home <b class="caret"></b></a>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Home</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
@@ -43,8 +47,8 @@
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown active">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Installation <b class="caret"></b></a>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
@@ -52,12 +56,12 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active">Use GitHub Codespaces</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Use GitHub Codespaces</a>
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Basics <b class="caret"></b></a>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Basics</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
@@ -93,8 +97,8 @@
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Upcoming <b class="caret"></b></a>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Upcoming</a>
                                 <ul class="dropdown-menu">
                                     
 <li>
@@ -104,9 +108,9 @@
                             </li>
                         </ul>
 
-                    <ul class="nav navbar-nav ml-auto">
+                    <ul class="nav navbar-nav ms-md-auto">
                         <li class="nav-item">
-                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
                                 <i class="fa fa-search"></i> Search
                             </a>
                         </li>
@@ -217,16 +221,41 @@
 <p><a href="../img/codespaces-start.png"><img alt="" src="../img/codespaces-start.png" /></a></p>
 <h2 id="select-lab-devices">Select Lab Devices</h2>
 <p>The IS-IS labs repository uses FRRouting containers as the default device. To change the device settings, edit the <code>defaults.yml</code> file with <code>vi</code> or <code>nano</code>.</p>
+<ul>
+<li>It&rsquo;s best to use network devices with free-to-download container images:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Device</th>
+<th>Device type to use in <code>defaults.yml</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FRRouting</td>
+<td>frr</td>
+</tr>
+<tr>
+<td>Nokia SR Linux</td>
+<td>srlinux</td>
+</tr>
+<tr>
+<td>VyOS</td>
+<td>vyos</td>
+</tr>
+</tbody>
+</table>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
+<p>Start with the <a href="../basic/0-frrouting/">Configuring IS-IS on FRRouting</a> exercise if you want to use the default settings but never worked with FRRouting before.</p>
+</div>
 <ul>
-<li>It&rsquo;s best to use network devices with free-to-download container images (FRRouting, Nokia SR Linux, Vyos).</li>
-<li>Use FRRouting containers to use the 2 CPU/8 GB codespaces VM with larger labs.</li>
+<li>Use FRRouting to use the 2 CPU/8 GB codespaces VM with more extensive labs.</li>
 <li>Codespaces have persistent storage; you can <a href="https://blog.ipspace.net/2024/07/arista-eos-codespaces/">download and install other containers</a>.</li>
 <li>To use containers that have to be downloaded from the vendors&rsquo; website, download them onto your laptop, <a href="https://blog.ipspace.net/2024/07/arista-eos-codespaces/">drag-and-drop them into the Folders</a>, and install them <a href="https://netlab.tools/labs/clab/#container-images">like you would on a local netlab instance</a>.</li>
 <li>You cannot run virtual machines in codespaces (yet?). This also precludes running VMs in virtual machines (the vrnetlab approach).</li>
 </ul>
-</div>
 <h2 id="start-a-lab">Start a Lab</h2>
 <p>Once you have the codespaces up and running:</p>
 <ul>
@@ -260,8 +289,7 @@
 <hr>
     <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
         </footer>
-        <script src="../js/jquery-3.6.0.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../js/bootstrap.bundle.min.js"></script>
         <script>
             var base_url = "..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
@@ -274,7 +302,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="searchModalLabel">Search</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>From here you can search these documents. Enter your search terms below.</p>
@@ -294,7 +322,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <table class="table">
