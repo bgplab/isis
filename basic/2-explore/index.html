@@ -394,7 +394,7 @@ Gandalf   default  x1               L2   Ethernet1          P2P               UP
 <p class="admonition-title">Tip</p>
 <p>A quickly increasing LSP sequence number might indicate routing instabilities.</p>
 </div>
-<p class="code-caption">The IS-IS topology database overview displayed by FRRouting<br /></p>
+<p class="code-caption">The LSP database overview displayed by FRRouting<br /></p>
 <pre><code>$ netlab connect rtr --show isis database
 Area Gandalf:
 IS-IS Level-2 link-state database:
@@ -404,7 +404,7 @@ x1.00-00                   92   0x00000002  0x23a0    1659    0/0/0
 x2.00-00                   92   0x00000002  0xc8f0    1633    0/0/0
     3 LSPs
 </code></pre>
-<p class="code-caption">The IS-IS topology database overview displayed by Arista cEOS<br /></p>
+<p class="code-caption">The IS-IS LSP database overview displayed by Arista cEOS<br /></p>
 <pre><code>rtr&gt;show isis database
 Legend:
 H - hostname conflict
