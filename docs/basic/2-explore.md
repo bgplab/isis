@@ -248,7 +248,7 @@ You can inspect the IS-IS topology database with a command similar to **show isi
 !!! tip
     A quickly increasing LSP sequence number might indicate routing instabilities.
 
-The IS-IS topology database overview displayed by FRRouting
+The LSP database overview displayed by FRRouting
 {: .code-caption }
 ```
 $ netlab connect rtr --show isis database
@@ -261,7 +261,7 @@ x2.00-00                   92   0x00000002  0xc8f0    1633    0/0/0
     3 LSPs
 ```
 
-The IS-IS topology database overview displayed by Arista cEOS
+The IS-IS LSP database overview displayed by Arista cEOS
 {: .code-caption }
 ```
 rtr>show isis database
