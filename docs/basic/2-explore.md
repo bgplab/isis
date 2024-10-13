@@ -12,13 +12,11 @@ Use any device [supported by the _netlab_ IS-IS configuration module](https://ne
 
 ## Starting the Lab
 
-Assuming you already [set up your lab infrastructure](../1-setup.md):
+You can start the lab [on your own lab infrastructure](../1-setup.md) or in [GitHub Codespaces](https://github.com/codespaces/new/bgplab/isis) ([more details](../4-codespaces.md)):
 
 * Change directory to `basic/2-explore`
-* Execute **netlab up**
+* Execute **netlab up**. You'll get a lab with IPv4 addresses and IS-IS routing configured on all lab devices.
 * Log into your device (RTR) with **netlab connect rtr**
-
-You'll get a lab with IPv4 addresses and IS-IS routing configured on all lab devices.
 
 ## Explore Router Configuration
 
@@ -27,7 +25,7 @@ Unless you're absolutely sure how your router is configured, always start with a
 The most significant bits of information include:
 
 * **NET**, which can be split into **area** and **system ID**. Some devices display NET; others display the IS-IS area and the system ID as independent components.
-* The address families (IPv4, IPv6)
+* The address families (CLNP/NSAPs, IPv4, IPv6, IP multicast)
 * Router type: intra-area router (level-1), inter-area router (level-2) or multi-level router[^ABR] (level-1-2, sometimes shown as level-3 because 1+2=3).
 
 [^ABR]: Similar, but not exactly equivalent to OSPF ABR
@@ -110,7 +108,7 @@ IS-IS high-level principles are similar to OSPF ones:
 
 * A hello protocol is used to discover neighbors. Unlike OSPF, which uses IP as a layer-3 protocol, IS-IS uses its own layer-3 protocol (IS-IS hello packets are encapsulated directly into layer-2 frames; [more details](https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/)).
 * Once the neighbors are discovered, an adjacency is established with them.
-* Neighbors exchange the contents of their LSP database[^CSNP] and, based on the results of that exchange, any missing LSPs.
+* Neighbors exchange the description (table-of-contents) of their LSP database[^CSNP] and, based on the results of that exchange, any missing LSPs.
 
 [^CSNP]: Using the Complete Sequence Number Packets (CSNP) -- a list of LSP descriptors (objects containing LSP-ID, LSP sequence number, remaining lifetime, and checksum).
 
@@ -118,7 +116,7 @@ Examining IS-IS neighbors is thus the next logical step after examining the loca
 
 * The local interface
 * Neighbor name or system ID. Most modern IS-IS implementations display neighbor names[^RFC5301].
-* The state of adjacency (it should be *Up*)
+* The state of adjacency (it should be *Up*, but could also be *Down* or *Init*)
 * The type of adjacency: intra-area adjacency (level-1), inter-area adjacency (level-2) or multi-level adjacency (level-1-2)[^MLNA].
 * Remote MAC address (SNPA[^SNPA]). The remote MAC address is sometimes displayed as `2020.2020.2020` on point-to-point links.
 
@@ -212,11 +210,13 @@ Gandalf   default  x1               L2   Ethernet1          P2P               UP
 
 ## Explore IS-IS LSP Database {#lspdb}
 
-Like OSPF (with its topology database), IS-IS uses an *LSP database[^LSP]* (LSPDB). LSPDB is not a true database; it's a distributed, eventually consistent[^EC] key-value store shared among all routers in an area or among all inter-area routers.
+Like OSPF (with its topology database), IS-IS uses an *LSP database[^LSP]* (LSPDB). LSPDB is not a true database; it's a distributed eventually-consistent[^EC] key-value store[^KVS] shared among all routers in an area or among all inter-area routers.
 
 [^LSP]: LSP (Link-State Protocol Data Unit) is the object a router uses to report information about the adjacent routers and known prefixes.
 
 [^EC]: The changes a router makes to an LSP are flooded across the network and are not visible to all other routers at the same time. All routers will eventually receive the changes though.
+
+[^KVS]: The keys are LSP IDs, the values are the contents of the LSPs
 
 Unlike OSPF, where an ABR could have topology information for multiple areas, IS-IS uses a simpler two-level approach:
 
@@ -237,7 +237,7 @@ OSPF stores various bits of topology information in multiple types of Link State
 
 The identifier of an IS-IS LSP (LSP ID) is always in the format `systemid.nodeid-fragmentid`:
 
-* The `systemid` is the 6-octet System ID part of [NET](1-simple-ipv4.md#bg). While IS-IS internally uses the 6-octet value, most implementations display hostnames in the **show** commands.
+* The `systemid` is the 6-octet System ID part of [NET](1-simple-ipv4.md#bg). While IS-IS internally uses the 6-octet value, most implementations display hostnames in the **show** commands. You can often use a command like **show isis hostname** to display the name-to-system-ID mappings.
 * The `nodeid` is zero for an LSP describing the router's information and non-zero for LAN pseudonodes[^LANPN].
 * The `fragmentid` is the sequence number of the [LSP fragment](#frag).
 
@@ -277,7 +277,9 @@ IS-IS Instance: Gandalf VRF: default
     x2.00-00                      2  51440  1610     92 L2  0000.0000.0003.00-00  <>
 ```
 
-You can inspect the contents of an IS-IS LSP with a command similar to **show isis database detail**. Each IS-IS LSP contains numerous data items encoded as Type-Length-Value (TLV) triplets. The TLV values are usually displayed in a human-friendly format; you'd have to use a packet capture tool like **tcpdump** or **wireshark** to see the dirty details.
+You can inspect the contents of an IS-IS LSP with a command similar to **show isis database detail**[^EMD]. Each IS-IS LSP contains numerous data items encoded as Type-Length-Value (TLV) triplets. The TLV values are usually displayed in a human-friendly format; you'd have to use a packet capture tool like **tcpdump** or **wireshark** to see the dirty details.
+
+[^EMD]: Explore the commands available on your platform. For example, the Cisco IOS XR **show** command has **verbose** and **internal** options that display even more details.
 
 The recognized IS-IS data types are collected in the [IANA IS-IS TLV Codepoints](https://www.iana.org/assignments/isis-tlv-codepoints/isis-tlv-codepoints.xhtml) registry; you'd usually see the following TLVs in a modern IPv4 network:
 
@@ -357,8 +359,12 @@ After the SPF algorithm generates the spanning tree, it uses the minimum cost to
 
 ## LSP Fragments {#frag}
 
-You rarely see LSP fragments in small networks, but it's pretty easy to generate them by lowering the maximum LSP size. For example, if we reduce the LSP size on **rtr** to 256, we'll get two fragments:
+You rarely see LSP fragments in small networks, but it's pretty easy to generate them by lowering the maximum LSP size. For example, if we reduce the LSP size on **rtr** to 256[^RLLA], we'll get two fragments:
 
+[^RLLA]: In a real-life network, the maximum LSP size should match across all routers.
+
+LSP fragments describing the **rtr** state
+{: .code-caption }
 ```
 rtr# show isis database
 Area Gandalf:
@@ -372,6 +378,8 @@ x2.00-00                   92   0x00000018  0x9c07    1043    0/0/0
 
 The LSP fragments contain the same information as the original LSP, only split across multiple smaller database objects:
 
+The detailed view of the LSP fragments
+{: .code-caption }
 ```
 rtr# show isis database detail rtr.00-00
 Area Gandalf:
