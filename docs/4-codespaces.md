@@ -12,13 +12,22 @@ You can run IS-IS labs in (free[^UTAP]) [GitHub codespaces](https://docs.github.
 ## Select Lab Devices
 
 The IS-IS labs repository uses FRRouting containers as the default device. To change the device settings, edit the `defaults.yml` file with `vi` or `nano`.
-    
+
+* It's best to use network devices with free-to-download container images:
+
+| Device | Device type to use in `defaults.yml` |
+|--------|--------------------------------------|
+| FRRouting | frr |
+| Nokia SR Linux | srlinux |
+| VyOS | vyos |
+
 !!! tip
-    * It's best to use network devices with free-to-download container images (FRRouting, Nokia SR Linux, Vyos).
-    * Use FRRouting containers to use the 2 CPU/8 GB codespaces VM with larger labs.
-    * Codespaces have persistent storage; you can [download and install other containers](https://blog.ipspace.net/2024/07/arista-eos-codespaces/).
-    * To use containers that have to be downloaded from the vendors' website, download them onto your laptop, [drag-and-drop them into the Folders](https://blog.ipspace.net/2024/07/arista-eos-codespaces/), and install them [like you would on a local netlab instance](https://netlab.tools/labs/clab/#container-images).
-    * You cannot run virtual machines in codespaces (yet?). This also precludes running VMs in virtual machines (the vrnetlab approach).
+    Start with the [Configuring IS-IS on FRRouting](basic/0-frrouting.md) exercise if you want to use the default settings but never worked with FRRouting before.
+
+* Use FRRouting to use the 2 CPU/8 GB codespaces VM with more extensive labs.
+* Codespaces have persistent storage; you can [download and install other containers](https://blog.ipspace.net/2024/07/arista-eos-codespaces/).
+* To use containers that have to be downloaded from the vendors' website, download them onto your laptop, [drag-and-drop them into the Folders](https://blog.ipspace.net/2024/07/arista-eos-codespaces/), and install them [like you would on a local netlab instance](https://netlab.tools/labs/clab/#container-images).
+* You cannot run virtual machines in codespaces (yet?). This also precludes running VMs in virtual machines (the vrnetlab approach).
 
 ## Start a Lab
 
