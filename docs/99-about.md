@@ -12,8 +12,6 @@ You'll find the lab topology files and initial device configurations in a [GitHu
 
 As always, everything starts with a [long wish list](3-upcoming.md). I probably missed something important -- please [open an issue](https://github.com/bgplab/isis/issues) or a [discussion](https://github.com/bgplab/isis/discussions), or (even better) become a contributor and submit a PR.
 
-[^NL]: As long as it's supported by _netlab_.
-
 [^HT]: When you happen to have a Hammer of Thor handy, everything looks like a nail waiting to be hit ;)
 
 [^XR]: Unless you love using resource hogs like Nexus OS, IOS XR, or some Junos variants.
