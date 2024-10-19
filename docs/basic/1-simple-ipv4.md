@@ -12,7 +12,7 @@ We'll start with the simplest possible scenario: we're adding a new router to an
 
 ## Starting the Lab
 
-Assuming you already [set up your lab infrastructure](../1-setup.md):
+You can start the lab [on your own lab infrastructure](../1-setup.md) or in [GitHub Codespaces](https://github.com/codespaces/new/bgplab/isis) ([more details](https://bgplabs.net/4-codespaces/)):
 
 * Change directory to `basic/1-simple-ipv4`
 * Execute **netlab up**

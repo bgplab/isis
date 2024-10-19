@@ -16,7 +16,7 @@ The Linux interfaces and IP addresses will be configured automatically if you st
 
 ## Start the Lab
 
-Assuming you already [set up your lab infrastructure](../1-setup.md):
+You can start the lab [on your own lab infrastructure](../1-setup.md) or in [GitHub Codespaces](https://github.com/codespaces/new/bgplab/isis) ([more details](https://bgplabs.net/4-codespaces/)):
 
 * Change directory to `basic/0-frrouting`
 * Execute **netlab up** to start a lab with two FRRouting virtual machines or containers (depending on your lab setup). R2 is preconfigured to run IS-IS; if you're using virtual machines, you might have to enable the IS-IS daemon on R1.
