@@ -12,7 +12,7 @@ Use any device [supported by the _netlab_ IS-IS configuration module](https://ne
 
 ## Starting the Lab
 
-Assuming you already [set up your lab infrastructure](../1-setup.md):
+You can start the lab [on your own lab infrastructure](../1-setup.md) or in [GitHub Codespaces](https://github.com/codespaces/new/bgplab/isis) ([more details](https://bgplabs.net/4-codespaces/)):
 
 * Change directory to `basic/4-metric`
 * Execute **netlab up**
@@ -102,6 +102,8 @@ You can change the IS-IS interface metric with an interface configuration comman
 
 After the change, R1 should use the first Ethernet interface to reach R3's loopback address. This is the printout you should get on FRRouting:
 
+Updated IP routing table on R1
+{ .code-caption }
 ```
 r1# show ip route 10.0.0.0/24 longer-prefixes
 Codes: K - kernel route, C - connected, L - local, S - static,
@@ -121,20 +123,32 @@ I>* 10.0.0.3/32 [115/30] via 10.1.0.2, eth1, weight 1, 00:02:53
 
 Did you notice the *Extended Reachability* and *Extended IP Reachability* headings in the LSP printouts? Here's the full story:
 
-* Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost (*path cost*) could not exceed 1023[^SPF]. Today, we call those metrics **narrow** metrics.
-* When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. [RFC 3784](https://www.rfc-editor.org/rfc/rfc3784) defined 24-bit metrics (we call them **wide** metrics). That's what most deployments use today.
-* All existing IS-IS networks that wanted to use the *wide* metrics had to transition from *narrow* to *wide* metrics, usually while keeping the network operational. The solution was to advertise both sets of metrics until all network devices understand *wide* metrics. Some vendors call that approach *transition* metrics.
+* Original IS-IS specifications had 6-bit interface metrics (0-63)[^ZLB], and the end-to-end path cost could not exceed 1023[^SPF]. Today, we call those metrics **narrow** metrics.
+* When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. [RFC 3784](https://www.rfc-editor.org/rfc/rfc3784) defined 24-bit metrics (we call them **wide** metrics), which is what most deployments use today.
+* All existing IS-IS networks that wanted to use the *wide* metrics had to transition from *narrow* to *wide* metrics, usually while keeping the network operational. The solution was to advertise both sets of metrics (that have to match) until all network devices advertise *wide* metrics. Some vendors call that approach *transition* metrics.
 
-[^SPF]: Someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.
+[^ZLB]: While you can set the metric to zero on the loopback interface, the metric has to be a positive number on a transit link, or the SPF algorithm could end in an infinite loop.
 
-!!! tip
-    I haven't seen an IS-IS implementation that doesn't understand the *narrow* metrics, and all recent implementations support *wide* metrics (they've been around for 20 years). Sadly, many devices use *narrow* metrics as the default; you should immediately change that to *wide*.
+[^SPF]: The DEC engineers working on IS-IS had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.
+
+Transitioning from narrow to wide metrics is somewhat convoluted:
+
+* You must configure all devices to advertise narrow and wide metrics (change the metric style from *narrow* to *transitional*).
+* Once all devices advertise wide metrics, you can configure them to use them (this step might be optional in the IS-IS implementation you're using).
+* Finally, you can stop advertising the *narrow* metrics (change the metric style from *transitional* to *wide*).
+* You can start using large metric values only after your devices use only *wide* metrics.
+
+As you can see, starting your IS-IS deployment with *wide* metrics is much better, especially if you want to use modern IS-IS features like SR-MPLS that work only with *wide* metrics.
 
 !!! warning
     You'll get weird results if some devices in your network support only *narrow* metrics while others advertise only *wide* metrics. If you have devices that do not understand the *wide* metrics, keep using the *narrow* metrics; otherwise, ensure all devices use only *wide* metrics.
 
-Let's try to reproduce the world we lived in around the turn of the millennium. FRRouting has a **metric-style** router configuration command. Let's set it to **narrow** on R1 and see what happens to the R1 LSP:
+I haven't seen an IS-IS implementation that doesn't understand the *narrow* metrics, and all recent implementations support *wide* metrics (they've been around for 20 years)[^SDH]. Sadly, many devices still use *narrow* metrics as the default, so let's reproduce that ancient world in a modern implementation (FRRouting). We'll use the **metric-style** router configuration command, set it to **narrow** on R1, and see what happens to the R1 LSP.
 
+[^SDH]: SDH equipment using CLNP for network management might be an exception.
+
+R1 LSP using narrow metrics
+{ .code-caption }
 ```
 r1# show isis database detail r1.00-00
 Area Gandalf:
@@ -157,6 +171,8 @@ As you can see, R1 replaced the *Extended Reachability* metric with the *IS Reac
 
 Finally, let's set the metric style to *transition* and observe the changes in R1 LSP. As expected, the LSP contains two sets of metrics for every link and IP prefix.
 
+R1 LSP with transition metrics (narrow and wide)
+{ .code-caption }
 ```
 r1# sh isis database detail r1.00-00
 Area Gandalf:
