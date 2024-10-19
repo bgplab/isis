@@ -204,7 +204,7 @@
 <h2 id="device-requirements">Device Requirements</h2>
 <p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a>.</p>
 <h2 id="starting-the-lab">Starting the Lab</h2>
-<p>Assuming you already <a href="../../1-setup/">set up your lab infrastructure</a>:</p>
+<p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
 <ul>
 <li>Change directory to <code>basic/4-metric</code></li>
 <li>Execute <strong>netlab up</strong></li>
@@ -273,6 +273,7 @@ r2.00-00                  112   0x00000003  0xfb73    1049    0/0/0
 <p>You can change the IS-IS interface metric with an interface configuration command similar to <strong>isis metric</strong><sup id="fnref:L1L2M"><a class="footnote-ref" href="#fn:L1L2M">2</a></sup>. Change the metric on the R1-R3 link to 50 (you must make the change on both ends).</p>
 <h2 id="verifying-the-change">Verifying the Change</h2>
 <p>After the change, R1 should use the first Ethernet interface to reach R3&rsquo;s loopback address. This is the printout you should get on FRRouting:</p>
+<p class="code-caption">Updated IP routing table on R1<br /></p>
 <pre><code>r1# show ip route 10.0.0.0/24 longer-prefixes
 Codes: K - kernel route, C - connected, L - local, S - static,
        R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
@@ -289,19 +290,24 @@ I&gt;* 10.0.0.3/32 [115/30] via 10.1.0.2, eth1, weight 1, 00:02:53
 <h2 id="narrow-wide-and-transitional-metrics">Narrow, Wide, and Transitional Metrics</h2>
 <p>Did you notice the <em>Extended Reachability</em> and <em>Extended IP Reachability</em> headings in the LSP printouts? Here&rsquo;s the full story:</p>
 <ul>
-<li>Original IS-IS specifications had 6-bit metrics (1-63), and the end-to-end cost (<em>path cost</em>) could not exceed 1023<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">3</a></sup>. Today, we call those metrics <strong>narrow</strong> metrics.</li>
-<li>When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. <a href="https://www.rfc-editor.org/rfc/rfc3784">RFC 3784</a> defined 24-bit metrics (we call them <strong>wide</strong> metrics). That&rsquo;s what most deployments use today.</li>
-<li>All existing IS-IS networks that wanted to use the <em>wide</em> metrics had to transition from <em>narrow</em> to <em>wide</em> metrics, usually while keeping the network operational. The solution was to advertise both sets of metrics until all network devices understand <em>wide</em> metrics. Some vendors call that approach <em>transition</em> metrics.</li>
+<li>Original IS-IS specifications had 6-bit interface metrics (0-63)<sup id="fnref:ZLB"><a class="footnote-ref" href="#fn:ZLB">3</a></sup>, and the end-to-end path cost could not exceed 1023<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">4</a></sup>. Today, we call those metrics <strong>narrow</strong> metrics.</li>
+<li>When large ISPs started using IS-IS, they quickly discovered that those limits were ridiculous. <a href="https://www.rfc-editor.org/rfc/rfc3784">RFC 3784</a> defined 24-bit metrics (we call them <strong>wide</strong> metrics), which is what most deployments use today.</li>
+<li>All existing IS-IS networks that wanted to use the <em>wide</em> metrics had to transition from <em>narrow</em> to <em>wide</em> metrics, usually while keeping the network operational. The solution was to advertise both sets of metrics (that have to match) until all network devices advertise <em>wide</em> metrics. Some vendors call that approach <em>transition</em> metrics.</li>
 </ul>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>I haven&rsquo;t seen an IS-IS implementation that doesn&rsquo;t understand the <em>narrow</em> metrics, and all recent implementations support <em>wide</em> metrics (they&rsquo;ve been around for 20 years). Sadly, many devices use <em>narrow</em> metrics as the default; you should immediately change that to <em>wide</em>.</p>
-</div>
+<p>Transitioning from narrow to wide metrics is somewhat convoluted:</p>
+<ul>
+<li>You must configure all devices to advertise narrow and wide metrics (change the metric style from <em>narrow</em> to <em>transitional</em>).</li>
+<li>Once all devices advertise wide metrics, you can configure them to use them (this step might be optional in the IS-IS implementation you&rsquo;re using).</li>
+<li>Finally, you can stop advertising the <em>narrow</em> metrics (change the metric style from <em>transitional</em> to <em>wide</em>).</li>
+<li>You can start using large metric values only after your devices use only <em>wide</em> metrics.</li>
+</ul>
+<p>As you can see, starting your IS-IS deployment with <em>wide</em> metrics is much better, especially if you want to use modern IS-IS features like SR-MPLS that work only with <em>wide</em> metrics.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>You&rsquo;ll get weird results if some devices in your network support only <em>narrow</em> metrics while others advertise only <em>wide</em> metrics. If you have devices that do not understand the <em>wide</em> metrics, keep using the <em>narrow</em> metrics; otherwise, ensure all devices use only <em>wide</em> metrics.</p>
 </div>
-<p>Let&rsquo;s try to reproduce the world we lived in around the turn of the millennium. FRRouting has a <strong>metric-style</strong> router configuration command. Let&rsquo;s set it to <strong>narrow</strong> on R1 and see what happens to the R1 LSP:</p>
+<p>I haven&rsquo;t seen an IS-IS implementation that doesn&rsquo;t understand the <em>narrow</em> metrics, and all recent implementations support <em>wide</em> metrics (they&rsquo;ve been around for 20 years)<sup id="fnref:SDH"><a class="footnote-ref" href="#fn:SDH">5</a></sup>. Sadly, many devices still use <em>narrow</em> metrics as the default, so let&rsquo;s reproduce that ancient world in a modern implementation (FRRouting). We&rsquo;ll use the <strong>metric-style</strong> router configuration command, set it to <strong>narrow</strong> on R1, and see what happens to the R1 LSP.</p>
+<p class="code-caption">R1 LSP using narrow metrics<br /></p>
 <pre><code>r1# show isis database detail r1.00-00
 Area Gandalf:
 IS-IS Level-2 link-state database:
@@ -320,6 +326,7 @@ r1.00-00             *    116   0x00000005  0x4857    1781    0/0/0
 </code></pre>
 <p>As you can see, R1 replaced the <em>Extended Reachability</em> metric with the <em>IS Reachability</em> metric and the <em>Extended IP Reachability</em> metric with the <em>IP Reachability metric</em>. It also wouldn&rsquo;t allow you to increase the metric on the R1-R3 link above 63.</p>
 <p>Finally, let&rsquo;s set the metric style to <em>transition</em> and observe the changes in R1 LSP. As expected, the LSP contains two sets of metrics for every link and IP prefix.</p>
+<p class="code-caption">R1 LSP with transition metrics (narrow and wide)<br /></p>
 <pre><code>r1# sh isis database detail r1.00-00
 Area Gandalf:
 IS-IS Level-2 link-state database:
@@ -452,8 +459,14 @@ r1.00-00             *    175   0x0000000a  0x7dab    1785    0/0/0
 <li id="fn:L1L2M">
 <p>IS-IS can use different metrics for L1 and L2 adjacencies. Don&rsquo;t waste your time on that detail, and I hope you&rsquo;ll never see a network using it outside of a CCIE lab.&#160;<a class="footnote-backref" href="#fnref:L1L2M" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
+<li id="fn:ZLB">
+<p>While you can set the metric to zero on the loopback interface, the metric has to be a positive number on a transit link, or the SPF algorithm could end in an infinite loop.&#160;<a class="footnote-backref" href="#fnref:ZLB" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
 <li id="fn:SPF">
-<p>Someone had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>The DEC engineers working on IS-IS had a great idea that you could optimize the SPF algorithm if the metric is small enough to be used as an index of a reasonably sized table.&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SDH">
+<p>SDH equipment using CLNP for network management might be an exception.&#160;<a class="footnote-backref" href="#fnref:SDH" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
