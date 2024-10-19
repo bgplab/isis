@@ -34,16 +34,18 @@ The link-state routing protocols (IS-IS and OSPF) were designed to run on device
 [^LM]: The Cisco 2500 router had up to 16 MB of memory. Most modern routers have at least 8 GB of (much faster) RAM.
 
 !!! tip
-    In a follow-up lab exercise, we'll discuss the details of multi-level routing. Today, we'll focus on the implications of using level-1 and level-2 routing on the same devices.
+    In a follow-up lab exercise, we'll discuss the details of multi-level routing. Today, we'll focus on the implications of using single-area level-1 and level-2 routing on the same devices.
 
 The IS-IS multi-level routing rules are simple:
 
-* An area is a contiguous set of routers with NETs that differ only in system IDs (everything left of the system ID is the same).
+* An area is a contiguous set of routers with NETs that differ only in system IDs (everything left of the system ID is the same)[^MA].
 * Level-1 (intra-area) routers know the topology of their area but not what's in other areas.
 * Level-2 (inter-area) routers know the inter-area topology but not the details of individual areas.
 * Level-1-2 routers are like OSPF Area Border Routers. They know the topology of their area[^SA] and the inter-area topology. They also summarize intra-area reachability information (prefixes and costs) and advertise them into the inter-area topology (similar to what OSPF ABRs do).
 * Contrary to OSPF (where an interface belongs to a single area), IS-IS routers could establish level-1 and level-2 adjacencies over the same interface.
 * Level-1 routing and level-2 routing are entirely separate. While they use a shared adjacency[^SHALSP], they use different topology databases.
+
+[^MA]: This is an over-simplified definition that ignores the IS-IS *area merging* functionality, where an IS-IS router with NETs from multiple areas joins those areas into a single L1 domain.
 
 [^SA]: Contrary to OSPF, an IS-IS router can belong to a single area (ignoring the overlapping areas exception).
 
@@ -51,20 +53,22 @@ The IS-IS multi-level routing rules are simple:
 
 Every router in an IS-IS network can be a *level-1 router*, a *level-2 router*, or a *level-1-2 router*. Furthermore, you could limit the adjacencies a router forms over individual interfaces (we'll leave this topic for another day).
 
-Now for the sad part: the default router type in most implementations is a *level-1-2* router. Let's assume we have a reasonably small network[^RSN] and don't use areas. Could the default setting hurt us?
+Now for the sad part: the default router type in most implementations is a *level-1-2* router. Let's assume we have a reasonably small network[^RSN] and don't use areas (all routers are in the same area). Could the default setting hurt us?
 
-[^RSN]: ISPs were running networks with hundreds of routers in an IS-IS area in the 1990s. Most everyone agrees that (assuming you're using a decent implementation) it's OK to run a few hundred routers in a relatively stable IS-IS area (TLDR: It Depends™️)
+[^RSN]: ISPs were running networks with hundreds of routers in an IS-IS area in the 1990s. Most everyone agrees that (assuming you're using a decent implementation) it's OK to run a few hundred routers (I've also heard "less than a thousand routers") in a relatively stable IS-IS area (TLDR: It Depends™️)
 
 ## Best Scenario: Duplicate Information
 
-FRRouting is one of those implementations where running level-1 and level-2 routing in parallel causes only minor damage. As of August 2024, the [FRRouting IS-IS implementation is incomplete](https://github.com/FRRouting/frr/issues/12793) and cannot distribute intra-area (level-1) information into inter-area (level-2) LSPs or vice versa[^NML]. Regardless, it's worth exploring this behavior, as other devices might have similar defaults[^NXOS].
+FRRouting is one of those implementations where running level-1 and level-2 routing in parallel causes only minor damage because it's [IS-IS implementation is incomplete](https://github.com/FRRouting/frr/issues/12793) (as of October 2024) and cannot distribute intra-area (level-1) information into inter-area (level-2) LSPs or vice versa[^NML] as required by the IS-IS standards. Regardless, it's worth exploring this behavior, as other devices might have similar defaults[^NXOS].
 
-[^NML]: You cannot use FRRouting as a level-1-2 router in a network that uses multi-level IS-IS routing.
+[^NML]: Let's be polite: I would not invest my time in figuring out how to use FRRouting as a level-1-2 router in a network that uses multi-level IS-IS routing.
 
 [^NXOS]: Cisco Nexus OS does not distribute level-1 information into level-2 LSPs unless you configure **distribute level-1 into level-2** within an IS-IS router address family.
 
-If you start our lab with FRRouting nodes, you can observe *level 3* adjacencies (that's how FRRouting says "level-1-2"). The neighbor details confirm that the circuit type is L1L2 -- we're running level-1 and level-2 routing with IS-IS neighbors.
+If you start our lab with FRRouting nodes, you can observe *level 3* adjacencies (that's how FRRouting says "level-1-2"). The neighbor details confirm that the circuit type is L1L2; we're running level-1 and level-2 routing with IS-IS neighbors.
 
+IS-IS neighbor details on R1 running FRRouting
+{ .code-caption }
 ```
 r1# show isis neighbor detail
 Area Gandalf:
@@ -89,8 +93,10 @@ Area Gandalf:
       10.1.0.10
 ```
 
-As expected, the routers have two IS-IS databases with duplicate information (the LSPs might have the exact same size):
+As expected, the routers have two IS-IS LSP databases with duplicate information (the LSPs might have the exact same size):
 
+IS-IS LSP database on R1 running FRRouting
+{ .code-caption }
 ```
 r1# show isis data
 Area Gandalf:
@@ -111,6 +117,8 @@ r3.00-00                  112   0x00000002  0x065d    1630    0/0/0
 
 Inspecting a level-1 LSP and a corresponding level-2 LSP confirms the duplication of information:
 
+L1 and L2 LSP originated by R2 running FRRouting
+{ .code-caption }
 ```
 r1# show isis database detail r2.00-00
 Area Gandalf:
@@ -168,10 +176,12 @@ Now, imagine you're using an implementation that follows the RFC1195 rules in a 
 
 All those level-2 prefixes would needlessly increase the overhead of level-2 SPFs (and the results of the level-2 SPF would be ignored anyway). Even worse, every change in the network topology that would change the cost of at least one prefix would result in changed level-2 LSPs that would be flooded across the whole network, triggering even more level-2 SPF runs.
 
-**Takeaway:** In a single-area IS-IS network, never run *level-1* and *level-2* routing in parallel.
+**Takeaway:** In a **single-area** IS-IS network, never configure your routers as *level-1-2* routers. Use *level-1* routing or *level-2* routing, but not both.
 
 You can reproduce that behavior with most IS-IS implementations. Start the lab and explore the contents of a level-1 LSP and corresponding level-2 LSP. This is what you would get on Arista cEOS:
 
+The L1 and L2 LSP advertised by R2 running Arista cEOS
+{ .code-caption }
 ```
 r1>show isis database r2.00-00 detail
 Legend:
@@ -220,9 +230,9 @@ IS-IS Instance: Gandalf VRF: default
 
 ## Configure IS-IS Router Type
 
-By now, you probably agree that running *level-1* routing and *level-2* routing in parallel[^ALN] does not make sense. Is it better to run just *level-1* routing or just *level-2* routing? I would go with *level-2* routing; things will keep working even if you decide to split your network into smaller areas sometime in the future.
+By now, you probably agree that running *level-1* routing and *level-2* routing in parallel on all links of a single-area network[^ALN] does not make sense. Is it better to run just *level-1* routing or just *level-2* routing? I would go with *level-2* routing; things will keep working even if you decide to split your network into smaller areas sometime in the future.
 
-[^ALN]: On all links in your network. In a network using multi-level IS-IS routing, you might have to run level-1 routing and level-2 routing on some core links (but you wouldn't do that on each link).
+[^ALN]: In a network with multiple areas using multi-level IS-IS routing, you might have to run level-1 routing and level-2 routing on some core links (but you wouldn't do that on each link).
 
 It's time to get our hands dirty. After exploring the IS-IS database structures, configure all routers in your network to be level-2 routers with a router configuration command similar to **is-type level-2**.
 
