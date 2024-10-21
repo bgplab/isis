@@ -4,11 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Configure IS-IS Features
 
-Passive IS-IS Interfaces
-: * Explain the need for passive interfaces
-  * Configure passive IS-IS interfaces
-  * If available, turn off the advertisement of inter-router prefixes
-
 Influence the Designated IS Election
 : * Explain the need for DIS priority
   * Configure DIS priority on a router
@@ -22,6 +17,9 @@ Route Redistribution into IS-IS
 Fast IS-IS Failure Detection and Convergence
 : * Configure IS-IS timers
   * Use BFD
+
+Minimize IS-IS Routing Tables
+: * Turn off the advertisement of inter-router prefixes
 
 ## Advanced Labs
 

@@ -28,5 +28,9 @@ The initial lab exercises will help you configure basic IS-IS features:
 * [Dual-Stack (IPv4+IPv6) IS-IS Routing](basic/5-ipv6.md)
 * [Optimize Simple IS-IS Deployments](basic/6-level-2.md)
 
+The next set of exercises covers individual IS-IS features. We just started working on this section, and this is what you can practice at the moment:
+
+* [Passive IS-IS Interfaces](feature/1-passive.md)
+
 Want to know what else we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.
 

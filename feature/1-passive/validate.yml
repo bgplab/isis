@@ -1,0 +1,23 @@
+# Validate the "Configure IS-IS Routing for IPv4" lab
+---
+adj:
+  description: Check R1-R2 IS-IS adjacency
+  nodes: [ r2 ]
+  devices: [ frr ]
+  plugin: isis_neighbor('r1',level='L2',area='49.0001')
+
+adj_x:
+  description: Check (lack of) R1-X IS-IS adjacency
+  nodes: [ r1 ]
+  devices: [ eos, frr ]
+  plugin: isis_neighbor('x',level='L2',area='49.0001',present=False)
+
+pfx_r1:
+  description: Check for R1 LAN prefix on R2
+  nodes: [ r1 ]
+  plugin: isis_prefix(pfx=nodes.r1.interfaces[0].ipv4,level='2')
+
+ping:
+  description: Connectivity check between A and B
+  nodes: [ a ]
+  plugin: ping('b')

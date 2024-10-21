@@ -3,7 +3,7 @@
 adj:
   description: Check IS-IS adjacencies
   nodes: [ x1, x2 ]
-  devices: [ eos, frr ]
+  devices: [ frr ]
   plugin: isis_neighbor('rtr',level='L2',area='49.0001')
 
 pfx_x1:

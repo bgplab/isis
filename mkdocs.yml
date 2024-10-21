@@ -37,6 +37,9 @@ nav:
   - basic/5-ipv6.md
   - basic/6-level-2.md
 
+- Features:
+  - feature/1-passive.md
+
 - "Upcoming":
   - Overview: 3-upcoming.md
 

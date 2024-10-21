@@ -1,0 +1,44 @@
+# Passive IS-IS interfaces
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: passive
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+plugin: [ check_validate ]
+_include: [ validate.yml ]
+_validate_version: 1.9.2
+
+groups:
+  external:
+    members: [ x ]
+  hosts:
+    members: [ a, b ]
+    device: linux
+
+nodes:
+  r1:
+  r2:
+  x:
+  a:
+    id: 10
+  b:
+    id: 11
+
+links:
+- r1:
+  x:
+  a:
+- r2:
+  b:
+  isis.passive: False
+- r1:
+  r2:
+
+message: |
+  The "Passive IS-IS Interfaces" lab is ready. Connect to the lab devices with
+  "netlab connect".
