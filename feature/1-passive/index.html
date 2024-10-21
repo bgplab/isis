@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/feature/1-passive/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Passive IS-IS Interfaces &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Home</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Basics</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Features</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Passive IS-IS Interfaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Upcoming</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../../basic/6-level-2/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#passive-is-is-interfaces" class="nav-link">Passive IS-IS Interfaces</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#the-problem" class="nav-link">The Problem</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configuration-tasks" class="nav-link">Configuration Tasks</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#bg" class="nav-link">Passive Interfaces or Redistribution</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="passive-is-is-interfaces">Passive IS-IS Interfaces</h1>
+<p>Running an IGP on an untrusted network edge<sup id="fnref:WET"><a class="footnote-ref" href="#fn:WET">1</a></sup> is a bad idea. Unless you take extra security measures like MD5 passwords<sup id="fnref:CTP"><a class="footnote-ref" href="#fn:CTP">2</a></sup>, an intruder can establish an IGP adjacency with your router and insert any prefix they wish into your network<sup id="fnref:POP3"><a class="footnote-ref" href="#fn:POP3">3</a></sup>.</p>
+<p>However, you still have to advertise those edge subnets into your IGP, or the hosts attached to your network won&rsquo;t be able to communicate. There are two ways to get that done: redistribute connected subnets into your IGP or make the customer-facing interfaces on the edge routers <em>passive</em> (<a href="#bg">more details</a>). That&rsquo;s what we&rsquo;ll do in this lab exercise.</p>
+<p><img alt="Lab topology" src="../topology-passive.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<ul>
+<li>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> for the routers in your lab (default: FRRouting virtual machines or containers).</li>
+<li>You can do automated lab validation if you use FRRouting on R1 and R2.</li>
+</ul>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
+<ul>
+<li>Change directory to <code>feature/1-passive</code></li>
+<li>Execute <strong>netlab up</strong>. You&rsquo;ll get a lab with IPv4 addresses configured on all interfaces and IS-IS routing configured on R1, R2, and X.</li>
+<li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
+</ul>
+<h2 id="the-problem">The Problem</h2>
+<p>R1 is running IS-IS on all its interfaces and establishes adjacency with the intruder (X):</p>
+<p class="code-caption">IS-IS neighbors on R1 running FRRouting<br /></p>
+<pre><code>r1# show isis neighbor
+Area Gandalf:
+  System Id           Interface   L  State        Holdtime SNPA
+ x                   eth1        2  Up            30       aac1.abd6.15da
+ r2                  eth2        2  Up            27       2020.2020.2020
+</code></pre>
+<p>The intruder is advertising its loopback IP address (10.0.0.3/32) but could advertise any IP prefix it wishes<sup id="fnref:LBIP"><a class="footnote-ref" href="#fn:LBIP">4</a></sup>.</p>
+<p class="code-caption">The IP routing table on R1 running FRRouting<br /></p>
+<pre><code>r1# show ip route
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+L * 10.0.0.1/32 is directly connected, lo, 00:17:00
+C&gt;* 10.0.0.1/32 is directly connected, lo, 00:17:00
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.2, eth2, weight 1, 00:16:57
+I&gt;* 10.0.0.3/32 [115/20] via 172.16.0.3, eth1, weight 1, 00:16:50
+I   10.1.0.0/30 [115/20] via 10.1.0.2, eth2 inactive, weight 1, 00:16:57
+C&gt;* 10.1.0.0/30 is directly connected, eth2, 00:17:00
+L&gt;* 10.1.0.1/32 is directly connected, eth2, 00:17:00
+I   172.16.0.0/24 [115/20] via 172.16.0.3, eth1 inactive, weight 1, 00:16:50
+C&gt;* 172.16.0.0/24 is directly connected, eth1, 00:17:00
+L&gt;* 172.16.0.1/32 is directly connected, eth1, 00:17:00
+I&gt;* 172.16.1.0/24 [115/20] via 10.1.0.2, eth2, weight 1, 00:16:57
+</code></pre>
+<h2 id="configuration-tasks">Configuration Tasks</h2>
+<p>Using an interface command similar to <strong>isis passive</strong>, configure the LAN interface on R1 as a passive IS-IS interface. For consistency reasons, you should do the same on R2.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Some devices configure the interface IGP state within the interface configuration; others do it within the IGP configuration.</p>
+</div>
+<h2 id="validation">Validation</h2>
+<p>You can use the <strong>netlab validate</strong> command if you&rsquo;re using <em>netlab</em> release 1.8.4 or later and run FRRouting on the external routers. This is the printout you should get after completing the lab exercise:</p>
+<p><img alt="" src="../validate-passive.png" /></p>
+<p>You could also do manual validation on R1 and R2:</p>
+<ul>
+<li>Inspect IS-IS adjacencies on R1 with a command similar to <strong>show isis neighbors</strong> or <strong>show isis adjacency</strong>. Your router should have an adjacency with R2 but not with X.</li>
+</ul>
+<p class="code-caption">IS-IS neighbors (FRRouting)<br /></p>
+<pre><code>r1# show isis neighbor
+Area Gandalf:
+  System Id           Interface   L  State        Holdtime SNPA
+ r2                  eth2        2  Up            27       2020.2020.2020
+</code></pre>
+<ul>
+<li>On some devices, you can inspect the details of the IS-IS interface state with a command similar to <strong>show isis interface detail</strong>. When executed on R1 running FRRouting, that command shows the R1-R2 interface as <em>Active</em> and the LAN and the loopback interfaces as <em>Passive</em>.</li>
+</ul>
+<p class="code-caption">IS-IS interface details (FRRouting)<br /></p>
+<pre><code>r1# show isis interface detail
+Area Gandalf:
+  Interface: eth2, State: Up, Active, Circuit Id: 0x0
+    Type: p2p, Level: L2
+    Level-2 Information:
+      Metric: 10, Active neighbors: 1
+      Hello interval: 3, Holddown count: 10, Padding: yes
+      CNSP interval: 10, PSNP interval: 2
+    IP Prefix(es):
+      10.1.0.1/30
+
+  Interface: lo, State: Up, Passive, Circuit Id: 0x0
+    Type: loopback, Level: L2
+    Level-2 Information:
+      Metric: 10
+    IP Prefix(es):
+      10.0.0.1/32
+
+  Interface: eth1, State: Up, Passive, Circuit Id: 0x0
+    Type: lan, Level: L2, SNPA: 0000.0000.0000
+    Level-2 Information:
+      Metric: 10
+    IP Prefix(es):
+      172.16.0.1/24
+</code></pre>
+<ul>
+<li>After verifying adjacencies on R1, inspect the IS-IS entries in the routing table on R2. R2 should have an IS-IS route for 172.16.0.0/24 (the R1 LAN prefix) but not for 10.0.0.3/32 (the intruder&rsquo;s loopback prefix)</li>
+</ul>
+<p class="code-caption">The IS-IS routes on R2 running FRRouting<br /></p>
+<pre><code>r2# show ip route isis
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I&gt;* 10.0.0.1/32 [115/20] via 10.1.0.1, eth2, weight 1, 00:31:18
+I   10.1.0.0/30 [115/20] via 10.1.0.1, eth2 inactive, weight 1, 00:31:18
+I&gt;* 172.16.0.0/24 [115/20] via 10.1.0.1, eth2, weight 1, 00:31:18
+</code></pre>
+<h2 id="bg">Passive Interfaces or Redistribution</h2>
+<p>An IS-IS <em>passive interface</em> is an interface that IS-IS knows about (it includes the interface subnets in its LSP) but on which it does not send or accept hello messages. IS-IS routers cannot establish an adjacency and exchange LSPs without the hello messages, making a passive interface resilient<sup id="fnref:PNS"><a class="footnote-ref" href="#fn:PNS">5</a></sup> against simple IS-IS spoofing attacks<sup id="fnref:MAL"><a class="footnote-ref" href="#fn:MAL">6</a></sup>.</p>
+<p>Considering the potential caveats described in the previous paragraph, a security-focused engineer might prefer <em>route redistribution</em> of connected subnets into IS-IS. Unfortunately, route redistribution brings its own set of caveats:</p>
+<ul>
+<li>Route redistribution is performed at a single point and has to be controlled by a combination of a route map and prefix lists. IS-IS passive interfaces are granular &ndash; you can decide whether to advertise a subnet into IS-IS on a per-interface basis.</li>
+<li>Using passive interfaces makes it easier to figure out what subnets are announced into IS-IS.</li>
+<li>You can set metrics on passive interfaces, for example, when you want to use redundant routers in a primary/backup scenario. While it&rsquo;s possible to set metrics with redistribution route maps, that requires a more complex route map and several prefix lists<sup id="fnref:PLER"><a class="footnote-ref" href="#fn:PLER">7</a></sup>.</li>
+<li>With the IS-IS circuit type, you can easily control whether a subnet on a passive interface is advertised as an L1 or an L2 route (or both). Implementing a similar functionality with a route map is significantly more complex.</li>
+</ul>
+<p>Finally, IS-IS advertises subnets configured on passive interfaces as <em>internal</em> IS-IS routes and redistributed subnets as <em>external</em> IS-IS routes. While the difference between the two route types is not as extreme as in OSPF (IS-IS routers advertise both route types in the same LSP), there are subtle differences in route preference<sup id="fnref:DRP"><a class="footnote-ref" href="#fn:DRP">8</a></sup> that could result in amusing<sup id="fnref:TTA"><a class="footnote-ref" href="#fn:TTA">9</a></sup> troubleshooting scenarios worthy of a CCIE lab.</p>
+<p><strong>Takeaway:</strong> Prefer passive interfaces over the redistribution of connected subnets.</p>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<p><strong>Point-to-point links:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r2</td>
+<td>eth1</td>
+<td>b</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>eth2</td>
+<td>r2</td>
+<td>eth2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LAN links:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Link Name (NET)</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>eth1</td>
+<td>passive_1</td>
+<td>a -&gt; [r1,x]</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>eth1</td>
+<td>passive_1</td>
+<td>r1 -&gt; [x,a]</td>
+</tr>
+<tr>
+<td>x</td>
+<td>eth1</td>
+<td>passive_1</td>
+<td>x -&gt; [r1,a]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running FRRouting.</p>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>a</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">172.16.0.10/24</td>
+<td style="text-align: right;"></td>
+<td>a -&gt; [r1,x]</td>
+</tr>
+<tr>
+<td><strong>b</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td></td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">172.16.1.11/24</td>
+<td style="text-align: right;"></td>
+<td>b -&gt; r2</td>
+</tr>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">172.16.0.1/24</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; [x,a]</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r2</td>
+</tr>
+<tr>
+<td><strong>r2</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">172.16.1.2/24</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; b</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; r1</td>
+</tr>
+<tr>
+<td><strong>x</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">172.16.0.3/24</td>
+<td style="text-align: right;"></td>
+<td>x -&gt; [r1,a]</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:WET">
+<p>And when was the network edge ever trustworthy?&#160;<a class="footnote-backref" href="#fnref:WET" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:CTP">
+<p>Because it&rsquo;s trivial to figure out cleartext passwords in the days of downloadable Wireshark.&#160;<a class="footnote-backref" href="#fnref:CTP" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:POP3">
+<p>I know an ISP that managed to get their POP3 server hijacked, exposing all their customers to a password-stealing man-in-the-middle attack.&#160;<a class="footnote-backref" href="#fnref:POP3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:LBIP">
+<p>We could make the intruder running FRRouting advertise the IP address of host A (172.16.0.10/32), but the same setup wouldn&rsquo;t work on most other network devices due to overlapping IP subnets.&#160;<a class="footnote-backref" href="#fnref:LBIP" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:PNS">
+<p>While the passive interfaces <em>should</em> provide security against all IS-IS-based attacks, some routers might decide to inspect the messages they should not care about anyway. For example, <a href="https://blog.ipspace.net/2023/10/reject-unknown-bgp-session/#ugly">Juniper routers love to open BGP TCP sessions with total strangers</a> and exchange BGP OPEN messages with them, resulting in <a href="https://blog.ipspace.net/2023/11/open-bgp-daemons/">thousands of routers being open to BGP-based attacks</a>.&#160;<a class="footnote-backref" href="#fnref:PNS" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:MAL">
+<p>Configure an Ethernetype access list <a href="https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/">blocking IS-IS Ethernetype</a> if you want to be absolutely sure IS-IS processing is blocked on an interface that is part of an IS-IS process.&#160;<a class="footnote-backref" href="#fnref:MAL" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:PLER">
+<p>The proof is left as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref:PLER" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:DRP">
+<p>See <a href="https://datatracker.ietf.org/doc/html/rfc5302#section-3.2">Section 3.2 of RFC 5302</a> for more details&#160;<a class="footnote-backref" href="#fnref:DRP" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TTA">
+<p>To the uninvolved audience&#160;<a class="footnote-backref" href="#fnref:TTA" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
