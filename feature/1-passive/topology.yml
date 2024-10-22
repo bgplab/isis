@@ -11,7 +11,7 @@ isis.type: level-2
 module: [ isis ]
 plugin: [ check_validate ]
 _include: [ validate.yml ]
-_validate_version: 1.9.2
+_validate_version: 1.8.4
 
 groups:
   external:

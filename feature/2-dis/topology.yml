@@ -1,0 +1,24 @@
+# Influence the Designated IS Election
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: dis
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+plugin: [ check_validate ]
+
+nodes:
+  hub:
+  s1:
+  s2:
+
+links:
+- s1-s2-hub
+
+message: |
+  The "Influence the Designated IS Election" lab is ready. Connect to the lab
+  devices with "netlab connect".

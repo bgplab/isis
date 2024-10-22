@@ -4,10 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Configure IS-IS Features
 
-Influence the Designated IS Election
-: * Explain the need for DIS priority
-  * Configure DIS priority on a router
-
 Protect IS-IS Adjacencies with MD5 Authentication
 : * Configure IS-IS area- and interface passwords
 
@@ -20,6 +16,9 @@ Fast IS-IS Failure Detection and Convergence
 
 Minimize IS-IS Routing Tables
 : * Turn off the advertisement of inter-router prefixes
+
+IS-IS on Unnumbered Interfaces
+: * Explore IS-IS running on point-to-point and multi-access unnumbered IPv4 interfaces and IPv6 LLA-only interfaces
 
 ## Advanced Labs
 
