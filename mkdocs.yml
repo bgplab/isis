@@ -40,6 +40,7 @@ nav:
 - Features:
   - feature/1-passive.md
   - feature/2-dis.md
+  - feature/3-md5.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md

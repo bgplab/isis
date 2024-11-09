@@ -1,0 +1,15 @@
+{% if isis.password|default(False) %}
+router isis Gandalf
+  authentication mode md5
+{%   if isis.password.area|default(False) %}
+  authentication key {{ isis.password.area }} level-1
+{%   endif %}
+{%   if isis.password.domain|default(False) %}
+  authentication key {{ isis.password.domain }} level-2
+{%   endif %}
+{% endif %}
+{% for intf in interfaces if intf.isis.password|default(False) %}
+interface {{ intf.ifname }}
+  isis authentication mode md5
+  isis authentication key {{ intf.isis.password }}
+{% endfor %}

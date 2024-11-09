@@ -1,0 +1,3 @@
+{% for intf in interfaces if intf.isis.password|default(False) %}
+interface {{ intf.ifname }}
+{% endfor %}

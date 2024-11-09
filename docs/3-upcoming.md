@@ -4,9 +4,6 @@ The [first few labs are already online](index.md); the list of ideas is much lon
 
 ## Configure IS-IS Features
 
-Protect IS-IS Adjacencies with MD5 Authentication
-: * Configure IS-IS area- and interface passwords
-
 Route Redistribution into IS-IS
 : * Configure static route and connected interface redistribution into IS-IS
 

@@ -1,0 +1,7 @@
+# Validate the "Configure IS-IS Routing for IPv4" lab
+---
+adj:
+  description: Check IS-IS adjacencies
+  nodes: [ r2, r3, r4 ]
+  devices: [ frr ]
+  plugin: isis_neighbor('r1',area='49.0001')
