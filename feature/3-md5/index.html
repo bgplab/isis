@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/feature/3-md5/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Protect IS-IS Routing Data with MD5 Authentication &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Home</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Basics</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Features</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../1-passive/" class="dropdown-item">Passive IS-IS Interfaces</a>
+</li>
+                                    
+<li>
+    <a href="../2-dis/" class="dropdown-item">Influence the Designated IS Election</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Protect IS-IS Routing Data with MD5 Authentication</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Upcoming</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../2-dis/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#protect-is-is-routing-data-with-md5-authentication" class="nav-link">Protect IS-IS Routing Data with MD5 Authentication</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#initial-configuration" class="nav-link">Initial Configuration</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#the-problem" class="nav-link">The Problem</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configuration-tasks" class="nav-link">Configuration Tasks</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="protect-is-is-routing-data-with-md5-authentication">Protect IS-IS Routing Data with MD5 Authentication</h1>
+<p>Like OSPF and BGP, IS-IS contains a simple mechanism to authenticate routing traffic &ndash; IS-IS packets can include a cleartext password or an <a href="https://datatracker.ietf.org/doc/html/rfc5304">MD5</a>- or <a href="https://datatracker.ietf.org/doc/html/rfc5310">SHA hash</a><sup id="fnref:HO"><a class="footnote-ref" href="#fn:HO">1</a></sup>. Unlike OSPF, IS-IS can authenticate:</p>
+<ul>
+<li>The packets exchanged between routers (hello packets)</li>
+<li>The contents of Link State PDUs flooded across an area or a domain.</li>
+</ul>
+<p>Authenticating IS-IS traffic is not as critical as authenticating EBGP traffic. It&rsquo;s almost impossible to inject IS-IS packets into a LAN segment the intruder is not connected to, and you&rsquo;re not supposed to run an IGP on an untrusted network anyway.</p>
+<p>Most IS-IS implementations have <em>interface</em> passwords (authenticating the IS-IS hello packets), <em>area</em> passwords (authenticating level-1 LSPs), and <em>domain</em> passwords (authenticating level-2 LSPs). You&rsquo;ll practice configuring all three in this lab exercise. </p>
+<p><img alt="Lab topology" src="../topology-md5.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<ul>
+<li>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> for R1 (default: FRRouting virtual machines or containers).</li>
+<li>If you want preconfigured passwords for the other three routers (R2, R3, and R4), use FRRouting or Arista EOS. You can use any other device for these routers, but you&rsquo;ll have to configure the passwords yourself.</li>
+<li>Automated lab validation requires FRRouting on R2, R3, and R4.</li>
+</ul>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
+<ul>
+<li>Change directory to <code>feature/3-md5</code></li>
+<li>Execute <strong>netlab up</strong>. You&rsquo;ll get a lab with IPv4 addresses configured on all interfaces and IS-IS routing configured on all routers.</li>
+<li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
+</ul>
+<h2 id="initial-configuration">Initial Configuration</h2>
+<ul>
+<li>R1, R2, and R3 are in IS-IS area 49.0001.</li>
+<li>R4 is in IS-IS area 49.0002.</li>
+<li>R1 (your router) and R2 are level-1-2 routers. R3 is a level-1 router, and R4 is a level-2 router.</li>
+<li>The link between R1 and R2 is a LAN (multi-access) link, the links R1-R3 and R1-R4 are point-to-point links.</li>
+</ul>
+<p>The initial configuration should result in these IS-IS adjacencies:</p>
+<table>
+<thead>
+<tr>
+<th>Link</th>
+<th>Adjacency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1-R2</td>
+<td>level-1 + level-2</td>
+</tr>
+<tr>
+<td>R1-R3</td>
+<td>level-1</td>
+</tr>
+<tr>
+<td>R1-R4</td>
+<td>level-2</td>
+</tr>
+</tbody>
+</table>
+<p>However, R2, R3, and R4 use IS-IS MD5 authentication with these keys:</p>
+<table>
+<thead>
+<tr>
+<th>Password type</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interface</td>
+<td>ForgetMeNot</td>
+</tr>
+<tr>
+<td>Area (level-1)</td>
+<td>MyAreaOnly</td>
+</tr>
+<tr>
+<td>Domain (level-2)</td>
+<td>CloseFriends</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-problem">The Problem</h2>
+<p>Some IS-IS implementations exhibit bizarre behavior when adjacent devices have an authentication mismatch. The device not using IS-IS authentication can claim full adjacency with its neighbors. In contrast, the adjacent device claims the adjacency is in the INIT state or shows no IS-IS neighbors on the interface.</p>
+<p>For example, R1 running FRRouting claims it has three IS-IS neighbors and full adjacency with two of them.</p>
+<p class="code-caption">IS-IS neighbors on R1 running FRRouting<br /></p>
+<pre><code>$ netlab connect r1 --show isis neighbor
+Connecting to container clab-md5-r1, executing vtysh -c &quot;show isis neighbor&quot;
+Area Gandalf:
+  System Id           Interface   L  State        Holdtime SNPA
+ r2                  eth1        1  Initializing  28       aac1.ab76.78a5
+ r2                  eth1        2  Initializing  28       aac1.ab76.78a5
+ r3                  eth2        1  Up            28       2020.2020.2020
+ r4                  eth3        2  Up            28       2020.2020.2020
+</code></pre>
+<p>At the same time, R2 through R4 claim they have no IS-IS neighbors.</p>
+<p>Arista EOS is a bit more consistent. R1 running Arista EOS claims to have three IS-IS neighbors, but the adjacency is stuck in the <em>INIT</em> phase.</p>
+<p class="code-caption">IS-IS neighbors on R1 running Arista EOS<br /></p>
+<pre><code>r1# show isis neighbor
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  0000.0000.0002   L1   Ethernet1          52:dc:ca:fe:2:1   INIT  25          r1.97
+Gandalf   default  0000.0000.0002   L2   Ethernet1          52:dc:ca:fe:2:1   INIT  25          r1.97
+Gandalf   default  0000.0000.0003   L1   Ethernet2          P2P               INIT  26          95
+Gandalf   default  0000.0000.0004   L2   Ethernet3          P2P               INIT  23          98
+</code></pre>
+<p>Anyway, we know what&rsquo;s wrong: R2, R3, and R4 use MD5 authentication and ignore unauthenticated packets sent by R1<sup id="fnref:SHC"><a class="footnote-ref" href="#fn:SHC">2</a></sup>. Let&rsquo;s fix it.</p>
+<h2 id="configuration-tasks">Configuration Tasks</h2>
+<p>Configure the following IS-IS passwords using <strong>authentication</strong> or <strong>password</strong> interface- or router configuration commands<sup id="fnref:ADP"><a class="footnote-ref" href="#fn:ADP">3</a></sup>: </p>
+<table>
+<thead>
+<tr>
+<th>Password type</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interface</td>
+<td>ForgetMeNot</td>
+</tr>
+<tr>
+<td>Area</td>
+<td>MyAreaOnly</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>RemoteFriend</td>
+</tr>
+</tbody>
+</table>
+<h2 id="validation">Validation</h2>
+<p>You can use the <strong>netlab validate</strong> command if you run FRRouting on R2, R3, and R4. The validation process checks the IS-IS adjacency using IS-IS hostnames. The validation will succeed on R2 and R3 if you configured the interface password (otherwise, the IS-IS adjacency is not established) and the area password (otherwise, R2 and R3 see adjacent system ID 0000.0000.0001 but do not know it is R1). You must configure the domain password for the validation to succeed on R4.</p>
+<p>For example, this is the printout you would get after configuring the interface- and area passwords:</p>
+<p><img alt="" src="../validate-md5.png" /></p>
+<p>You could also do manual validation:</p>
+<ul>
+<li>After configuring the interface passwords, all IS-IS adjacencies should be in UP state on all routers.</li>
+</ul>
+<p class="code-caption">IS-IS neighbors on R1 running Arista EOS<br /></p>
+<pre><code>r1#show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  r2               L1   Ethernet1          52:dc:ca:fe:2:1   UP    8           r2.a4
+Gandalf   default  r2               L2   Ethernet1          52:dc:ca:fe:2:1   UP    6           r2.a4
+Gandalf   default  r3               L1   Ethernet2          P2P               UP    22          A6
+Gandalf   default  r4               L2   Ethernet3          P2P               UP    28          A8
+</code></pre>
+<ul>
+<li>You will not see R1 level-1 LSPs on other routers until you configure the area (level-1) password on R1. For example, this is the level-1 database on R2 when R1 has no area password. The R1 LSP is missing, and R3 is unreachable.</li>
+</ul>
+<p class="code-caption">IS-IS level-1 database on R2 running Arista EOS<br /></p>
+<pre><code>r2#show isis database level-1
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 1 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r2.00-00                      3  61902   905    113 L2  0000.0000.0002.00-00  &lt;&gt;
+ U  r2.a4-00                      1  13264   905     70 L2  0000.0000.0002.a4-00  &lt;&gt;
+ U  r3.00-00                      3  58414   907    113 L1  0000.0000.0003.00-00  &lt;&gt;
+</code></pre>
+<ul>
+<li>After configuring the area (level-1) password on R1, R2 and R3 should display R1&rsquo;s LSPs in their level-1 database:</li>
+</ul>
+<p class="code-caption">IS-IS level-1 database on R2 running Arista EOS contains authenticated R1 LSP<br /></p>
+<pre><code>r2#show isis database level-1
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 1 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                      9  61720  1195    150 L2  0000.0000.0001.00-00  &lt;DefaultAtt&gt;
+    r2.00-00                      3  61902   842    113 L2  0000.0000.0002.00-00  &lt;&gt;
+    r2.a4-00                      1  13264   842     70 L2  0000.0000.0002.a4-00  &lt;&gt;
+    r3.00-00                      3  58414   844    113 L1  0000.0000.0003.00-00  &lt;&gt;
+</code></pre>
+<ul>
+<li>Similarly, R2 and R4 won&rsquo;t display R1 level-2 LSP until you configure the domain (level-2) password:</li>
+</ul>
+<p class="code-caption">IS-IS level-2 database on R4 (running Arista EOS) does not contain the R1 LSP<br /></p>
+<pre><code>r4#show isis database
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+ U  r2.00-00                      4  53488  1052    151 L2  0000.0000.0002.00-00  &lt;&gt;
+ U  r2.a4-00                      1  20572   711     70 L2  0000.0000.0002.a4-00  &lt;&gt;
+    r4.00-00                      3  36459   711    113 L2  0000.0000.0004.00-00  &lt;&gt;
+</code></pre>
+<ul>
+<li>After configuring the domain (level-2) password on R1, R2 and R4 should display R1&rsquo;s LSPs in their level-2 database:</li>
+</ul>
+<p class="code-caption">IS-IS level-2 database on R4 running Arista EOS contains authenticated R1 LSP<br /></p>
+<pre><code>r4#show isis database
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                     10  16371  1196    170 L2  0000.0000.0001.00-00  &lt;&gt;
+    r2.00-00                      4  53488   983    151 L2  0000.0000.0002.00-00  &lt;&gt;
+    r2.a4-00                      1  20572   642     70 L2  0000.0000.0002.a4-00  &lt;&gt;
+    r4.00-00                      3  36459   642    113 L2  0000.0000.0004.00-00  &lt;&gt;
+</code></pre>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>eth1</td>
+<td>r2</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>eth2</td>
+<td>r3</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>eth3</td>
+<td>r4</td>
+<td>eth1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running FRRouting.</p>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r2</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r3</td>
+</tr>
+<tr>
+<td>eth3</td>
+<td style="text-align: right;">10.1.0.9/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; r4</td>
+</tr>
+<tr>
+<td><strong>r2</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; r1</td>
+</tr>
+<tr>
+<td><strong>r3</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>r3 -&gt; r1</td>
+</tr>
+<tr>
+<td><strong>r4</strong></td>
+<td style="text-align: right;">10.0.0.4/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.10/30</td>
+<td style="text-align: right;"></td>
+<td>r4 -&gt; r1</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:HO">
+<p>Please note that the IS-IS packets are not encrypted. Anyone can see their contents, but the Hashed Message Authentication Code (HMAC) makes it really hard for an intruder to impersonate an IS-IS router using MD5 or SHA authentication (but not impossible as we know it&rsquo;s possible to break MD5).&#160;<a class="footnote-backref" href="#fnref:HO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SHC">
+<p>Figuring that out from the <strong>show</strong> printouts, particularly when you don&rsquo;t have access to the remote router, is an interesting hair-pulling exercise.&#160;<a class="footnote-backref" href="#fnref:SHC" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ADP">
+<p>Some implementations (for example, Arista EOS) call the area password <em>level-1</em> and the domain password <em>level-2</em>.&#160;<a class="footnote-backref" href="#fnref:ADP" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
