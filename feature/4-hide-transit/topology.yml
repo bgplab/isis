@@ -1,0 +1,32 @@
+# Hide transit subnets
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: adv_passive
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+plugin: [ check_validate ]
+_include: [ validate.yml ]
+_validate_version: 1.9.4
+
+nodes:
+  core:
+  acc1:
+  acc2:
+  wan:
+
+links:
+- core-acc1
+- core-acc2
+- core-wan
+- acc1:
+  acc2:
+  pool: lan
+
+message: |
+  The "Hide Transit Subnets" lab is ready. Connect to the lab devices with
+  "netlab connect".

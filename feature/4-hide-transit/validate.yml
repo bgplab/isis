@@ -1,0 +1,37 @@
+# Validate the "Hide transit subnets" lab
+---
+isis_adj:
+  description: Check WAN-Core IS-IS adjacency
+  nodes: [ wan ]
+  devices: [ eos ]
+  show:
+    eos: isis neighbors | json
+  valid:
+    eos: vrfs.default.isisInstances.Gandalf.neighbors
+
+lan_pfx:
+  description: Is the LAN prefix in the IP routing table?
+  nodes: [ wan ]
+  show:
+    eos: ip route {{ hostvars.acc1.interfaces[1].ipv4 }} | json
+  valid:
+    eos: vrfs.default.routes
+  fail: LAN prefix is not in the IP routing table on WAN router
+
+acc1_pfx:
+  description: Is the Acc1-Core prefix in the IP routing table?
+  nodes: [ wan ]
+  show:
+    eos: ip route {{ hostvars.acc1.interfaces[0].ipv4 }} | json
+  valid:
+    eos: len(vrfs.default.routes) == 0
+  fail: Transit prefix of Acc1 is in the IP routing table on WAN router
+
+acc2_pfx:
+  description: Is the Acc2-Core prefix in the IP routing table?
+  nodes: [ wan ]
+  show:
+    eos: ip route {{ hostvars.acc2.interfaces[0].ipv4 }} | json
+  valid:
+    eos: len(vrfs.default.routes) == 0
+  fail: Transit prefix of Acc2 is in the IP routing table on WAN router

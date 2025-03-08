@@ -11,9 +11,6 @@ Fast IS-IS Failure Detection and Convergence
 : * Configure IS-IS timers
   * Use BFD
 
-Minimize IS-IS Routing Tables
-: * Turn off the advertisement of inter-router prefixes
-
 IS-IS on Unnumbered Interfaces
 : * Explore IS-IS running on point-to-point and multi-access unnumbered IPv4 interfaces and IPv6 LLA-only interfaces
 
