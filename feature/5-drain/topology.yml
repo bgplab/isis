@@ -1,0 +1,26 @@
+# Drain Traffic Before Node Maintenance
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 1.8.4
+
+name: drain
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+plugin: [ check_validate ]
+_include: [ validate.yml ]
+_validate_version: 1.8.4
+
+groups:
+  external:
+    members: [ l1, l2 ]
+
+nodes: [ s1, s2, l1, l2 ]
+
+links: [ l1-s1, l1-s2, l2-s1, l2-s2 ]
+
+message: |
+  The "Drain Traffic Before Node Maintenance" lab is ready. Connect to the lab
+  devices with "netlab connect".

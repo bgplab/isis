@@ -20,9 +20,6 @@ Multi-Level IS-IS Networks
 : * Explain intra-area and inter-area routing
   * Configure a network with multiple areas and L1/L2 routers
 
-Graceful Shutdown with IS-IS Overload Bit
-: * Configure IS-IS overload bit or maximum metric to drain traffic from a transit router
-
 Build an SR-MPLS Network with IS-IS
 : * Build a BGP-free MPLS core using SR-MPLS with IS-IS
 

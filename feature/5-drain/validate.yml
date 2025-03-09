@@ -1,0 +1,27 @@
+# Validate the "Configure IS-IS Routing for IPv4" lab
+---
+adj_s1:
+  description: Check IS-IS adjacency with S1
+  nodes: [ l1, l2 ]
+  devices: [ frr ]
+  plugin: isis_neighbor('s1',level='L2',area='49.0001')
+
+adj_s2:
+  description: Check IS-IS adjacency with S2
+  nodes: [ l1, l2 ]
+  devices: [ frr ]
+  plugin: isis_neighbor('s1',level='L2',area='49.0001')
+
+lb_s1:
+  description: Check for the S1 loopback interface
+  nodes: [ l1, l2 ]
+  plugin: isis_prefix(pfx=nodes.s1.loopback.ipv4,level='2')
+
+lb_l2:
+  description: Check for the L2 loopback interface
+  nodes: [ l1 ]
+  exec:
+    frr: vtysh -c 'show ip route {{ hostvars.l2.loopback.ipv4 }}'
+  valid:
+    frr: "'{{ interfaces[0].ifname }}' not in stdout"
+  fail: The L2 loopback is still reachable through S1
