@@ -36,6 +36,7 @@ nav:
   - basic/4-metric.md
   - basic/5-ipv6.md
   - basic/6-level-2.md
+  - basic/7-unnumbered.md
 
 - Features:
   - feature/1-passive.md

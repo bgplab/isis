@@ -261,6 +261,8 @@ r3.00-00                  112   0x00000007  0xfb62    1701    0/0/0
     3 LSPs
 ```
 
+**Next**: [Running IS-IS Over Unnumbered Interfaces](7-unnumbered.md)
+
 ## Reference Information
 
 ### Lab Wiring

@@ -1,0 +1,24 @@
+# Running IS-IS Over Unnumbered Interfaces
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+addressing:
+  p2p.ipv6: 2001:db8:20::/48
+  loopback.ipv6: 2001:db8:cafe::/48
+  lan.ipv6: 2001:db8:21::/48
+
+version: 1.8.4
+
+name: unnumbered
+
+isis.area: '49.0001'
+isis.type: level-2
+
+module: [ isis ]
+
+nodes: [ r1, r2, r3, r4 ]
+
+links: [ r1-r2-r3, r3-r4 ]
+
+message: |
+  The "Running IS-IS Over Unnumbered Interfaces" lab is ready. Connect to your
+  devices with "netlab connect".
