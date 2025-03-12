@@ -95,6 +95,10 @@
 <li>
     <a href="../6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
 </li>
+                                    
+<li>
+    <a href="../7-unnumbered/" class="dropdown-item">Running IS-IS Over Unnumbered Interfaces</a>
+</li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -551,6 +555,7 @@ r2.00-00             *    152   0x00000008  0xed0b    1415    0/0/0
 </code></pre>
 <p>The per-protocol neighbor reachability information allows routers to run the SPF algorithm for individual address families. The algorithm can then discard useless links (for an address family) while building the shortest path tree.</p>
 <p><strong>Takeaway:</strong> Use multi-topology IS-IS routing in multiprotocol networks unless you can guarantee that all links use the same address families (or love late-night troubleshooting sessions).</p>
+<p><strong>Next:</strong> <a href="../6-level-2/">Optimize Simple IS-IS Deployments</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>

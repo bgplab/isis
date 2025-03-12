@@ -95,6 +95,10 @@
 <li>
     <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
 </li>
+                                    
+<li>
+    <a href="../../basic/7-unnumbered/" class="dropdown-item">Running IS-IS Over Unnumbered Interfaces</a>
+</li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -140,7 +144,7 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../../basic/6-level-2/" class="nav-link">
+                                <a rel="prev" href="../../basic/7-unnumbered/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
@@ -344,6 +348,7 @@ I&gt;* 172.16.0.0/24 [115/20] via 10.1.0.1, eth2, weight 1, 00:31:18
 </ul>
 <p>Finally, IS-IS advertises subnets configured on passive interfaces as <em>internal</em> IS-IS routes and redistributed subnets as <em>external</em> IS-IS routes. While the difference between the two route types is not as extreme as in OSPF (IS-IS routers advertise both route types in the same LSP), there are subtle differences in route preference<sup id="fnref:DRP"><a class="footnote-ref" href="#fn:DRP">8</a></sup> that could result in amusing<sup id="fnref:TTA"><a class="footnote-ref" href="#fn:TTA">9</a></sup> troubleshooting scenarios worthy of a CCIE lab.</p>
 <p><strong>Takeaway:</strong> Prefer passive interfaces over the redistribution of connected subnets.</p>
+<p><strong>Next:</strong> <a href="../2-dis/">Influence the Designated IS Election</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <p><strong>Point-to-point links:</strong></p>

@@ -95,6 +95,10 @@
 <li>
     <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
 </li>
+                                    
+<li>
+    <a href="../../basic/7-unnumbered/" class="dropdown-item">Running IS-IS Over Unnumbered Interfaces</a>
+</li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -334,6 +338,7 @@ Area Gandalf:
 <p>If a DIS fails, its pseudonode LSP remains in the LSPDB, and the connectivity through the pseudonode is intact until another DIS is elected. At that point, the new DIS advertises a new LAN pseudonode, and all remaining routers change their LSPs to link to it. A change in DIS thus causes no connectivity loss<sup id="fnref:DLER"><a class="footnote-ref" href="#fn:DLER">4</a></sup>, but it does cause a flurry of LSP changes.</p>
 <p>Error recovery is more critical. In a perfect world with no transmission errors, a DIS failure doesn&rsquo;t matter. However, if the LAN segment experiences packet drops, and there&rsquo;s no DIS to send periodic CSNP packets, the dropped packets won&rsquo;t be retransmitted until the new DIS is elected and sends the first CSNP packet. DIS failure thus has the potential to impact network convergence.</p>
 <p><strong>Takeaway:</strong> Making DIS stable is not a bad idea, especially on large-scale segments with many routers and a higher probability of packet loss (for example, large Carrier Ethernet deployments).</p>
+<p><strong>Next:</strong> <a href="../3-md5/">Protect IS-IS Routing Data with MD5 Authentication</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
