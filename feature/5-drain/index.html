@@ -256,7 +256,7 @@ Routing entry for 10.0.0.4/32
 <p>If you shut down S1, the routes using S1 (next hop 10.1.0.2) remain in the routing (and forwarding) table of L1 until L1 discovers it lost the link toward S1. That might be pretty fast if you can rely on the physical link-loss signal or take seconds if your only failure detection mechanism is the IS-IS hello protocol. Regardless of the failure detection time, there will be some traffic disruption.</p>
 <h2 id="draining-traffic-from-an-is-is-router">Draining Traffic from an IS-IS Router</h2>
 <p>We&rsquo;re using the <em>maximum metric</em> functionality in OSPF networks to solve a similar problem; if an OSPF router advertises all its links with a high metric, all other routers eventually find a better path, and the router is no longer used for transit traffic.</p>
-<p>While some IS-IS implementations have a similar configuration command (for example, <code>advertise-high-metrics</code> on FRRouting), the IS-IS designers decided to use an even better approach: the IS-IS LSPs contain an <strong>overload</strong> bit that a router can use to tell everyone else to avoid it for transit traffic.</p>
+<p>While some IS-IS implementations have a similar configuration command (for example, <code>advertise-high-metrics</code> on FRRouting), the IS-IS designers decided to take an even better approach years before OSPF got the <em>maximum metric</em> functionality: the IS-IS LSPs contain an <strong>overload</strong> bit that a router can use to tell everyone else to avoid it for transit traffic.</p>
 <p>Setting the <strong>overload</strong> bit on S1 enables a clean shutdown. As the other routers receive and flood S1 LSP across the network, they recompute their best paths and remove routes using S1 (or replace them with alternate paths).</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -265,16 +265,20 @@ Routing entry for 10.0.0.4/32
 </div>
 <h2 id="configuration-tasks">Configuration Tasks</h2>
 <p>Configure the <strong>overload</strong> bit in the IS-IS process of S1.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You&rsquo;re running a dual-stack network; some devices (for example, FRRouting) can set the <strong>overload</strong> bit for individual address families. Check what your devices are doing, or you might drain IPv4 traffic but leave IPv6 intact.</p>
+</div>
 <p>Check also the <em>IS-IS high metric</em> functionality on devices that support it as an alternative to the <strong>overload</strong> bit and in combination with it, and explore the resulting changes in the S1&rsquo;s IS-IS LSP, IS-IS topology, and IP routing table.</p>
 <h2 id="validation">Validation</h2>
 <p>You can use the <strong>netlab validate</strong> command if you&rsquo;re using <em>netlab</em> release 1.8.4 or later and run FRRouting on L1 and L2. This is the printout you&rsquo;d get if you failed to configure the <strong>overload</strong> bit:</p>
 <p><img alt="" src="../validate-drain.png" /></p>
 <p>You could also do manual validation of the routing tables on L1 and L2:</p>
 <ul>
-<li>There should be a single path (through S2) for the loopback prefix of the other leaf router.</li>
-<li>The loopback prefix of S1 should still be reachable (because it&rsquo;s not a transit route through S1).</li>
+<li>There should be a single path (through S2) for the other leaf router&rsquo;s IPv4 and IPv6 loopback prefixes.</li>
+<li>The IPv4 and IPv6 loopback prefixes of S1 should still be reachable (because it&rsquo;s not a transit route through S1).</li>
 </ul>
-<p class="code-caption">The final loopback IS-IS routes on L1 (FRRouting)<br /></p>
+<p class="code-caption">The final IPv4 loopback IS-IS routes on L1 (FRRouting)<br /></p>
 <pre><code>l1# show ip route 10.0.0.0/24 longer-prefixes isis
 Codes: K - kernel route, C - connected, L - local, S - static,
        R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
@@ -309,6 +313,7 @@ s1.00-00                  112   0x00000004  0x0266    1618    0/0/1
 <h2 id="other-uses-of-the-overload-bit">Other Uses of the Overload Bit</h2>
 <p>Most IS-IS implementations can set the <strong>overload</strong> bit during the device startup process to prevent other routers from using a device for transit routing until it completes collecting routing information or initializing other control-plane protocols (for example, LDP).</p>
 <p>Some implementations allow you to set the overload bit for a fixed amount of time; others are more flexible and can wait for the initial BGP convergence to complete before clearing the <strong>overload</strong> bit.</p>
+<p>Finally, some implementors returned to the fundamentals and started using the <strong>overload</strong> bit for what it was initially designed to do: signal to the rest of the network that the router has performance problems (for example, running out of RAM due to a memory leak) and should be avoided.</p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -362,73 +367,73 @@ s1.00-00                  112   0x00000004  0x0266    1618    0/0/1
 <tr>
 <td><strong>l1</strong></td>
 <td style="text-align: right;">10.0.0.3/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:3::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
 <td>eth1</td>
 <td style="text-align: right;">10.1.0.1/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>l1 -&gt; s1</td>
 </tr>
 <tr>
 <td>eth2</td>
 <td style="text-align: right;">10.1.0.5/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>l1 -&gt; s2</td>
 </tr>
 <tr>
 <td><strong>l2</strong></td>
 <td style="text-align: right;">10.0.0.4/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:4::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
 <td>eth1</td>
 <td style="text-align: right;">10.1.0.9/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>l2 -&gt; s1</td>
 </tr>
 <tr>
 <td>eth2</td>
 <td style="text-align: right;">10.1.0.13/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>l2 -&gt; s2</td>
 </tr>
 <tr>
 <td><strong>s1</strong></td>
 <td style="text-align: right;">10.0.0.1/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:1::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
-<td>eth1</td>
+<td>Ethernet1</td>
 <td style="text-align: right;">10.1.0.2/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>s1 -&gt; l1</td>
 </tr>
 <tr>
-<td>eth2</td>
+<td>Ethernet2</td>
 <td style="text-align: right;">10.1.0.10/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>s1 -&gt; l2</td>
 </tr>
 <tr>
 <td><strong>s2</strong></td>
 <td style="text-align: right;">10.0.0.2/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:2::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
-<td>eth1</td>
+<td>Ethernet1</td>
 <td style="text-align: right;">10.1.0.6/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>s2 -&gt; l1</td>
 </tr>
 <tr>
-<td>eth2</td>
+<td>Ethernet2</td>
 <td style="text-align: right;">10.1.0.14/30</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">LLA</td>
 <td>s2 -&gt; l2</td>
 </tr>
 </tbody>

@@ -292,6 +292,7 @@ IS-IS Instance: Gandalf VRF: default
 <li>Disable the advertising of transit prefixes on all routers in your lab.</li>
 <li>If available, turn off the advertising of transit interface addresses.</li>
 </ul>
+<p>Some devices also have the opposite nerd knob that can explicitly suppress the subnet used on the interface.</p>
 <h2 id="problem-solved-not-yet">Problem Solved? Not Yet</h2>
 <p>Connect to the WAN router and inspect the IS-IS routes in its IP routing table. You&rsquo;re done if you see the three loopback prefixes <em>and the LAN prefix</em>. However, if you mindlessly followed the above instructions, you&rsquo;ll get only the three loopback prefixes:</p>
 <p class="code-caption">The reduced IP routing table on WAN<br /></p>
