@@ -118,6 +118,8 @@ You can use the **netlab validate** command if you're using *netlab* release 1.8
 
 You could also manually validate your work. Inspect IS-IS routes in the WAN router's IP routing table; it should contain three loopback (/32) prefixes and a single LAN (/24) prefix but no transit (/30) prefixes.
 
+**Next:** [Drain Traffic Before Node Maintenance](5-drain.md)
+
 ## Reference Information
 
 ### Lab Wiring

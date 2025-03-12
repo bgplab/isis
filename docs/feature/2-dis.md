@@ -150,6 +150,8 @@ Error recovery is more critical. In a perfect world with no transmission errors,
 
 **Takeaway:** Making DIS stable is not a bad idea, especially on large-scale segments with many routers and a higher probability of packet loss (for example, large Carrier Ethernet deployments).
 
+**Next:** [Protect IS-IS Routing Data with MD5 Authentication](3-md5.md)
+
 ## Reference Information
 
 ### Lab Wiring

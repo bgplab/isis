@@ -396,6 +396,8 @@ The per-protocol neighbor reachability information allows routers to run the SPF
 
 **Takeaway:** Use multi-topology IS-IS routing in multiprotocol networks unless you can guarantee that all links use the same address families (or love late-night troubleshooting sessions).
 
+**Next:** [Optimize Simple IS-IS Deployments](6-level-2.md)
+
 ## Reference Information
 
 ### Lab Wiring

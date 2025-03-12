@@ -167,6 +167,8 @@ Finally, IS-IS advertises subnets configured on passive interfaces as *internal*
 
 **Takeaway:** Prefer passive interfaces over the redistribution of connected subnets.
 
+**Next:** [Influence the Designated IS Election](2-dis.md)
+
 ## Reference Information
 
 ### Lab Wiring
