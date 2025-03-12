@@ -1,6 +1,6 @@
 # Drain Traffic Before Node Maintenance
 ---
-defaults.sources.extra: [ ../../defaults.yml ]
+defaults.sources.extra: [ ../../defaults.yml, ../../defaults-ipv6.yml ]
 version: 1.8.4
 
 name: drain

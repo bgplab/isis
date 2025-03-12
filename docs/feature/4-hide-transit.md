@@ -87,6 +87,8 @@ Many IS-IS implementations contain one or two nerd knobs that can be used to sup
 * Disable the advertising of transit prefixes on all routers in your lab.
 * If available, turn off the advertising of transit interface addresses.
 
+Some devices also have the opposite nerd knob that can explicitly suppress the subnet used on the interface.
+
 ## Problem Solved? Not Yet
 
 Connect to the WAN router and inspect the IS-IS routes in its IP routing table. You're done if you see the three loopback prefixes *and the LAN prefix*. However, if you mindlessly followed the above instructions, you'll get only the three loopback prefixes:

@@ -25,3 +25,12 @@ lb_l2:
   valid:
     frr: "'{{ interfaces[0].ifname }}' not in stdout"
   fail: The L2 loopback is still reachable through S1
+
+lb_l2_v6:
+  description: Check for the L2 loopback interface
+  nodes: [ l1 ]
+  exec:
+    frr: vtysh -c 'show ipv6 route {{ hostvars.l2.loopback.ipv6 }}'
+  valid:
+    frr: "'{{ interfaces[0].ifname }}' not in stdout"
+  fail: The L2 loopback is still reachable through S1

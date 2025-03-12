@@ -42,7 +42,7 @@ If you shut down S1, the routes using S1 (next hop 10.1.0.2) remain in the routi
 
 We're using the *maximum metric* functionality in OSPF networks to solve a similar problem; if an OSPF router advertises all its links with a high metric, all other routers eventually find a better path, and the router is no longer used for transit traffic.
 
-While some IS-IS implementations have a similar configuration command (for example, `advertise-high-metrics` on FRRouting), the IS-IS designers decided to use an even better approach: the IS-IS LSPs contain an **overload** bit that a router can use to tell everyone else to avoid it for transit traffic.
+While some IS-IS implementations have a similar configuration command (for example, `advertise-high-metrics` on FRRouting), the IS-IS designers decided to take an even better approach years before OSPF got the *maximum metric* functionality: the IS-IS LSPs contain an **overload** bit that a router can use to tell everyone else to avoid it for transit traffic.
 
 Setting the **overload** bit on S1 enables a clean shutdown. As the other routers receive and flood S1 LSP across the network, they recompute their best paths and remove routes using S1 (or replace them with alternate paths).
 
@@ -55,6 +55,9 @@ Setting the **overload** bit on S1 enables a clean shutdown. As the other router
 
 Configure the **overload** bit in the IS-IS process of S1.
 
+!!! Tip
+    You're running a dual-stack network; some devices (for example, FRRouting) can set the **overload** bit for individual address families. Check what your devices are doing, or you might drain IPv4 traffic but leave IPv6 intact.
+
 Check also the *IS-IS high metric* functionality on devices that support it as an alternative to the **overload** bit and in combination with it, and explore the resulting changes in the S1's IS-IS LSP, IS-IS topology, and IP routing table.
 
 ## Validation
@@ -65,10 +68,10 @@ You can use the **netlab validate** command if you're using *netlab* release 1.8
 
 You could also do manual validation of the routing tables on L1 and L2:
 
-* There should be a single path (through S2) for the loopback prefix of the other leaf router.
-* The loopback prefix of S1 should still be reachable (because it's not a transit route through S1).
+* There should be a single path (through S2) for the other leaf router's IPv4 and IPv6 loopback prefixes.
+* The IPv4 and IPv6 loopback prefixes of S1 should still be reachable (because it's not a transit route through S1).
 
-The final loopback IS-IS routes on L1 (FRRouting)
+The final IPv4 loopback IS-IS routes on L1 (FRRouting)
 {.code-caption}
 ```
 l1# show ip route 10.0.0.0/24 longer-prefixes isis
@@ -113,6 +116,8 @@ Most IS-IS implementations can set the **overload** bit during the device startu
 
 Some implementations allow you to set the overload bit for a fixed amount of time; others are more flexible and can wait for the initial BGP convergence to complete before clearing the **overload** bit.
 
+Finally, some implementors returned to the fundamentals and started using the **overload** bit for what it was initially designed to do: signal to the rest of the network that the router has performance problems (for example, running out of RAM due to a memory leak) and should be avoided.
+
 ## Reference Information
 
 ### Lab Wiring
@@ -130,15 +135,16 @@ Some implementations allow you to set the overload bit for a fixed amount of tim
 
 | Node/Interface | IPv4 Address | IPv6 Address | Description |
 |----------------|-------------:|-------------:|-------------|
-| **l1** |  10.0.0.3/32 |  | Loopback |
-| eth1 | 10.1.0.1/30 |  | l1 -> s1 |
-| eth2 | 10.1.0.5/30 |  | l1 -> s2 |
-| **l2** |  10.0.0.4/32 |  | Loopback |
-| eth1 | 10.1.0.9/30 |  | l2 -> s1 |
-| eth2 | 10.1.0.13/30 |  | l2 -> s2 |
-| **s1** |  10.0.0.1/32 |  | Loopback |
-| eth1 | 10.1.0.2/30 |  | s1 -> l1 |
-| eth2 | 10.1.0.10/30 |  | s1 -> l2 |
-| **s2** |  10.0.0.2/32 |  | Loopback |
-| eth1 | 10.1.0.6/30 |  | s2 -> l1 |
-| eth2 | 10.1.0.14/30 |  | s2 -> l2 |
+| **l1** |  10.0.0.3/32 | 2001:db8:cafe:3::1/64 | Loopback |
+| eth1 | 10.1.0.1/30 | LLA | l1 -> s1 |
+| eth2 | 10.1.0.5/30 | LLA | l1 -> s2 |
+| **l2** |  10.0.0.4/32 | 2001:db8:cafe:4::1/64 | Loopback |
+| eth1 | 10.1.0.9/30 | LLA | l2 -> s1 |
+| eth2 | 10.1.0.13/30 | LLA | l2 -> s2 |
+| **s1** |  10.0.0.1/32 | 2001:db8:cafe:1::1/64 | Loopback |
+| Ethernet1 | 10.1.0.2/30 | LLA | s1 -> l1 |
+| Ethernet2 | 10.1.0.10/30 | LLA | s1 -> l2 |
+| **s2** |  10.0.0.2/32 | 2001:db8:cafe:2::1/64 | Loopback |
+| Ethernet1 | 10.1.0.6/30 | LLA | s2 -> l1 |
+| Ethernet2 | 10.1.0.14/30 | LLA | s2 -> l2 |
+
