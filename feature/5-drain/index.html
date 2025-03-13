@@ -124,6 +124,10 @@
 <li>
     <a href="./" class="dropdown-item active" aria-current="page">Drain Traffic Before Node Maintenance</a>
 </li>
+                                    
+<li>
+    <a href="../6-timers/" class="dropdown-item">Adjust IS-IS Timers</a>
+</li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -149,7 +153,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                <a rel="next" href="../6-timers/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -318,6 +322,7 @@ s1.00-00                  112   0x00000004  0x0266    1618    0/0/1
 <p>Most IS-IS implementations can set the <strong>overload</strong> bit during the device startup process to prevent other routers from using a device for transit routing until it completes collecting routing information or initializing other control-plane protocols (for example, LDP).</p>
 <p>Some implementations allow you to set the overload bit for a fixed amount of time; others are more flexible and can wait for the initial BGP convergence to complete before clearing the <strong>overload</strong> bit.</p>
 <p>Finally, some implementors returned to the fundamentals and started using the <strong>overload</strong> bit for what it was initially designed to do: signal to the rest of the network that the router has performance problems (for example, running out of RAM due to a memory leak) and should be avoided.</p>
+<p><strong>Next:</strong> <a href="../6-timers/">Adjust IS-IS Timers</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -447,7 +452,7 @@ s1.00-00                  112   0x00000004  0x0266    1618    0/0/1
 
         <footer class="col-md-12">
 <hr>
-    <p>(C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)</p>
+    <p>(C) 2023–2025 Ivan Pepelnjak (ipSpace.net AG)</p>
         </footer>
         <script src="../../js/bootstrap.bundle.min.js"></script>
         <script>

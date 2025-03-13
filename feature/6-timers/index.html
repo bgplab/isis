@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
-        <link rel="canonical" href="https://isis.bgplabs.net/feature/3-md5/">
+        <link rel="canonical" href="https://isis.bgplabs.net/feature/6-timers/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Protect IS-IS Routing Data with MD5 Authentication &#171; IS-IS Labs</title>
+  <title>Adjust IS-IS Timers &#171; IS-IS Labs</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -114,7 +114,7 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Protect IS-IS Routing Data with MD5 Authentication</a>
+    <a href="../3-md5/" class="dropdown-item">Protect IS-IS Routing Data with MD5 Authentication</a>
 </li>
                                     
 <li>
@@ -126,7 +126,7 @@
 </li>
                                     
 <li>
-    <a href="../6-timers/" class="dropdown-item">Adjust IS-IS Timers</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Adjust IS-IS Timers</a>
 </li>
                                 </ul>
                             </li>
@@ -148,12 +148,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../2-dis/" class="nav-link">
+                                <a rel="prev" href="../5-drain/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../4-hide-transit/" class="nav-link">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -181,7 +181,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
       <ul class="nav flex-column">
           
-      <li class="nav-item" data-level="1"><a href="#protect-is-is-routing-data-with-md5-authentication" class="nav-link">Protect IS-IS Routing Data with MD5 Authentication</a>
+      <li class="nav-item" data-level="1"><a href="#adjust-is-is-timers" class="nav-link">Adjust IS-IS Timers</a>
         <ul class="nav flex-column">
       <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
         <ul class="nav flex-column">
@@ -191,11 +191,7 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#initial-configuration" class="nav-link">Initial Configuration</a>
-        <ul class="nav flex-column">
-        </ul>
-      </li>
-      <li class="nav-item" data-level="2"><a href="#the-problem" class="nav-link">The Problem</a>
+      <li class="nav-item" data-level="2"><a href="#initial-state" class="nav-link">Initial State</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -204,6 +200,10 @@
         </ul>
       </li>
       <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#beyond-neighbor-hold-times" class="nav-link">Beyond Neighbor Hold Times</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -230,213 +230,79 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="protect-is-is-routing-data-with-md5-authentication">Protect IS-IS Routing Data with MD5 Authentication</h1>
-<p>Like OSPF and BGP, IS-IS contains a simple mechanism to authenticate routing traffic &ndash; IS-IS packets can include a cleartext password or an <a href="https://datatracker.ietf.org/doc/html/rfc5304">MD5</a>- or <a href="https://datatracker.ietf.org/doc/html/rfc5310">SHA hash</a><sup id="fnref:HO"><a class="footnote-ref" href="#fn:HO">1</a></sup>. Unlike OSPF, IS-IS can authenticate:</p>
-<ul>
-<li>The packets exchanged between routers (hello packets)</li>
-<li>The contents of Link State PDUs flooded across an area or a domain.</li>
-</ul>
-<p>Authenticating IS-IS traffic is not as critical as authenticating EBGP traffic. It&rsquo;s almost impossible to inject IS-IS packets into a LAN segment the intruder is not connected to, and you&rsquo;re not supposed to run an IGP on an untrusted network anyway.</p>
-<p>Most IS-IS implementations have <em>interface</em> passwords (authenticating the IS-IS hello packets), <em>area</em> passwords (authenticating level-1 LSPs), and <em>domain</em> passwords (authenticating level-2 LSPs). You&rsquo;ll practice configuring all three in this lab exercise. </p>
-<p><img alt="Lab topology" src="../topology-md5.png" /></p>
+<h1 id="adjust-is-is-timers">Adjust IS-IS Timers</h1>
+<p>Like any other (interior) routing protocol, IS-IS uses hello packets to discover adjacent routers (intermediate systems) and to detect the loss of communication with them.</p>
+<p>Unlike OSPF, where the hello timers must match between neighbors, IS-IS allows each router to define its own hold time (the time after which it is considered unreachable). The <em>advertised hold time</em> is the only parameter relevant in the neighbor loss detection; it&rsquo;s up to the IS-IS implementation what the hello interval is and how many hello packets are sent within the hold time.</p>
+<p>In this lab exercise, you will fine-tune the IS-IS timers on the remote routers (R1, R2) to speed up neighbor loss detection on the Core router. You will also explore other configurable timers.</p>
+<p><img alt="Lab topology" src="../topology-timers.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
 <ul>
-<li>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> for R1 (default: FRRouting virtual machines or containers).</li>
-<li>If you want preconfigured passwords for the other three routers (R2, R3, and R4), use FRRouting or Arista EOS. You can use any other device for these routers, but you&rsquo;ll have to configure the passwords yourself.</li>
-<li>Automated lab validation requires FRRouting on R2, R3, and R4.</li>
+<li>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> for the routers in your lab.</li>
+<li>You can do automated lab validation when using Arista EOS on your routers<sup id="fnref:FRSAT"><a class="footnote-ref" href="#fn:FRSAT">1</a></sup>.</li>
 </ul>
 <h2 id="starting-the-lab">Starting the Lab</h2>
 <p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
 <ul>
-<li>Change directory to <code>feature/3-md5</code></li>
-<li>Execute <strong>netlab up</strong>. You&rsquo;ll get a lab with IPv4 addresses configured on all interfaces and IS-IS routing configured on all routers.</li>
+<li>Change directory to <code>feature/6-timers</code></li>
+<li>Execute <strong>netlab up</strong>. You&rsquo;ll get a lab with IPv4 addresses configured on all interfaces and level-2 IS-IS routing configured on all routers.</li>
 <li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
 </ul>
-<h2 id="initial-configuration">Initial Configuration</h2>
-<ul>
-<li>R1, R2, and R3 are in IS-IS area 49.0001.</li>
-<li>R4 is in IS-IS area 49.0002.</li>
-<li>R1 (your router) and R2 are level-1-2 routers. R3 is a level-1 router, and R4 is a level-2 router.</li>
-<li>The link between R1 and R2 is a LAN (multi-access) link, the links R1-R3 and R1-R4 are point-to-point links.</li>
-</ul>
-<p>The initial configuration should result in these IS-IS adjacencies:</p>
-<table>
-<thead>
-<tr>
-<th>Link</th>
-<th>Adjacency</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>R1-R2</td>
-<td>level-1 + level-2</td>
-</tr>
-<tr>
-<td>R1-R3</td>
-<td>level-1</td>
-</tr>
-<tr>
-<td>R1-R4</td>
-<td>level-2</td>
-</tr>
-</tbody>
-</table>
-<p>However, R2, R3, and R4 use IS-IS MD5 authentication with these keys:</p>
-<table>
-<thead>
-<tr>
-<th>Password type</th>
-<th>Password</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Interface</td>
-<td>ForgetMeNot</td>
-</tr>
-<tr>
-<td>Area (level-1)</td>
-<td>MyAreaOnly</td>
-</tr>
-<tr>
-<td>Domain (level-2)</td>
-<td>CloseFriends</td>
-</tr>
-</tbody>
-</table>
-<h2 id="the-problem">The Problem</h2>
-<p>Some IS-IS implementations exhibit bizarre behavior when adjacent devices have an authentication mismatch. The device not using IS-IS authentication can claim full adjacency with its neighbors. In contrast, the adjacent device claims the adjacency is in the INIT state or shows no IS-IS neighbors on the interface.</p>
-<p>For example, R1 running FRRouting claims it has three IS-IS neighbors and full adjacency with two of them.</p>
-<p class="code-caption">IS-IS neighbors on R1 running FRRouting<br /></p>
-<pre><code>$ netlab connect r1 --show isis neighbor
-Connecting to container clab-md5-r1, executing vtysh -c &quot;show isis neighbor&quot;
+<h2 id="initial-state">Initial State</h2>
+<p>Most IS-IS implementations advertise a 30-second <em>hold interval</em>  but differ significantly in their hello intervals. For example, by default, FRRouting sends ISH (Intermediate System Hello) packets every three seconds, while Arista EOS sends them every ten seconds.</p>
+<p>Some platforms show the configured ISH timers in the <strong>show isis interface</strong> commands:</p>
+<p class="code-caption">The <strong>show isis interface</strong> command on FRRouting displays the ISH timers<br /></p>
+<pre><code>r1# show isis interface detail
 Area Gandalf:
-  System Id           Interface   L  State        Holdtime SNPA
- r2                  eth1        1  Initializing  28       aac1.ab76.78a5
- r2                  eth1        2  Initializing  28       aac1.ab76.78a5
- r3                  eth2        1  Up            28       2020.2020.2020
- r4                  eth3        2  Up            28       2020.2020.2020
+  Interface: eth1, State: Up, Active, Circuit Id: 0x0
+    Type: p2p, Level: L2
+    Level-2 Information:
+      Metric: 10, Active neighbors: 1
+      Hello interval: 3, Holddown count: 10, Padding: yes
+      CNSP interval: 10, PSNP interval: 2
+    IP Prefix(es):
+      10.1.0.1/30
 </code></pre>
-<p>At the same time, R2 through R4 claim they have no IS-IS neighbors.</p>
-<p>Arista EOS is a bit more consistent. R1 running Arista EOS claims to have three IS-IS neighbors, but the adjacency is stuck in the <em>INIT</em> phase.</p>
-<p class="code-caption">IS-IS neighbors on R1 running Arista EOS<br /></p>
-<pre><code>r1# show isis neighbor
+<p>To get the advertised <em>hold time</em> value, use the <strong>show isis neighbor</strong> command; some implementations include it in the printout.</p>
+<p class="code-caption">The <strong>show isis neighbor detail</strong> command on Arista EOS displays the advertised hold time<br /></p>
+<pre><code>r1#show isis neighbors detail
+
 Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
-Gandalf   default  0000.0000.0002   L1   Ethernet1          52:dc:ca:fe:2:1   INIT  25          r1.97
-Gandalf   default  0000.0000.0002   L2   Ethernet1          52:dc:ca:fe:2:1   INIT  25          r1.97
-Gandalf   default  0000.0000.0003   L1   Ethernet2          P2P               INIT  26          95
-Gandalf   default  0000.0000.0004   L2   Ethernet3          P2P               INIT  23          98
+Gandalf   default  r2               L2   Ethernet1          P2P               UP    25          DB
+  Area addresses: 49.0001
+  SNPA: P2P
+  Router ID: 0.0.0.0
+  Advertised Hold Time: 30
+  State Changed: 00:04:38 ago at 2025-03-12 16:36:58
+  IPv4 Interface Address: 10.1.0.2
+  IPv6 Interface Address: none
+  Interface name: Ethernet1
+  Graceful Restart: Supported
+  Supported Address Families: IPv4
+  Neighbor Supported Address Families: IPv4
 </code></pre>
-<p>Anyway, we know what&rsquo;s wrong: R2, R3, and R4 use MD5 authentication and ignore unauthenticated packets sent by R1<sup id="fnref:SHC"><a class="footnote-ref" href="#fn:SHC">2</a></sup>. Let&rsquo;s fix it.</p>
 <h2 id="configuration-tasks">Configuration Tasks</h2>
-<p>Configure the following IS-IS passwords using <strong>authentication</strong> or <strong>password</strong> interface- or router configuration commands<sup id="fnref:ADP"><a class="footnote-ref" href="#fn:ADP">3</a></sup>: </p>
-<table>
-<thead>
-<tr>
-<th>Password type</th>
-<th>Password</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Interface</td>
-<td>ForgetMeNot</td>
-</tr>
-<tr>
-<td>Area</td>
-<td>MyAreaOnly</td>
-</tr>
-<tr>
-<td>Domain</td>
-<td>RemoteFriend</td>
-</tr>
-</tbody>
-</table>
+<p>In our network, every remote router has a single uplink to the core router. Detecting neighbor loss on the remote routers is thus not as relevant as detecting remote site failure on the core router:</p>
+<ul>
+<li>Reduce the advertised hold time on the Core router to 15 seconds.</li>
+<li>Reduce the advertised hold time on R1 and R2 to 3 seconds.</li>
+<li>Most IS-IS implementations ask you to configure the interface parameters <strong>hello-interval</strong> and <strong>hello-multiplier</strong> (the advertised hold time is a product of these two parameters). Use whatever parameter values work for you.</li>
+</ul>
 <h2 id="validation">Validation</h2>
-<p>You can use the <strong>netlab validate</strong> command if you run FRRouting on R2, R3, and R4. The validation process checks the IS-IS adjacency using IS-IS hostnames. The validation will succeed on R2 and R3 if you configured the interface password (otherwise, the IS-IS adjacency is not established) and the area password (otherwise, R2 and R3 see adjacent system ID 0000.0000.0001 but do not know it is R1). You must configure the domain password for the validation to succeed on R4.</p>
-<p>For example, this is the printout you would get after configuring the interface- and area passwords:</p>
-<p><img alt="" src="../validate-md5.png" /></p>
-<p>You could also do manual validation:</p>
-<ul>
-<li>After configuring the interface passwords, all IS-IS adjacencies should be in UP state on all routers.</li>
-</ul>
-<p class="code-caption">IS-IS neighbors on R1 running Arista EOS<br /></p>
-<pre><code>r1#show isis neighbors
-
-Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
-Gandalf   default  r2               L1   Ethernet1          52:dc:ca:fe:2:1   UP    8           r2.a4
-Gandalf   default  r2               L2   Ethernet1          52:dc:ca:fe:2:1   UP    6           r2.a4
-Gandalf   default  r3               L1   Ethernet2          P2P               UP    22          A6
-Gandalf   default  r4               L2   Ethernet3          P2P               UP    28          A8
-</code></pre>
-<ul>
-<li>You will not see R1 level-1 LSPs on other routers until you configure the area (level-1) password on R1. For example, this is the level-1 database on R2 when R1 has no area password. The R1 LSP is missing, and R3 is unreachable.</li>
-</ul>
-<p class="code-caption">IS-IS level-1 database on R2 running Arista EOS<br /></p>
-<pre><code>r2#show isis database level-1
-Legend:
-H - hostname conflict
-U - node unreachable
-
-IS-IS Instance: Gandalf VRF: default
-  IS-IS Level 1 Link State Database
-    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r2.00-00                      3  61902   905    113 L2  0000.0000.0002.00-00  &lt;&gt;
- U  r2.a4-00                      1  13264   905     70 L2  0000.0000.0002.a4-00  &lt;&gt;
- U  r3.00-00                      3  58414   907    113 L1  0000.0000.0003.00-00  &lt;&gt;
-</code></pre>
-<ul>
-<li>After configuring the area (level-1) password on R1, R2 and R3 should display R1&rsquo;s LSPs in their level-1 database:</li>
-</ul>
-<p class="code-caption">IS-IS level-1 database on R2 running Arista EOS contains authenticated R1 LSP<br /></p>
-<pre><code>r2#show isis database level-1
-Legend:
-H - hostname conflict
-U - node unreachable
-
-IS-IS Instance: Gandalf VRF: default
-  IS-IS Level 1 Link State Database
-    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r1.00-00                      9  61720  1195    150 L2  0000.0000.0001.00-00  &lt;DefaultAtt&gt;
-    r2.00-00                      3  61902   842    113 L2  0000.0000.0002.00-00  &lt;&gt;
-    r2.a4-00                      1  13264   842     70 L2  0000.0000.0002.a4-00  &lt;&gt;
-    r3.00-00                      3  58414   844    113 L1  0000.0000.0003.00-00  &lt;&gt;
-</code></pre>
-<ul>
-<li>Similarly, R2 and R4 won&rsquo;t display R1 level-2 LSP until you configure the domain (level-2) password:</li>
-</ul>
-<p class="code-caption">IS-IS level-2 database on R4 (running Arista EOS) does not contain the R1 LSP<br /></p>
-<pre><code>r4#show isis database
-Legend:
-H - hostname conflict
-U - node unreachable
-
-IS-IS Instance: Gandalf VRF: default
-  IS-IS Level 2 Link State Database
-    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
- U  r2.00-00                      4  53488  1052    151 L2  0000.0000.0002.00-00  &lt;&gt;
- U  r2.a4-00                      1  20572   711     70 L2  0000.0000.0002.a4-00  &lt;&gt;
-    r4.00-00                      3  36459   711    113 L2  0000.0000.0004.00-00  &lt;&gt;
-</code></pre>
-<ul>
-<li>After configuring the domain (level-2) password on R1, R2 and R4 should display R1&rsquo;s LSPs in their level-2 database:</li>
-</ul>
-<p class="code-caption">IS-IS level-2 database on R4 running Arista EOS contains authenticated R1 LSP<br /></p>
-<pre><code>r4#show isis database
-Legend:
-H - hostname conflict
-U - node unreachable
-
-IS-IS Instance: Gandalf VRF: default
-  IS-IS Level 2 Link State Database
-    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r1.00-00                     10  16371  1196    170 L2  0000.0000.0001.00-00  &lt;&gt;
-    r2.00-00                      4  53488   983    151 L2  0000.0000.0002.00-00  &lt;&gt;
-    r2.a4-00                      1  20572   642     70 L2  0000.0000.0002.a4-00  &lt;&gt;
-    r4.00-00                      3  36459   642    113 L2  0000.0000.0004.00-00  &lt;&gt;
-</code></pre>
-<p><strong>Next</strong>: <a href="../4-hide-transit/">Hide Transit Subnets in IS-IS Networks</a></p>
+<p>You can use the <strong>netlab validate</strong> command if you&rsquo;re using <em>netlab</em> release 1.8.4 or later and run Arista EOS on the WAN router. This is the printout you should get after completing the lab exercise:</p>
+<p><img alt="" src="../validate-timers.png" /></p>
+<p>You could also manually validate your work. Inspect the details of IS-IS neighbors on all three routers and check the <em>advertised hold time</em>.</p>
+<h2 id="beyond-neighbor-hold-times">Beyond Neighbor Hold Times</h2>
+<p>Most IS-IS implementations have several SPF-, LSP-, and CSNP-related timers you can tweak to improve your network&rsquo;s convergence. While setting these timers to low values is tempting, you always have to find the right balance between convergence speed, routing protocol overhead (excessive flooding and CPU utilization), and network instability due to overly quick reactions to partially updated information (<a href="https://blog.ipspace.net/2019/06/know-thy-environment-before-redesigning/">example</a>).</p>
+<p>These are the usual timers you can tweak:</p>
+<dl>
+<dt><strong>SPF interval</strong></dt>
+<dd>Changes the maximum interval between SPF runs. This parameter directly impacts the convergence speed and is set to highly conservative values in implementations with enough history as they had to work on very slow CPUs.</dd>
+<dt><strong>LSP generation</strong></dt>
+<dd>Interval between generating changed LSPs. This parameter should not be set too low as it prevents your router from flooding the network with too many changes generated by a flapping interface. However, it might also impact the speed with which the changes in redistributed routes are advertised in IS-IS.</dd>
+<dt><strong>CSNP generation</strong></dt>
+<dd>IS-IS uses periodic CSNP packets (table-of-contents of the LSP database) to detect missing information. Sending them more often will improve recovery from lost LSP updates. However, if the LSP packet loss significantly impacts your network convergence, you have much bigger problems to fix than the CSNP interval.</dd>
+</dl>
+<p>You can find further network-convergence-related information in the <a href="https://blog.ipspace.net/series/fast-failover/">Fast Failover</a> series of blog posts.</p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -451,25 +317,19 @@ IS-IS Instance: Gandalf VRF: default
 <tbody>
 <tr>
 <td>r1</td>
-<td>eth1</td>
+<td>Ethernet1</td>
+<td>core</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
 <td>r2</td>
-<td>eth1</td>
-</tr>
-<tr>
-<td>r1</td>
-<td>eth2</td>
-<td>r3</td>
-<td>eth1</td>
-</tr>
-<tr>
-<td>r1</td>
-<td>eth3</td>
-<td>r4</td>
-<td>eth1</td>
+<td>Ethernet1</td>
+<td>core</td>
+<td>Ethernet2</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running FRRouting.</p>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running Arista EOS.</p>
 <h3 id="lab-addressing">Lab Addressing</h3>
 <table>
 <thead>
@@ -482,78 +342,54 @@ IS-IS Instance: Gandalf VRF: default
 </thead>
 <tbody>
 <tr>
+<td><strong>core</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>core -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>core -&gt; r2</td>
+</tr>
+<tr>
 <td><strong>r1</strong></td>
 <td style="text-align: right;">10.0.0.1/32</td>
 <td style="text-align: right;"></td>
 <td>Loopback</td>
 </tr>
 <tr>
-<td>eth1</td>
-<td style="text-align: right;">10.1.0.1/30</td>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
 <td style="text-align: right;"></td>
-<td>r1 -&gt; r2</td>
-</tr>
-<tr>
-<td>eth2</td>
-<td style="text-align: right;">10.1.0.5/30</td>
-<td style="text-align: right;"></td>
-<td>r1 -&gt; r3</td>
-</tr>
-<tr>
-<td>eth3</td>
-<td style="text-align: right;">10.1.0.9/30</td>
-<td style="text-align: right;"></td>
-<td>r1 -&gt; r4</td>
+<td>r1 -&gt; core</td>
 </tr>
 <tr>
 <td><strong>r2</strong></td>
-<td style="text-align: right;">10.0.0.2/32</td>
-<td style="text-align: right;"></td>
-<td>Loopback</td>
-</tr>
-<tr>
-<td>eth1</td>
-<td style="text-align: right;">10.1.0.2/30</td>
-<td style="text-align: right;"></td>
-<td>r2 -&gt; r1</td>
-</tr>
-<tr>
-<td><strong>r3</strong></td>
 <td style="text-align: right;">10.0.0.3/32</td>
 <td style="text-align: right;"></td>
 <td>Loopback</td>
 </tr>
 <tr>
-<td>eth1</td>
+<td>Ethernet1</td>
 <td style="text-align: right;">10.1.0.6/30</td>
 <td style="text-align: right;"></td>
-<td>r3 -&gt; r1</td>
-</tr>
-<tr>
-<td><strong>r4</strong></td>
-<td style="text-align: right;">10.0.0.4/32</td>
-<td style="text-align: right;"></td>
-<td>Loopback</td>
-</tr>
-<tr>
-<td>eth1</td>
-<td style="text-align: right;">10.1.0.10/30</td>
-<td style="text-align: right;"></td>
-<td>r4 -&gt; r1</td>
+<td>r2 -&gt; core</td>
 </tr>
 </tbody>
 </table>
 <div class="footnote">
 <hr />
 <ol>
-<li id="fn:HO">
-<p>Please note that the IS-IS packets are not encrypted. Anyone can see their contents, but the Hashed Message Authentication Code (HMAC) makes it really hard for an intruder to impersonate an IS-IS router using MD5 or SHA authentication (but not impossible as we know it&rsquo;s possible to break MD5).&#160;<a class="footnote-backref" href="#fnref:HO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-<li id="fn:SHC">
-<p>Figuring that out from the <strong>show</strong> printouts, particularly when you don&rsquo;t have access to the remote router, is an interesting hair-pulling exercise.&#160;<a class="footnote-backref" href="#fnref:SHC" title="Jump back to footnote 2 in the text">&#8617;</a></p>
-</li>
-<li id="fn:ADP">
-<p>Some implementations (for example, Arista EOS) call the area password <em>level-1</em> and the domain password <em>level-2</em>.&#160;<a class="footnote-backref" href="#fnref:ADP" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:FRSAT">
+<p>FRRouting does not display the advertised hold time in the <strong>show isis neighbors</strong> command and thus cannot provide the information needed for the automated validation.&#160;<a class="footnote-backref" href="#fnref:FRSAT" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>

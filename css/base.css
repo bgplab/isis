@@ -89,6 +89,8 @@ h1:first-child, h2:first-child, h3:first-child {
     margin-top: 0;
 }
 
+/* Headers */
+
 h1 {
     font-size: 1.5rem;
 }
@@ -123,9 +125,18 @@ h4 {
     }
 }
 
-hr {
-    border-top: 1px solid #aaa;
+.headerlink {
+    font-family: FontAwesome;
+    font-size: 14px;
+    display: none;
+    padding-left: .5em;
 }
+
+h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .headerlink, h5:hover .headerlink, h6:hover .headerlink {
+    display:inline-block;
+}
+
+/* Code */
 
 pre, .rst-content tt {
     max-width: 100%;
@@ -176,6 +187,8 @@ kbd {
     box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
 }
 
+/* Links */
+
 a {
     color: #d26400;
     text-decoration: none;
@@ -192,13 +205,7 @@ a:hover code, a:focus code {
     color: #d26400;
 }
 
-footer {
-    margin-top: 30px;
-    margin-bottom: 10px;
-    text-align: center;
-    font-weight: 200;
-    font-size: 80%;
-}
+/* Tables */
 
 table.table {
     border-collapse: collapse;
@@ -237,6 +244,24 @@ table.table-striped tbody tr:nth-of-type(even) > * {
 
 button:focus {
     outline: 1px dotted !important;
+}
+
+/* Other markup */
+
+hr {
+    border-top: 1px solid #aaa;
+}
+
+footer {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 200;
+    font-size: 80%;
+}
+
+dd {
+    margin: 1rem 0 1rem 2rem;
 }
 
 /*
@@ -320,16 +345,7 @@ button:focus {
     font-weight: normal;
 }
 
-.headerlink {
-    font-family: FontAwesome;
-    font-size: 14px;
-    display: none;
-    padding-left: .5em;
-}
-
-h1:hover .headerlink, h2:hover .headerlink, h3:hover .headerlink, h4:hover .headerlink, h5:hover .headerlink, h6:hover .headerlink {
-    display:inline-block;
-}
+/* Quotes */
 
 blockquote {
     padding-left: 10px;
@@ -397,6 +413,8 @@ blockquote {
         max-height: calc(100vh - 3.5rem);
     }
 }
+
+/* Dropdown menu */
 
 .dropdown-item {
     color: #fff;
