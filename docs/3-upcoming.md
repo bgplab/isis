@@ -1,6 +1,6 @@
 # Upcoming Labs
 
-The [first few labs are already online](index.md); the list of ideas is much longer. Here they are:
+A large number of IS-IS labs are [already online](index.md), but we keep getting interesting ideas. Here are some of them:
 
 ## Configure IS-IS Features
 
@@ -8,8 +8,7 @@ Route Redistribution into IS-IS
 : * Configure static route and connected interface redistribution into IS-IS
 
 Fast IS-IS Failure Detection and Convergence
-: * Configure IS-IS timers
-  * Use BFD
+: * Use BFD
 
 ## Advanced Labs
 

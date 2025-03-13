@@ -16,7 +16,7 @@ extra:
     'Upcoming Labs': '3-upcoming'
     'About': '99-about'
 
-copyright: (C) 2023–2024 Ivan Pepelnjak (ipSpace.net AG)
+copyright: (C) 2023–2025 Ivan Pepelnjak (ipSpace.net AG)
 plugins:
 - search
 - include_dir_to_nav
@@ -44,6 +44,7 @@ nav:
   - feature/3-md5.md
   - feature/4-hide-transit.md
   - feature/5-drain.md
+  - feature/6-timers.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md

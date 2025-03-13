@@ -118,6 +118,8 @@ Some implementations allow you to set the overload bit for a fixed amount of tim
 
 Finally, some implementors returned to the fundamentals and started using the **overload** bit for what it was initially designed to do: signal to the rest of the network that the router has performance problems (for example, running out of RAM due to a memory leak) and should be avoided.
 
+**Next:** [Adjust IS-IS Timers](6-timers.md)
+
 ## Reference Information
 
 ### Lab Wiring
