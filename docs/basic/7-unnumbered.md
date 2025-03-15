@@ -1,4 +1,4 @@
-# Running IS-IS Over Unnumbered Interfaces
+# Running IS-IS Over Unnumbered/LLA-only Interfaces
 
 IS-IS does not use IPv4 or IPv6 to exchange routing information. It uses a [dedicated layer-3 protocol](https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/) (it has its own 802.1 Service Access Point -- SAP) and transports IPv4/IPv6 information only in various TLVs inside the LSPs.
 
@@ -20,7 +20,7 @@ You can start the lab [on your own lab infrastructure](../1-setup.md) or in [Git
 
 ## Explore the IS-IS Data Structures
 
-Before changing anything, explore the IS-IS data structures routers generate using regular IPv4/IPv6 interface addresses. Their LSPs contain the LAN/P2P prefix and the interface IPv4/IPv6 addresses:
+Before changing anything, explore the IS-IS data structures routers generate using regular IPv4/IPv6 interface addresses. Their LSPs contain the LAN/P2P prefix; some platforms also add all the interface IPv4/IPv6 addresses:
 
 R3 LSP displayed by R1 running Arista EOS
 {: .code-caption }
@@ -83,6 +83,9 @@ Gandalf   default  r3               L2   Ethernet1          52:dc:ca:fe:3:1   UP
   Neighbor Supported Address Families: IPv4, IPv6
 ```
 
+!!! tip
+    The interface addresses advertised in the LSPs are rarely used. Instead, routers use the interface addresses advertised in the IS-IS hello packets to determine the next hops for the IP routing table.
+
 ## Building the IP Routing Table
 
 Calculating the prefixes that go into the IP routing tables and the next-hop routers is the primary job of the IS-IS SPF algorithm (we covered a few details in the [Explore IS-IS Data Structures](2-explore.md) lab exercise). In this lab exercise, we'll focus on the next hops of those prefixes.
@@ -119,14 +122,17 @@ r1#show ipv6 route isis
 !!! Tip
     The IS-IS IPv6 routes use IPv6 LLA as the next-hop IPv6 address.
 
-## Migrating to Unnumbered Interfaces
+## Migrating to Unnumbered/LLA-only Interfaces
 
 Replace IPv4/IPv6 addresses on all Ethernet interfaces of all routers in your lab with unnumbered IPv4 addresses and link-local-only IPv6.
 
-The commands you have to use might be similar to **no ip address** followed by **ip address unnumbered loopback 0** and **no ipv6 address** followed by **ipv6 enable**.
+The commands to do that might be similar to **no ip address** followed by **ip address unnumbered loopback 0** and **no ipv6 address** followed by **ipv6 enable**.
 
 !!! tip
-    FRRouting allows you to configure the same IP address on multiple interfaces. After removing the original Ethernet IPv4 address, use the regular **ip address** command with the loopback IPv4 address. It also needs no **ipv6 enable** command; IPv6 is enabled with the **sysctl** commands, and removing an IPv6 address from an interface does not disable it.
+    FRRouting:
+    
+    * Allows you to configure the same IP address on multiple interfaces. After removing the original Ethernet IPv4 address, use the regular **ip address** command with the loopback IPv4 address.
+    * Does not need the **ipv6 enable** command; IPv6 is enabled with the **sysctl** commands, and removing an IPv6 address from an interface does not deactivate IPv6 on that interface.
 
 ## Does It Still Work?
 
