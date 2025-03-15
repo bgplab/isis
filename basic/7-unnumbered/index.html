@@ -8,7 +8,7 @@
         <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
         <link rel="canonical" href="https://isis.bgplabs.net/basic/7-unnumbered/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Running IS-IS Over Unnumbered Interfaces &#171; IS-IS Labs</title>
+  <title>Running IS-IS Over Unnumbered/LLA-only Interfaces &#171; IS-IS Labs</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -97,7 +97,7 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Running IS-IS Over Unnumbered Interfaces</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Running IS-IS Over Unnumbered/LLA-only Interfaces</a>
 </li>
                                 </ul>
                             </li>
@@ -181,7 +181,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
       <ul class="nav flex-column">
           
-      <li class="nav-item" data-level="1"><a href="#running-is-is-over-unnumbered-interfaces" class="nav-link">Running IS-IS Over Unnumbered Interfaces</a>
+      <li class="nav-item" data-level="1"><a href="#running-is-is-over-unnumberedlla-only-interfaces" class="nav-link">Running IS-IS Over Unnumbered/LLA-only Interfaces</a>
         <ul class="nav flex-column">
       <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
         <ul class="nav flex-column">
@@ -199,7 +199,7 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#migrating-to-unnumbered-interfaces" class="nav-link">Migrating to Unnumbered Interfaces</a>
+      <li class="nav-item" data-level="2"><a href="#migrating-to-unnumberedlla-only-interfaces" class="nav-link">Migrating to Unnumbered/LLA-only Interfaces</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -234,7 +234,7 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="running-is-is-over-unnumbered-interfaces">Running IS-IS Over Unnumbered Interfaces</h1>
+<h1 id="running-is-is-over-unnumberedlla-only-interfaces">Running IS-IS Over Unnumbered/LLA-only Interfaces</h1>
 <p>IS-IS does not use IPv4 or IPv6 to exchange routing information. It uses a <a href="https://blog.ipspace.net/2009/06/is-is-is-not-running-over-clnp/">dedicated layer-3 protocol</a> (it has its own 802.1 Service Access Point &ndash; SAP) and transports IPv4/IPv6 information only in various TLVs inside the LSPs.</p>
 <p>Running IS-IS over point-to-point or multi-access unnumbered interfaces should be a no-brainer, but do all IS-IS implementations support that? You can test that in this lab exercise, which contains a point-to-point link between two routers and a LAN segment.</p>
 <p><img alt="Lab topology" src="../topology-unnumbered.png" /></p>
@@ -248,7 +248,7 @@
 <li>Log into your device (RTR) with <strong>netlab connect rtr</strong></li>
 </ul>
 <h2 id="explore-the-is-is-data-structures">Explore the IS-IS Data Structures</h2>
-<p>Before changing anything, explore the IS-IS data structures routers generate using regular IPv4/IPv6 interface addresses. Their LSPs contain the LAN/P2P prefix and the interface IPv4/IPv6 addresses:</p>
+<p>Before changing anything, explore the IS-IS data structures routers generate using regular IPv4/IPv6 interface addresses. Their LSPs contain the LAN/P2P prefix; some platforms also add all the interface IPv4/IPv6 addresses:</p>
 <p class="code-caption">R3 LSP displayed by R1 running Arista EOS<br /></p>
 <pre><code>r1#show isis database level-2 r3.00-00 detail
 Legend:
@@ -303,6 +303,10 @@ Gandalf   default  r3               L2   Ethernet1          52:dc:ca:fe:3:1   UP
   Supported Address Families: IPv4, IPv6
   Neighbor Supported Address Families: IPv4, IPv6
 </code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The interface addresses advertised in the LSPs are rarely used. Instead, routers use the interface addresses advertised in the IS-IS hello packets to determine the next hops for the IP routing table.</p>
+</div>
 <h2 id="building-the-ip-routing-table">Building the IP Routing Table</h2>
 <p>Calculating the prefixes that go into the IP routing tables and the next-hop routers is the primary job of the IS-IS SPF algorithm (we covered a few details in the <a href="../2-explore/">Explore IS-IS Data Structures</a> lab exercise). In this lab exercise, we&rsquo;ll focus on the next hops of those prefixes.</p>
 <p>For example, R1 finds three prefixes that go through R3 (the loopback addresses of R3 and R4 and their point-to-point link). Combining that with the IPv4/IPv6 interface address advertised by R3 in the IS-IS hello messages (see above), it installs the following routes in the IPv4 and IPv6 routing tables:</p>
@@ -331,12 +335,16 @@ Gandalf   default  r3               L2   Ethernet1          52:dc:ca:fe:3:1   UP
 <p class="admonition-title">Tip</p>
 <p>The IS-IS IPv6 routes use IPv6 LLA as the next-hop IPv6 address.</p>
 </div>
-<h2 id="migrating-to-unnumbered-interfaces">Migrating to Unnumbered Interfaces</h2>
+<h2 id="migrating-to-unnumberedlla-only-interfaces">Migrating to Unnumbered/LLA-only Interfaces</h2>
 <p>Replace IPv4/IPv6 addresses on all Ethernet interfaces of all routers in your lab with unnumbered IPv4 addresses and link-local-only IPv6.</p>
-<p>The commands you have to use might be similar to <strong>no ip address</strong> followed by <strong>ip address unnumbered loopback 0</strong> and <strong>no ipv6 address</strong> followed by <strong>ipv6 enable</strong>.</p>
+<p>The commands to do that might be similar to <strong>no ip address</strong> followed by <strong>ip address unnumbered loopback 0</strong> and <strong>no ipv6 address</strong> followed by <strong>ipv6 enable</strong>.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>FRRouting allows you to configure the same IP address on multiple interfaces. After removing the original Ethernet IPv4 address, use the regular <strong>ip address</strong> command with the loopback IPv4 address. It also needs no <strong>ipv6 enable</strong> command; IPv6 is enabled with the <strong>sysctl</strong> commands, and removing an IPv6 address from an interface does not disable it.</p>
+<p>FRRouting:</p>
+<ul>
+<li>Allows you to configure the same IP address on multiple interfaces. After removing the original Ethernet IPv4 address, use the regular <strong>ip address</strong> command with the loopback IPv4 address.</li>
+<li>Does not need the <strong>ipv6 enable</strong> command; IPv6 is enabled with the <strong>sysctl</strong> commands, and removing an IPv6 address from an interface does not deactivate IPv6 on that interface.</li>
+</ul>
 </div>
 <h2 id="does-it-still-work">Does It Still Work?</h2>
 <p>Connect to R3 and explore its IS-IS neighbors. R3 should still have working adjacencies with all other routers in your lab.</p>
