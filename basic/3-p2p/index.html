@@ -319,7 +319,7 @@ r1.00-00             *     92   0x00000006  0xc193    1780    0/0/0
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If you use Cisco IOSv on one of the routers and some other network operating system on the other router, you have to configure <strong>‌isis three-way-handshake ietf</strong> on Cisco IOSv interfaces (<a href="#three-way-handshake">more details</a>) because someone thought it prudent to keep the pre-standard protocol as the default setting for at least a decade after the RFC was published. Cisco IOS XE uses the IETF 3-way handshake as the default protocol.</p>
+<p>If you use Cisco IOSv on one of the routers and some other network operating system on the other router, you <a href="https://datatracker.ietf.org/doc/html/rfc2119">SHOULD</a> configure <strong>‌isis three-way-handshake ietf</strong> on Cisco IOSv interfaces (<a href="#three-way-handshake">more details</a>) because someone thought it prudent to keep the pre-standard protocol as the default setting for at least a decade after the RFC was published. Cisco IOS XE uses the IETF 3-way handshake as the default protocol.</p>
 </div>
 <p>Let&rsquo;s inspect the IS-IS topology database after the change. As expected, it contains two LSPs (one per router).</p>
 <p class="code-caption">The LSP database with a point-to-point link<br /></p>
