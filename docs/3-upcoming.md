@@ -25,6 +25,11 @@ Leaking L2 routes into L1 areas
 : * Redistribute L2 routes into L1 areas
   * Combine redistributed routes with default routing
 
+Explore LSP Database Behavior
+: * What happens when an LSP is changed?
+  * How is an LSP removed from a database?
+  * What happens on network partitioning?
+
 Graceful Shutdown
 : * Use 'overload bit' or 'advertise-high-metric' functionality to shift traffic away from a router
 
