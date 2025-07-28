@@ -1,6 +1,6 @@
 # Upcoming Labs
 
-A large number of IS-IS labs are [already online](index.md), but we keep getting interesting ideas. Here are some of them:
+A large number of IS-IS labs are [already online](index.md), but we keep getting interesting ideas ([example](https://github.com/bgplab/isis/issues/4)). Here are some of them:
 
 ## Configure IS-IS Features
 
@@ -15,6 +15,18 @@ Fast IS-IS Failure Detection and Convergence
 Multi-Level IS-IS Networks
 : * Explain intra-area and inter-area routing
   * Configure a network with multiple areas and L1/L2 routers
+  * Use L2 default routing (based on ATT bit) in L1 areas
+
+Securing Multi-Level Networks at the Interface Level
+: * Use interface *circuit-type* to stop L1 or L2 adjacencies from forming
+  * Use level-specific passwords
+
+Leaking L2 routes into L1 areas
+: * Redistribute L2 routes into L1 areas
+  * Combine redistributed routes with default routing
+
+Graceful Shutdown
+: * Use 'overload bit' or 'advertise-high-metric' functionality to shift traffic away from a router
 
 Build an SR-MPLS Network with IS-IS
 : * Build a BGP-free MPLS core using SR-MPLS with IS-IS
@@ -24,6 +36,10 @@ Configure IS-IS Fast Reroute Using TI-LFA
 
 Using IS-IS with SRv6
 : * Build a BGP-free IPv6 core using SRv6 for end-to-end transport
+
+Two-Way Redistribution
+: * Redistribute routes between OSPF and IS-IS at multiple points
+  * Use route filters to prevent routing loops
 
 ## Troubleshooting
 
