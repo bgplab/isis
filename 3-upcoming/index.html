@@ -246,7 +246,7 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="upcoming-labs">Upcoming Labs</h1>
-<p>A large number of IS-IS labs are <a href="../">already online</a>, but we keep getting interesting ideas. Here are some of them:</p>
+<p>A large number of IS-IS labs are <a href="../">already online</a>, but we keep getting interesting ideas (<a href="https://github.com/bgplab/isis/issues/4">example</a>). Here are some of them:</p>
 <h2 id="configure-is-is-features">Configure IS-IS Features</h2>
 <dl>
 <dt>Route Redistribution into IS-IS</dt>
@@ -269,6 +269,27 @@
 <ul>
 <li>Explain intra-area and inter-area routing</li>
 <li>Configure a network with multiple areas and L1/L2 routers</li>
+<li>Use L2 default routing (based on ATT bit) in L1 areas</li>
+</ul>
+</dd>
+<dt>Securing Multi-Level Networks at the Interface Level</dt>
+<dd>
+<ul>
+<li>Use interface <em>circuit-type</em> to stop L1 or L2 adjacencies from forming</li>
+<li>Use level-specific passwords</li>
+</ul>
+</dd>
+<dt>Leaking L2 routes into L1 areas</dt>
+<dd>
+<ul>
+<li>Redistribute L2 routes into L1 areas</li>
+<li>Combine redistributed routes with default routing</li>
+</ul>
+</dd>
+<dt>Graceful Shutdown</dt>
+<dd>
+<ul>
+<li>Use &lsquo;overload bit&rsquo; or &lsquo;advertise-high-metric&rsquo; functionality to shift traffic away from a router</li>
 </ul>
 </dd>
 <dt>Build an SR-MPLS Network with IS-IS</dt>
@@ -287,6 +308,13 @@
 <dd>
 <ul>
 <li>Build a BGP-free IPv6 core using SRv6 for end-to-end transport</li>
+</ul>
+</dd>
+<dt>Two-Way Redistribution</dt>
+<dd>
+<ul>
+<li>Redistribute routes between OSPF and IS-IS at multiple points</li>
+<li>Use route filters to prevent routing loops</li>
 </ul>
 </dd>
 </dl>
