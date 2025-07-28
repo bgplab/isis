@@ -231,8 +231,8 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="is-is-on-point-to-point-links">IS-IS on Point-to-Point Links</h1>
-<p>In the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise, I told you to configure the links as point-to-point links and promised a detailed explanation in a follow-up lab exercise. We got that far; let&rsquo;s see why using point-to-point links on Ethernet interfaces is strongly preferred.</p>
-<p>To keep things simple, we&rsquo;ll use the simplest possible lab topology: two routers connected with a single link.</p>
+<p>In the <a href="../1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> lab exercise, I told you to configure the links as point-to-point links and promised a detailed explanation in a follow-up lab exercise. We got that far; let&rsquo;s see why point-to-point IS-IS links are strongly preferred on point-to-point Ethernet interfaces.</p>
+<p>We&rsquo;ll use the simplest possible lab topology to keep things simple: two routers connected with a single link.</p>
 <p><img alt="Lab topology" src="../topology-frrouting.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
 <p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a>.</p>
@@ -330,7 +330,11 @@ LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
 r1.00-00             *     92   0x00000008  0x5d6a    1598    0/0/0
 r2.00-00                   92   0x00000009  0xd4ec    1558    0/0/0
 </code></pre>
-<p>The LSPs describe the direct connection between the routers. For example, R1 claims it&rsquo;s directly connected to R2<sup id="fnref:HNM"><a class="footnote-ref" href="#fn:HNM">13</a></sup>:</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For a few seconds, you will continue to see the &ldquo;empty&rdquo; DIS-originated network LSP in the LSP databases. If you manage to inspect its details before it disappears, you&rsquo;ll notice it no longer claims to have connections to R1 and R2. The network LSP should be removed (aged out) from the LSP databases in a few seconds; it might persist longer in the LSP database of the router originating it<sup id="fnref:ECDD"><a class="footnote-ref" href="#fn:ECDD">13</a></sup>.</p>
+</div>
+<p>The LSPs describe the direct connection between the routers. For example, R1 claims it&rsquo;s directly connected to R2<sup id="fnref:HNM"><a class="footnote-ref" href="#fn:HNM">14</a></sup>:</p>
 <p class="code-caption">The router LSP with a point-to-point link to another router<br /></p>
 <pre><code>r1# show isis database detail r1.00-00
 Area Gandalf:
@@ -353,14 +357,14 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <li><a href="../6-level-2/">Optimize Simple IS-IS Deployments</a></li>
 </ul>
 <h2 id="three-way-handshake">Three-Way Handshake</h2>
-<p>The original IS-IS specifications used a simple HELLO protocol on point-to-point links<sup id="fnref:3WO"><a class="footnote-ref" href="#fn:3WO">14</a></sup>: whenever a router received an IS-IS Hello (IIH) from an adjacent router, it assumed the adjacent router could be reached, resulting in miserable failures on unidirectional links<sup id="fnref:MFMD"><a class="footnote-ref" href="#fn:MFMD">15</a></sup>.</p>
+<p>The original IS-IS specifications used a simple HELLO protocol on point-to-point links<sup id="fnref:3WO"><a class="footnote-ref" href="#fn:3WO">15</a></sup>: whenever a router received an IS-IS Hello (IIH) from an adjacent router, it assumed the adjacent router could be reached, resulting in miserable failures on unidirectional links<sup id="fnref:MFMD"><a class="footnote-ref" href="#fn:MFMD">16</a></sup>.</p>
 <p>That hurdle was removed with the three-way handshake defined in <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>. That RFC specifies a new IS-IS option (Point-to-Point Three-Way Adjacency) that contains the System ID of the adjacent device, allowing IS-IS routers to verify they have a two-way communication.</p>
-<p>Modern IS-IS implementations use the three-way handshake by default. Still, you might have to turn it off to interoperate with an older device (or a device with ancient defaults) with an interface command similar to <strong>no isis three-way-handshake</strong><sup id="fnref:NAA"><a class="footnote-ref" href="#fn:NAA">16</a></sup>. </p>
+<p>Modern IS-IS implementations use the three-way handshake by default. Still, you might have to turn it off to interoperate with an older device (or a device with ancient defaults) with an interface command similar to <strong>no isis three-way-handshake</strong><sup id="fnref:NAA"><a class="footnote-ref" href="#fn:NAA">17</a></sup>. </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>A mismatch in the three-way handshake setting could have bizarre results. For example, turning it off on a FRRouting device results in one of the neighbors having a fully operational IS-IS adjacency while, at the same time, the other neighbor claims it can see no neighbors. To make matters worse, that often happens only after the IS-IS adjacency has been lost and would have to be re-established.</p>
+<p>A mismatch in the three-way handshake setting could have bizarre results. For example, turning it off on an FRRouting device results in one of the neighbors having a fully operational IS-IS adjacency while, at the same time, the other neighbor claims it can see no neighbors. To make matters worse, that often happens only after the IS-IS adjacency has been lost and would have to be re-established.</p>
 </div>
-<p>As the last task in this lab, try out how your devices react to a three-way-handshake mismatch (assuming you can configure it):</p>
+<p>As the last task in this lab, try out how your devices react to a three-way handshake mismatch (assuming you can configure it):</p>
 <ul>
 <li>Turn it off on one of the routers.</li>
 <li>Clear the IS-IS adjacency with a command similar to <strong>clear isis neighbor</strong></li>
@@ -441,7 +445,7 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <p>And consequently, the overall convergence time after a link recovery.&#160;<a class="footnote-backref" href="#fnref:OCT" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:NBD">
-<p>DIS does not have the critical role that OSPF DR has. DIS is not responsible for the flooding of LSP changes; its only role is to help detect transmission errors by periodically sending table-of-contents (CSNP) of its LSPDB.&#160;<a class="footnote-backref" href="#fnref:NBD" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>DIS does not have the critical role OSPF DR has. DIS is not responsible for flooding LSP changes; its only role is to help detect transmission errors by periodically sending a table-of-contents (CSNP) of its LSPDB.&#160;<a class="footnote-backref" href="#fnref:NBD" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 <li id="fn:PNID">
 <p>Remember the <em>nodeid</em> octet in the LSP ID? That octet uniquely identifies a pseudonode originated by a DIS. The <em>systemid</em> in a pseudonode LSP is identical to the DIS <em>systemid</em>, making it very simple to identify the DIS.&#160;<a class="footnote-backref" href="#fnref:PNID" title="Jump back to footnote 5 in the text">&#8617;</a></p>
@@ -467,17 +471,20 @@ r1.00-00             *     92   0x00000008  0x5d6a    1533    0/0/0
 <li id="fn:TM">
 <p>On many network devices, you must enable message logging on terminal sessions with a command similar to <strong>terminal monitor</strong>.&#160;<a class="footnote-backref" href="#fnref:TM" title="Jump back to footnote 12 in the text">&#8617;</a></p>
 </li>
+<li id="fn:ECDD">
+<p>That&rsquo;s the price for using an eventually-consistent distributed database. Deleting records from such a database and ensuring they&rsquo;re not recreated from disconnected stale copies is a non-trivial task.&#160;<a class="footnote-backref" href="#fnref:ECDD" title="Jump back to footnote 13 in the text">&#8617;</a></p>
+</li>
 <li id="fn:HNM">
-<p>FRR printouts are a bit inconsistent. Router names are displayed in high-level printouts, while the detailed printouts contain system IDs. Use the <strong>show isis hostname</strong> command to display the mapping between system IDs and hostnames.&#160;<a class="footnote-backref" href="#fnref:HNM" title="Jump back to footnote 13 in the text">&#8617;</a></p>
+<p>FRR printouts are a bit inconsistent. Router names are displayed in high-level printouts, while the detailed printouts contain system IDs. Use the <strong>show isis hostname</strong> command to display the mapping between system IDs and hostnames.&#160;<a class="footnote-backref" href="#fnref:HNM" title="Jump back to footnote 14 in the text">&#8617;</a></p>
 </li>
 <li id="fn:3WO">
-<p>IS-IS hello packets on multi-access media (as well as OSPF) always had a field specifying IS-IS neighbors a router can see. For whatever reason, that field was not present in the original specification of IS-IS hello packets used on point-to-point links.&#160;<a class="footnote-backref" href="#fnref:3WO" title="Jump back to footnote 14 in the text">&#8617;</a></p>
+<p>Similar to OSPF, IS-IS hello packets on multi-access media always had a field specifying IS-IS neighbors that a router can see. For whatever reason, that field was not present in the original specification of IS-IS hello packets used on point-to-point links.&#160;<a class="footnote-backref" href="#fnref:3WO" title="Jump back to footnote 15 in the text">&#8617;</a></p>
 </li>
 <li id="fn:MFMD">
-<p>See the introduction section of <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a> for more details.&#160;<a class="footnote-backref" href="#fnref:MFMD" title="Jump back to footnote 15 in the text">&#8617;</a></p>
+<p>See the introduction section of <a href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a> for more details.&#160;<a class="footnote-backref" href="#fnref:MFMD" title="Jump back to footnote 16 in the text">&#8617;</a></p>
 </li>
 <li id="fn:NAA">
-<p>RFC 5303 was published in 2008, and recent IS-IS implementations, for example, Arista EOS, no longer have that nerd knob.&#160;<a class="footnote-backref" href="#fnref:NAA" title="Jump back to footnote 16 in the text">&#8617;</a></p>
+<p>RFC 5303 was published in 2008, and recent IS-IS implementations, for example, Arista EOS, no longer have that nerd knob.&#160;<a class="footnote-backref" href="#fnref:NAA" title="Jump back to footnote 17 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
