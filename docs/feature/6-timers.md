@@ -108,6 +108,8 @@ IS-IS uses periodic CSNP packets (table-of-contents of the LSP database) to dete
 
 You can find further network-convergence-related information in the [Fast Failover](https://blog.ipspace.net/series/fast-failover/) series of blog posts.
 
+**Next**: [Route Redistribution into IS-IS](7-redistribute.md)
+
 ## Reference Information
 
 ### Lab Wiring
