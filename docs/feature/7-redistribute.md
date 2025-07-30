@@ -33,7 +33,7 @@ You'll get a lab with IPv4 addresses and basic IS-IS configurations on R1 and R2
 
 You'll also get static routes on R1 if we've implemented static routing configuration on the device you're using for R1; otherwise, you'll get a warning message and will have to configure static routes for 0.0.0.0/0 and 172.16.0.0/16 pointing to 10.0.42.42.
 
-[^ABP]: That's against the recommendations from the [Configure IS-IS Routing for IPv4](1-simple-ipv4.md) lab exercise for reasons that will become obvious in a few minutes.
+[^ABP]: That's against the recommendations from the [Configure IS-IS Routing for IPv4](../basic/1-simple-ipv4.md) lab exercise for reasons that will become obvious in a few minutes.
 
 ## The Problem
 
