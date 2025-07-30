@@ -128,6 +128,10 @@
 <li>
     <a href="./" class="dropdown-item active" aria-current="page">Adjust IS-IS Timers</a>
 </li>
+                                    
+<li>
+    <a href="../7-redistribute/" class="dropdown-item">Route Redistribution into IS-IS</a>
+</li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -153,7 +157,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                <a rel="next" href="../7-redistribute/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -305,6 +309,7 @@ Gandalf   default  r2               L2   Ethernet1          P2P               UP
 <p><strong>CSNP generation</strong></p>
 <p style="margin-left: 2rem">IS-IS uses periodic CSNP packets (table-of-contents of the LSP database) to detect missing information. Sending them more often will improve recovery from lost LSP updates. However, if the LSP packet loss significantly impacts your network convergence, you have much bigger problems to fix than the CSNP interval.<br /></p>
 <p>You can find further network-convergence-related information in the <a href="https://blog.ipspace.net/series/fast-failover/">Fast Failover</a> series of blog posts.</p>
+<p><strong>Next</strong>: <a href="../7-redistribute/">Route Redistribution into IS-IS</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
