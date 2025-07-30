@@ -4,9 +4,6 @@ A large number of IS-IS labs are [already online](index.md), but we keep getting
 
 ## Configure IS-IS Features
 
-Route Redistribution into IS-IS
-: * Configure static route and connected interface redistribution into IS-IS
-
 Fast IS-IS Failure Detection and Convergence
 : * Use BFD
 
@@ -29,9 +26,6 @@ Explore LSP Database Behavior
 : * What happens when an LSP is changed?
   * How is an LSP removed from a database?
   * What happens on network partitioning?
-
-Graceful Shutdown
-: * Use 'overload bit' or 'advertise-high-metric' functionality to shift traffic away from a router
 
 Build an SR-MPLS Network with IS-IS
 : * Build a BGP-free MPLS core using SR-MPLS with IS-IS

@@ -1,0 +1,39 @@
+# Validate the "Route redistribution into IS-IS" lab
+---
+adj:
+  description: Check IS-IS adjacencies
+  nodes: [ r1 ]
+  plugin: isis_neighbor('r2',level='L1L2',area='49.0001')
+
+def_r2:
+  description: Check for default route on R2
+  nodes: [ r2 ]
+  stop_on_error: True
+  plugin: isis_prefix(pfx='0.0.0.0/0',level='2')
+
+pfx_r2:
+  description: Check for the other static route on R2
+  nodes: [ r2 ]
+  plugin: isis_prefix(pfx='172.16.0.0/16',level='2')
+
+lev_r1:
+  description: Check whether R1 redistributes static routes into level-1 database
+  nodes: [ r2 ]
+  pass: R1 redistributes static routes only into level-2 database
+  fail: R1 redistributes static routes into level-1 database
+  level: warning
+  plugin: isis_prefix(pfx='172.16.0.0/16',level='1',present=False)
+
+pfx_r1:
+  description: Check for R2-X2 prefix on R1
+  nodes: [ r2 ]
+  plugin: isis_prefix(pfx=nodes.r2.interfaces[1].ipv4,level='2')
+  stop_on_error: True
+
+lev_r2:
+  description: Check whether R2 redistributes connected subnets into level-1 database
+  nodes: [ r1 ]
+  pass: R2 redistributes connected subnets only into level-2 database
+  fail: R2 redistributes connected subnets into level-1 database
+  level: warning
+  plugin: isis_prefix(pfx=nodes.r2.interfaces[1].ipv4,level='1',present=False)

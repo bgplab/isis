@@ -1,0 +1,54 @@
+# Route redistribution into IS-IS
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+name: redistribute
+
+plugin: [ check_validate ]
+version: 2.0.0
+
+#_validate_version: 1.8.3
+_include: [ validate.yml ]
+
+groups:
+  external:
+    members: [ x1, x2 ]
+    device: linux
+  validate:
+    members: [ r1, r2 ]
+
+module: [ isis ]
+isis.area: '49.0001'
+isis.type: level-1-2
+
+nodes:
+  r1:
+    module: [ routing, isis ]
+    routing.static:
+    - ipv4: 0.0.0.0/0
+      nexthop.node: x1
+    - ipv4: 172.16.0.0/16
+      nexthop.node: x1
+  r2:
+  x1:
+    id: 42
+  x2:
+    module: [ routing ]
+    routing.static:
+    - ipv4: 10.0.0.0/8
+      nexthop.node: r2
+    - ipv4: 172.16.0.0/12
+      nexthop.node: r2
+
+links:
+- r1-r2
+- interfaces: [ r1, x1 ]
+  isis: False
+  prefix.ipv4: 10.0.42.0/24
+- interfaces: [ r2, x2 ]
+  isis: False
+  prefix.ipv4: 172.16.42.0/24
+
+message: |
+  The "Route Redistribution into IS-IS" lab is ready. Use "netlab connect" to
+  connect to lab devices and "netlab connect --show" to execute show commands on
+  x1 and x2.

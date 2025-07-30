@@ -45,6 +45,7 @@ nav:
   - feature/4-hide-transit.md
   - feature/5-drain.md
   - feature/6-timers.md
+  - feature/7-redistribute.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md
