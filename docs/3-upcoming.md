@@ -2,11 +2,6 @@
 
 A large number of IS-IS labs are [already online](index.md), but we keep getting interesting ideas ([example](https://github.com/bgplab/isis/issues/4)). Here are some of them:
 
-## Configure IS-IS Features
-
-Fast IS-IS Failure Detection and Convergence
-: * Use BFD
-
 ## Advanced Labs
 
 Multi-Level IS-IS Networks

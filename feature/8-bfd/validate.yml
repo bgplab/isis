@@ -1,0 +1,38 @@
+# Validate the "Hide transit subnets" lab
+---
+isis_adj:
+  description: Check IS-IS adjacencies on the Core router
+  nodes: [ core ]
+  devices: [ eos ]
+  show:
+    eos: isis neighbors | json
+  valid:
+    eos: len(vrfs.default.isisInstances.Gandalf.neighbors) == 2
+  fail: The Core router does not have two neighbors
+
+ht_r1:
+  description: Check the hold time advertised by R1
+  nodes: [ core ]
+  show:
+    eos: isis neighbors | json
+  valid:
+    eos: vrfs.default.isisInstances.Gandalf.neighbors["0000.0000.0001"].adjacencies[0].details.advertisedHoldTime == 3
+  fail: The hold time advertised by R1 is not 3
+
+ht_r2:
+  description: Check the hold time advertised by R2
+  nodes: [ core ]
+  show:
+    eos: isis neighbors | json
+  valid:
+    eos: vrfs.default.isisInstances.Gandalf.neighbors["0000.0000.0003"].adjacencies[0].details.advertisedHoldTime == 3
+  fail: The hold time advertised by R2 is not 3
+
+ht_core:
+  description: Check the hold time advertised by Core
+  nodes: [ r1, r2 ]
+  show:
+    eos: isis neighbors | json
+  valid:
+    eos: vrfs.default.isisInstances.Gandalf.neighbors["0000.0000.0002"].adjacencies[0].details.advertisedHoldTime == 15
+  fail: The hold time advertised by Core is not 15

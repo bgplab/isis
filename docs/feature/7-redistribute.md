@@ -177,6 +177,8 @@ IS-IS Instance: Gandalf VRF: default
         Area leader priority: 250 algorithm: 0
 ```
 
+**Next**: [Use BFD to Speed Up IS-IS Failure Detection](8-bfd.md)
+
 ## Reference Information
 
 ### Lab Wiring

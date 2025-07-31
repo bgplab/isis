@@ -46,6 +46,7 @@ nav:
   - feature/5-drain.md
   - feature/6-timers.md
   - feature/7-redistribute.md
+  - feature/8-bfd.md
 
 - "Upcoming":
   - Overview: 3-upcoming.md
