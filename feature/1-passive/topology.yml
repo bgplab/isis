@@ -16,6 +16,9 @@ _validate_version: 1.8.4
 groups:
   external:
     members: [ x ]
+  validate:
+    members: [ r1, r2 ]                 # We're doing validation on these devices
+
   hosts:
     members: [ a, b ]
     device: linux

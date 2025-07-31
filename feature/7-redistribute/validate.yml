@@ -4,6 +4,7 @@ adj:
   description: Check IS-IS adjacencies
   nodes: [ r1 ]
   plugin: isis_neighbor('r2',level='L1L2',area='49.0001')
+  devices: [ frr ]
 
 def_r2:
   description: Check for default route on R2

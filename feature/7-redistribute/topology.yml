@@ -3,7 +3,7 @@
 defaults.sources.extra: [ ../../defaults.yml ]
 name: redistribute
 
-plugin: [ check_validate ]
+plugin: [ check_validate, check_static ]
 version: 2.0.0
 
 #_validate_version: 1.8.3

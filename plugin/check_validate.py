@@ -1,7 +1,7 @@
 import os
 
 from netsim import __version__
-from netsim.utils import log
+from netsim.utils import log,strings
 from box import Box
 
 def init(topology: Box) -> None:
@@ -30,9 +30,18 @@ def post_transform(topology: Box) -> None:
   if 'message' not in topology:
     topology.message = ''
 
-  x_device = topology.get('groups.external.device',None)
-  if x_device is None:
+  # Find the most relevant device group
+  v_groups = [ topology.groups[grp] for grp in ['validate','external'] if grp in topology.groups ]
+  if not v_groups:
     return
+  
+  v_group = v_groups[0]
+  x_device = v_group.get('device',None)
+  if x_device is None:
+    n_devices = list(set([ topology.nodes[node].device for node in v_group.members ]))
+    if not n_devices:
+      return
+    x_device = n_devices[0]
 
   v_dlist = topology.validate[0].devices
   if x_device in v_dlist:
@@ -42,8 +51,8 @@ completed the lab exercise.
 '''
     return
   
-  topology.message += f'''
-You're using {x_device} on external routers. Lab validation is not yet
-supported on that device. If you want to use 'netlab validate' command,
-use one of these devices on external routers: {", ".join(v_dlist)}
-'''
+  v_nodes = ", ".join(v_group.members)
+  topology.message += "\n".join(strings.wrap_text_into_lines(
+    f"\nYou're using {x_device} on {v_nodes}. " + \
+    "Lab validation is not yet supported on that device. If you want to use 'netlab validate' command, " + \
+    f'use one of these devices on {v_nodes}: {", ".join(v_dlist)}',width=80))

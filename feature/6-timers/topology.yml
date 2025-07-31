@@ -8,6 +8,8 @@ name: timers
 isis.area: '49.0001'
 isis.type: level-2
 
+groups.validate.members: [ r1, core, r2 ]       # We're doing validation on these devices
+
 module: [ isis ]
 plugin: [ check_validate ]
 _include: [ validate.yml ]

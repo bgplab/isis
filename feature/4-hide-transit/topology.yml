@@ -5,6 +5,8 @@ version: 1.8.4
 
 name: adv_passive
 
+groups.validate.members: [ wan ]        # We're doing validation on these devices
+
 isis.area: '49.0001'
 isis.type: level-2
 
