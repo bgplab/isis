@@ -29,7 +29,7 @@ The initial lab exercises will help you configure basic IS-IS features:
 * [Optimize Simple IS-IS Deployments](basic/6-level-2.md)
 * [Running IS-IS Over IPv4 Unnumbered and IPv6 LLA-only Interfaces](basic/7-unnumbered.md)<!--new-->
 
-The next set of exercises covers individual IS-IS features. We just started working on this section, and this is what you can practice at the moment:
+The next set of exercises covers individual IS-IS features:
 
 * [Passive IS-IS Interfaces](feature/1-passive.md)
 * [Influence the Designated IS Election](feature/2-dis.md)
@@ -38,5 +38,6 @@ The next set of exercises covers individual IS-IS features. We just started work
 * [Drain Traffic Before Node Maintenance](feature/5-drain.md)<!--new-->
 * [Adjust IS-IS Timers](feature/6-timers.md)<!--new-->
 * [Route Redistribution into IS-IS](feature/7-redistribute.md)<!--new-->
+* [Use BFD to Speed Up IS-IS Failure Detection](feature/8-bfd.md)<!--new-->
 
-Want to know what else we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.
+Want to know what advanced labs we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.

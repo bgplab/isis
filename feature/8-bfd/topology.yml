@@ -1,0 +1,41 @@
+# Use BFD to Speed Up IS-IS Failure Detection
+---
+defaults.sources.extra: [ ../../defaults.yml, ../../defaults-ipv6.yml ]
+version: 2.0.0
+
+name: bfd
+
+isis.area: '49.0001'
+isis.type: level-2
+
+groups.validate.members: [ r2, r3 ]       # We're doing validation on these devices
+
+module: [ isis, bfd ]
+isis.bfd: False
+
+#plugin: [ check_validate ]
+#_include: [ validate.yml ]
+
+vlans:
+  ethernet:
+    bfd: False
+    isis.network_type: point-to-point
+    mode: bridge
+    links: [ br-r2, br-r3 ]
+
+nodes:
+  r1:
+  r2:
+  r3:
+  br:
+    device: frr
+    module: [ vlan ]
+
+links:
+- r1:
+  r2:
+  bfd: False
+
+message: |
+  The "Use BFD to Speed Up IS-IS Failure Detection" lab is ready. Connect to the
+  lab devices with "netlab connect".
