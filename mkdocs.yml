@@ -48,6 +48,9 @@ nav:
   - feature/7-redistribute.md
   - feature/8-bfd.md
 
+- Advanced:
+  - advanced/10-sr.md
+
 - "Upcoming":
   - Overview: 3-upcoming.md
 
