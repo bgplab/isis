@@ -22,9 +22,6 @@ Explore LSP Database Behavior
   * How is an LSP removed from a database?
   * What happens on network partitioning?
 
-Configure IS-IS Fast Reroute Using TI-LFA
-: * In a triangle network, configure the longer path as a backup path
-
 Using IS-IS with SRv6
 : * Build a BGP-free IPv6 core using SRv6 for end-to-end transport
 
