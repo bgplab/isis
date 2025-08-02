@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
-        <link rel="canonical" href="https://isis.bgplabs.net/feature/2-dis/">
+        <link rel="canonical" href="https://isis.bgplabs.net/feature/8-bfd/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Influence the Designated IS Election &#171; IS-IS Labs</title>
+  <title>Use BFD to Speed Up IS-IS Failure Detection &#171; IS-IS Labs</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -110,7 +110,7 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Influence the Designated IS Election</a>
+    <a href="../2-dis/" class="dropdown-item">Influence the Designated IS Election</a>
 </li>
                                     
 <li>
@@ -134,7 +134,7 @@
 </li>
                                     
 <li>
-    <a href="../8-bfd/" class="dropdown-item">Use BFD to Speed Up IS-IS Failure Detection</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Use BFD to Speed Up IS-IS Failure Detection</a>
 </li>
                                 </ul>
                             </li>
@@ -165,12 +165,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../1-passive/" class="nav-link">
+                                <a rel="prev" href="../7-redistribute/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../3-md5/" class="nav-link">
+                                <a rel="next" href="../../advanced/10-sr/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -198,7 +198,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
       <ul class="nav flex-column">
           
-      <li class="nav-item" data-level="1"><a href="#influence-the-designated-is-election" class="nav-link">Influence the Designated IS Election</a>
+      <li class="nav-item" data-level="1"><a href="#use-bfd-to-speed-up-is-is-failure-detection" class="nav-link">Use BFD to Speed Up IS-IS Failure Detection</a>
         <ul class="nav flex-column">
       <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
         <ul class="nav flex-column">
@@ -208,7 +208,7 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#the-problem" class="nav-link">The Problem</a>
+      <li class="nav-item" data-level="2"><a href="#measure-the-failure-detection-time" class="nav-link">Measure the Failure Detection Time</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -217,10 +217,6 @@
         </ul>
       </li>
       <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
-        <ul class="nav flex-column">
-        </ul>
-      </li>
-      <li class="nav-item" data-level="2"><a href="#bg" class="nav-link">The Role of a Designated Intermediate System</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -247,119 +243,123 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="influence-the-designated-is-election">Influence the Designated IS Election</h1>
-<p>In the <a href="../../basic/3-p2p/">IS-IS on Point-to-Point Links</a> lab exercise, we discussed why it&rsquo;s better to configure Ethernet inter-router links as point-to-point links instead of leaving them configured as multi-access links. However, even though a large majority of core Ethernet links connect two routers, you might encounter situations where you have to connect routers to a multi-access network, for example, when building a private WAN network on top of Carrier Ethernet E-LAN service.</p>
-<p><img alt="Lab topology" src="../topology-dis.png" /></p>
-<p>Like OSPF, IS-IS routers<sup id="fnref:IS"><a class="footnote-ref" href="#fn:IS">1</a></sup> connected to a shared segment elect a Designated Intermediate System (DIS). Unlike OSPF, the DIS is not as crucial to the proper operation of the routing protocol as the OSPF Designated Router is. IS-IS, therefore, does not have a concept of a Backup DIS.</p>
-<p>DIS failure can still temporarily slow down network convergence (<a href="#bg">more details</a>); it makes sense to ensure that the most stable router (for example, the hub router of a Carrier Ethernet network) becomes DIS. That&rsquo;s almost impossible to achieve without additional device configuration; when all routers connected to a segment have the same priority, the one with the highest MAC address becomes DIS, and that&rsquo;s often the last router you bought<sup id="fnref:IMAC"><a class="footnote-ref" href="#fn:IMAC">2</a></sup>, not the hub router.</p>
-<p>Therefore, you should always increase the DIS election priority on hub routers and decrease it on routers you don&rsquo;t want to use as DIS (spoke routers). You&rsquo;ll practice both in this lab exercise.</p>
+<h1 id="use-bfd-to-speed-up-is-is-failure-detection">Use BFD to Speed Up IS-IS Failure Detection</h1>
+<p>In the <a href="../6-timers/">Adjust IS-IS Timers</a> lab exercise, you&rsquo;ve learned how to reduce the IS-IS hello interval and hold time to improve the failure detection speed, and how to tweak the SPF timers to minimize the overall convergence time. The minimum IS-IS hello interval is usually a second, resulting in a 3-second failure detection time; you must use BFD if you need faster convergence.</p>
+<p>In this lab exercise, you&rsquo;ll combine BFD with IS-IS to reduce the failure detection time to less than one second. The lab topology is almost identical to the one we used in the <a href="../6-timers/">Adjust IS-IS Timers</a> exercise; the only new element is a bridge<sup id="fnref:L2S"><a class="footnote-ref" href="#fn:L2S">1</a></sup> we&rsquo;ll use to create a link failure <em>on the path</em> between two routers.</p>
+<p><img alt="Lab topology" src="../topology-bfd.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
-<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> for the routers in your lab (default: FRRouting virtual machines or containers).</p>
+<ul>
+<li>Use any device supported by the <em>netlab</em> <a href="https://netlab.tools/module/isis/#platform-support">IS-IS</a> and <a href="https://netlab.tools/module/bfd/">BFD</a> configuration modules for the routers in your lab.</li>
+<li>The bridge between R2 and R3 is implemented with a Linux VM or container (depending on the virtualization provider you&rsquo;re using) running FRRouting.</li>
+</ul>
 <h2 id="starting-the-lab">Starting the Lab</h2>
 <p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
 <ul>
-<li>Change directory to <code>feature/2-dis</code></li>
-<li>Execute <strong>netlab up</strong>. You&rsquo;ll get a lab with IPv4 addresses and IS-IS routing configured on all lab routers.</li>
+<li>Change directory to <code>feature/8-bfd</code></li>
+<li>Execute <strong>netlab up</strong>.</li>
+</ul>
+<p>You&rsquo;ll get a lab with IPv4+IPv6 addresses and basic IS-IS configurations on R1, R2, and R3. BFD will be enabled but not configured.</p>
+<ul>
 <li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
 </ul>
-<h2 id="the-problem">The Problem</h2>
-<p>Docker or libvirt/KVM assigns random MAC addresses to containers or virtual machines. Predicting which router on your Carrier Ethernet will become DIS is a Mission Impossible.</p>
-<p>You can usually check the DIS status of your router with a command similar to <strong>show isis interface <em>name</em></strong>. This is what you&rsquo;d get on a router running FRRouting when it&rsquo;s not a DIS:</p>
-<p class="code-caption">The IS-IS interface details displayed on the Hub router running FRRouting<br /></p>
-<pre><code>hub# show isis interface eth1
-Area Gandalf:
-  Interface: eth1, State: Up, Active, Circuit Id: 0xbb
-    Type: lan, Level: L2, SNPA: aac1.ab23.d6e0
-    Level-2 Information:
-      Metric: 10, Active neighbors: 2
-      Hello interval: 3, Holddown count: 10, Padding: yes
-      CNSP interval: 10, PSNP interval: 2
-      LAN Priority: 64, is not DIS
-    IP Prefix(es):
-      172.16.0.1/24
-</code></pre>
-<p>You can often display the DIS status of IS-IS neighbors with a command similar to <strong>show isis neighbor detail</strong>. This is what it displays on FRRouting when the first spoke router becomes DIS <sup id="fnref:RTR"><a class="footnote-ref" href="#fn:RTR">3</a></sup>:</p>
-<p class="code-caption">The details of IS-IS neighbors displayed on the Hub router running FRRouting<br /></p>
-<pre><code>hub# show isis nei detail
-Area Gandalf:
- s1
-    Interface: eth1, Level: 2, State: Up, Expires in 27s
-    Adjacency flaps: 1, Last: 11s ago
-    Circuit type: L2, Speaks: IPv4
-    SNPA: aac1.abed.313f, LAN id: s1.b7
-    LAN Priority: 64, is DIS, DIS flaps: 1, Last: 3s ago
-    Area Address(es):
-      49.0001
-    IPv4 Address(es):
-      172.16.0.2
+<h2 id="measure-the-failure-detection-time">Measure the Failure Detection Time</h2>
+<ul>
+<li>Log into R1 and R2</li>
+<li>Enable IP routing debugging on R1<sup id="fnref:ZR"><a class="footnote-ref" href="#fn:ZR">2</a></sup> and IS-IS adjacency logging on R2</li>
+<li>Shut down an interface on BR with the <code>bash down.sh</code> command<sup id="fnref:DOWN"><a class="footnote-ref" href="#fn:DOWN">3</a></sup></li>
+</ul>
+<p>This is what you might get when using FRRouting on R1 and R2:</p>
+<p class="code-caption">The bridge interface is shut down (notice the timestamp)<br /></p>
+<pre><code>$ bash down.sh
+.........
 
- s2
-    Interface: eth1, Level: 2, State: Up, Expires in 30s
-    Adjacency flaps: 1, Last: 11s ago
-    Circuit type: L2, Speaks: IPv4
-    SNPA: aac1.ab7d.6c12, LAN id: s1.b7
-    LAN Priority: 64, is not DIS, DIS flaps: 1, Last: 3s ago
-    Area Address(es):
-      49.0001
-    IPv4 Address(es):
-      172.16.0.3
+# STATS ****************************************************************************************************************
+br    : ok=9    changed=2   failed=0    unreachable=0   rescued=0   ignored=0
+
+Interface shut down @ 14:45:50.724834949
 </code></pre>
+<p class="code-caption">IS-IS adjacency logging message on R2<br /></p>
+<pre><code>2025-07-31 14:46:17.168 [INFO] isisd: [Q7SVW-YVKRH] %ADJCHANGE: Adjacency to r3 (eth2) for level-2 changed from Up to Down, holding time expired
+</code></pre>
+<p class="code-caption">The routing table is updated on R1 (select messages only)<br /></p>
+<pre><code>2025-07-31 14:46:17.225 [DEBG] zebra: [S59C1-4C5PP] default(0:254):10.0.0.3/32: Deleting route rn 0x7fb7c59f5b90, re 0x7fb7c59d73d0 (isis)
+2025-07-31 14:46:17.225 [DEBG] zebra: [S59C1-4C5PP] default(0:254):2001:db8:cafe:3::/64: Deleting route rn 0x7fb7c59de760, re 0x7fb7c59d7490 (isis)
+</code></pre>
+<p>Based on the debugging printouts:</p>
+<ul>
+<li>It took R2 ~27 seconds to detect the link failure</li>
+<li>LSP flooding and SPF run were almost immediate. Less than 100 milliseconds passed between failure detection and routing table update on R1.</li>
+</ul>
+<p>Finally, use <code>bash up.sh</code> command to restore the R2-R3 link.</p>
+<p>Now that you have a pretty decent<sup id="fnref:FIC"><a class="footnote-ref" href="#fn:FIC">4</a></sup> measurement tool, tweak the IS-IS interface- and SPF timers to reduce the overall convergence time (see <a href="../6-timers/">Adjust IS-IS Timers</a> for more details).</p>
 <h2 id="configuration-tasks">Configuration Tasks</h2>
-<p>Using an interface command similar to <strong>isis priority</strong>, increase the hub router&rsquo;s DIS election priority to 127 (the highest value; the default value is 64) and lower the value on the spoke routers to zero (the lowest possible value).</p>
+<ul>
+<li>Enable BFD on R2 and R3 (not needed on some devices)</li>
+<li>Enable BFD for IS-IS (usually with an interface command like <strong>isis bfd</strong>). On some platforms, you might have to enable BFD for IPv4 and IPv6 separately<sup id="fnref:AAI"><a class="footnote-ref" href="#fn:AAI">5</a></sup>. Other platforms (for example, FRRouting) have a single command, but run BFD in a single address family.</li>
+</ul>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Some devices configure the interface IGP parameters within the interface configuration; others do it within the IGP configuration.</p>
+<p>While running BFD for IPv4 and IPv6 is recommended<sup id="fnref:WH"><a class="footnote-ref" href="#fn:WH">6</a></sup>, it&rsquo;s not strictly necessary. A single BFD session failure will bring down the IS-IS adjacency.</p>
 </div>
-<h2 id="validation">Validation</h2>
-<p>Log into your devices and check the state of their IS-IS interfaces and IS-IS neighbors. The hub router should consistently become the DIS; these are the printouts you should get on the Hub router:</p>
-<p class="code-caption">The IS-IS interface details (Hub router running FRRouting)<br /></p>
-<pre><code>hub# show isis interface eth1
-Area Gandalf:
-  Interface: eth1, State: Up, Active, Circuit Id: 0xbb
-    Type: lan, Level: L2, SNPA: aac1.ab23.d6e0
-    Level-2 Information:
-      Metric: 10, Active neighbors: 2
-      Hello interval: 3, Holddown count: 10, Padding: yes
-      CNSP interval: 10, PSNP interval: 2
-      LAN Priority: 127, is DIS
-    IP Prefix(es):
-      172.16.0.1/24
-</code></pre>
-<p class="code-caption">The IS-IS neighbor details (Hub router running FRRouting)<br /></p>
-<pre><code>hub# show isis neighbor detail
-Area Gandalf:
- s1
-    Interface: eth1, Level: 2, State: Up, Expires in 28s
-    Adjacency flaps: 1, Last: 1h26m3s ago
-    Circuit type: L2, Speaks: IPv4
-    SNPA: aac1.abed.313f, LAN id: 0000.0000.0001.bb
-    LAN Priority: 0, is not DIS, DIS flaps: 4, Last: 1m33s ago
-    Area Address(es):
-      49.0001
-    IPv4 Address(es):
-      172.16.0.2
-
- s2
-    Interface: eth1, Level: 2, State: Up, Expires in 30s
-    Adjacency flaps: 1, Last: 1h26m3s ago
-    Circuit type: L2, Speaks: IPv4
-    SNPA: aac1.ab7d.6c12, LAN id: 0000.0000.0001.bb
-    LAN Priority: 0, is not DIS, DIS flaps: 1, Last: 1h25m55s ago
-    Area Address(es):
-      49.0001
-    IPv4 Address(es):
-      172.16.0.3
-</code></pre>
-<h2 id="bg">The Role of a Designated Intermediate System</h2>
-<p>The Designated Intermediate System on a LAN segment has two roles:</p>
 <ul>
-<li>It advertises the <a href="../../basic/3-p2p/#db">LAN pseudonode</a>. The LAN pseudonode has <a href="../../basic/3-p2p/#ma">zero-cost links to all other nodes attached to the LAN</a>, and all LAN nodes advertise a link to the LAN pseudonode</li>
-<li>It helps other routers detect transmission errors. DIS sends periodic Complete Sequence Number PDU (CSNP) packets. These packets contain the table-of-contents of the DIS LSPDB, and other routers attached to the LAN can use them to discover LSPDB discrepancies. A router that discovers it has an extra bit of information floods it, and a router that&rsquo;s missing some information requests it with the Partial Sequence Number PDU (PSNP) packet.</li>
+<li>If possible, tweak the BFD timers. The configuration differs widely between platforms. While many implementations have an interface configuration command similar to <strong>bfd interval</strong>, you must configure a BFD profile on FRRouting and apply it to IS-IS on each interface.</li>
 </ul>
-<p>If a DIS fails, its pseudonode LSP remains in the LSPDB, and the connectivity through the pseudonode is intact until another DIS is elected. At that point, the new DIS advertises a new LAN pseudonode, and all remaining routers change their LSPs to link to it. A change in DIS thus causes no connectivity loss<sup id="fnref:DLER"><a class="footnote-ref" href="#fn:DLER">4</a></sup>, but it does cause a flurry of LSP changes.</p>
-<p>Error recovery is more critical. In a perfect world with no transmission errors, a DIS failure doesn&rsquo;t matter. However, if the LAN segment experiences packet drops, and there&rsquo;s no DIS to send periodic CSNP packets, the dropped packets won&rsquo;t be retransmitted until the new DIS is elected and sends the first CSNP packet. DIS failure thus has the potential to impact network convergence.</p>
-<p><strong>Takeaway:</strong> Making DIS stable is not a bad idea, especially on large-scale segments with many routers and a higher probability of packet loss (for example, large Carrier Ethernet deployments).</p>
-<p><strong>Next:</strong> <a href="../3-md5/">Protect IS-IS Routing Data with MD5 Authentication</a></p>
+<h2 id="validation">Validation</h2>
+<p>Use a command similar to <strong>show bfd peers</strong> to verify that R2 runs BFD with R3 over IPv4 and IPv6.</p>
+<p class="code-caption">BFD peers on R2 running FRRouting (it runs BFD only over IPv6)<br /></p>
+<pre><code>BFD Peers:
+    peer fe80::a8c1:abff:fe94:12c7 local-address fe80::a8c1:abff:fefa:38b3 vrf default interface eth2
+        ID: 3558723326
+        Remote ID: 1517743069
+        Active mode
+        Log session changes
+        Status: up
+        Uptime: 4 minute(s), 45 second(s)
+        Diagnostics: ok
+        Remote diagnostics: ok
+        Peer Type: dynamic
+        RTT min/avg/max: 0/0/0 usec
+        Local timers:
+            Detect-multiplier: 3
+            Receive interval: 300ms
+            Transmission interval: 50ms
+            Echo receive interval: 50ms
+            Echo transmission interval: disabled
+        Remote timers:
+            Detect-multiplier: 3
+            Receive interval: 300ms
+            Transmission interval: 50ms
+            Echo receive interval: 50ms
+</code></pre>
+<p>BFD peers on R2 running Arista EOS (it also tries to establish a session with R1)</p>
+<pre><code>r2#show bfd peers
+VRF name: default
+-----------------
+DstAddr            MyDisc      YourDisc    Interface/Transport       Type             LastUp     LastDown          LastDiag   State
+------------- ------------- ------------- ---------------------- ---------- ------------------ ------------ ----------------- -----
+172.16.0.3     1905829730    1290893693       Ethernet2(14579)     normal     07/31/25 15:25           NA     No Diagnostic      Up
+
+DstAddr                       MyDisc     YourDisc   Interface/Transport     Type           LastUp   LastDown        LastDiag  State
+------------------------- ----------- ------------ --------------------- -------- ---------------- ---------- --------------- -----
+fe80::50dc:caff:fefe:101   142389730            0      Ethernet1(14583)   normal               NA         NA   No Diagnostic   Down
+fe80::50dc:caff:fefe:301  4084028665   1014221528      Ethernet2(14579)   normal   07/31/25 15:26         NA   No Diagnostic     Up
+</code></pre>
+<p>Repeat the failure detection measurement. You might get results similar to these on FRRouting:</p>
+<p class="code-caption">The bridge interface is shut down<br /></p>
+<pre><code>$ bash down.sh
+.........
+
+# STATS ****************************************************************************************************************
+br    : ok=9    changed=2   failed=0    unreachable=0   rescued=0   ignored=0
+
+Interface shut down @ 15:13:23.078914210
+</code></pre>
+<p class="code-caption">FRRouting IS-IS and BFD logging messages on R2<br /></p>
+<pre><code>2025-07-31 15:13:23.645 [NTFY] bfdd: [STTY2-28ZPH] Session-Change: [mhop:no peer:fe80::a8c1:abff:fe94:12c7 local:fe80::a8c1:abff:fefa:38b3 vrf:default ifname:eth2] up -&gt; down reason:control-expired
+2025-07-31 15:13:23.646 [INFO] isisd: [Q7SVW-YVKRH] %ADJCHANGE: Adjacency to r3 (eth2) for level-2 changed from Up to Down, bfd session went down
+2025-07-31 15:13:23.646 [DEBG] isisd: [M611R-YQPBQ] ISIS-SPF (Gandalf) L2 SPF scheduled immediately due to BFD 'down' message
+</code></pre>
+<p>According to the debugging messages, it took R2 approximately 600 milliseconds to detect the link failure, declare the IS-IS adjacency failure, and schedule the SPF run. Further reducing the BFD <strong>transmit</strong> and <strong>receive</strong> timers can bring the failure detection time down to ~100 milliseconds, at which point the routers detect failure before the Ansible playbook finishes<sup id="fnref:BA"><a class="footnote-ref" href="#fn:BA">7</a></sup> (the script timestamp is higher than the debugging timestamp).</p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -367,32 +367,32 @@ Area Gandalf:
 <tr>
 <th>Origin Device</th>
 <th>Origin Port</th>
-<th>Link Name (NET)</th>
-<th>Description</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>hub</td>
-<td>eth1</td>
-<td>dis_1</td>
-<td>hub -&gt; [s1,s2]</td>
+<td>r1</td>
+<td>Ethernet1</td>
+<td>r2</td>
+<td>Ethernet1</td>
 </tr>
 <tr>
-<td>s1</td>
+<td>br</td>
 <td>eth1</td>
-<td>dis_1</td>
-<td>s1 -&gt; [s2,hub]</td>
+<td>r2</td>
+<td>Ethernet2</td>
 </tr>
 <tr>
-<td>s2</td>
-<td>eth1</td>
-<td>dis_1</td>
-<td>s2 -&gt; [s1,hub]</td>
+<td>br</td>
+<td>eth2</td>
+<td>r3</td>
+<td>Ethernet1</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running FRRouting.</p>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running Arista EOS.</p>
 <h3 id="lab-addressing">Lab Addressing</h3>
 <table>
 <thead>
@@ -405,57 +405,96 @@ Area Gandalf:
 </thead>
 <tbody>
 <tr>
-<td><strong>hub</strong></td>
+<td><strong>r1</strong></td>
 <td style="text-align: right;">10.0.0.1/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:1::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
-<td>eth1</td>
-<td style="text-align: right;">172.16.0.1/24</td>
-<td style="text-align: right;"></td>
-<td>hub -&gt; [s1,s2]</td>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;">LLA</td>
+<td>r1 -&gt; r2</td>
 </tr>
 <tr>
-<td><strong>s1</strong></td>
+<td><strong>r2</strong></td>
 <td style="text-align: right;">10.0.0.2/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:2::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
-<td>eth1</td>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;">LLA</td>
+<td>r2 -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
 <td style="text-align: right;">172.16.0.2/24</td>
-<td style="text-align: right;"></td>
-<td>s1 -&gt; [s2,hub]</td>
+<td style="text-align: right;">2001:db8:21::2/64</td>
+<td>r2 -&gt; [br,r3]</td>
 </tr>
 <tr>
-<td><strong>s2</strong></td>
+<td><strong>r3</strong></td>
 <td style="text-align: right;">10.0.0.3/32</td>
-<td style="text-align: right;"></td>
+<td style="text-align: right;">2001:db8:cafe:3::1/64</td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">172.16.0.3/24</td>
+<td style="text-align: right;">2001:db8:21::3/64</td>
+<td>r3 -&gt; [r2,br]</td>
+</tr>
+<tr>
+<td><strong>br</strong></td>
+<td style="text-align: right;">10.0.0.4/32</td>
+<td style="text-align: right;">2001:db8:cafe:4::1/64</td>
 <td>Loopback</td>
 </tr>
 <tr>
 <td>eth1</td>
-<td style="text-align: right;">172.16.0.3/24</td>
 <td style="text-align: right;"></td>
-<td>s2 -&gt; [s1,hub]</td>
+<td style="text-align: right;"></td>
+<td>[Access VLAN ethernet] br -&gt; r2</td>
+</tr>
+<tr>
+<td>eth2</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td>[Access VLAN ethernet] br -&gt; r3</td>
+</tr>
+<tr>
+<td>vlan1000</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td>VLAN ethernet (1000) -&gt; [r2,r3]</td>
 </tr>
 </tbody>
 </table>
 <div class="footnote">
 <hr />
 <ol>
-<li id="fn:IS">
-<p>Called Intermediate Systems in IS-IS standards&#160;<a class="footnote-backref" href="#fnref:IS" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:L2S">
+<p>Sometimes lovingly called <em>layer-2 switch</em> by vendor marketing departments&#160;<a class="footnote-backref" href="#fnref:L2S" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn:IMAC">
-<p>One would expect MAC addresses to increase over time within the same vendor ID (OUI, the top 24 bits of the MAC address)&#160;<a class="footnote-backref" href="#fnref:IMAC" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:ZR">
+<p>Use <strong>debug zebra rib</strong> on FRRouting&#160;<a class="footnote-backref" href="#fnref:ZR" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn:RTR">
-<p>If you don&rsquo;t like the results, restart the lab with <strong>netlab restart</strong> and hope for a better set of random MAC addresses.&#160;<a class="footnote-backref" href="#fnref:RTR" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:DOWN">
+<p>The command starts the <code>down.sh</code> script in the current directory. The script uses the <strong>netlab config</strong> command to deploy a configuration template that shuts down the first interface on BR. It also prints the current date and time, which you can compare to the debugging printouts.&#160;<a class="footnote-backref" href="#fnref:DOWN" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn:DLER">
-<p>The details are left as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref:DLER" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<li id="fn:FIC">
+<p>Compared to its cost&#160;<a class="footnote-backref" href="#fnref:FIC" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:AAI">
+<p>On Arista EOS, use <strong>isis bfd</strong> interface command to enable BFD for IPv4, and <strong>bfd all-interfaces</strong> router address family configuration command to enable BFD for IPv6.&#160;<a class="footnote-backref" href="#fnref:AAI" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:WH">
+<p>I have seen weird hardware that treated IPv4 packets differently from IPv6 ones 🤦‍♂️. You&rsquo;d better run BFD in both address families if you have such hardware in the forwarding path.&#160;<a class="footnote-backref" href="#fnref:WH" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:BA">
+<p>Since we haven&rsquo;t seen tachions yet, I blame Ansible.&#160;<a class="footnote-backref" href="#fnref:BA" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
