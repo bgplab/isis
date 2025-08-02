@@ -22,9 +22,6 @@ Explore LSP Database Behavior
   * How is an LSP removed from a database?
   * What happens on network partitioning?
 
-Build an SR-MPLS Network with IS-IS
-: * Build a BGP-free MPLS core using SR-MPLS with IS-IS
-
 Configure IS-IS Fast Reroute Using TI-LFA
 : * In a triangle network, configure the longer path as a backup path
 

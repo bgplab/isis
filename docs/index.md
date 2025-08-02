@@ -40,4 +40,8 @@ The next set of exercises covers individual IS-IS features:
 * [Route Redistribution into IS-IS](feature/7-redistribute.md)<!--new-->
 * [Use BFD to Speed Up IS-IS Failure Detection](feature/8-bfd.md)<!--new-->
 
-Want to know what advanced labs we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.
+Ready for a challenge? Try to solve this lab exercise:
+
+* [Build an SR-MPLS Network with IS-IS](advanced/10-sr.md)<!--new-->
+
+Want to know what other advanced labs we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.

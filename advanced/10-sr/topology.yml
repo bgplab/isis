@@ -1,0 +1,38 @@
+# Build an SR-MPLS Network with IS-IS
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 2.0.0
+
+name: sr
+
+isis.area: '49.0001'
+isis.type: level-2
+
+groups:
+  hosts:
+    device: linux
+    members: [ h1, h2 ]
+
+module: [ isis, bgp ]
+bgp.as: 65000
+bgp.advertise_loopback: False
+
+nodes:
+  pe1:
+  p:
+    module: [ isis ]
+  pe2:
+  h1:
+  h2:
+
+links:
+- group: edge
+  isis: False
+  bgp.advertise: True
+  members: [ pe1-h1, pe2-h2 ]
+- group: core
+  members: [ pe1-p, pe2-p ]
+
+message: |
+  The "Build an SR-MPLS Network with IS-IS" lab is ready. Connect to the
+  lab devices with "netlab connect".
