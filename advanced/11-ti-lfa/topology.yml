@@ -1,0 +1,28 @@
+# Configure IS-IS Fast Reroute Using TI-LFA
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 2.0.0
+
+name: tilfa
+plugin: [ enable_sr ]
+
+isis.area: '49.0001'
+isis.type: level-2
+
+groups:
+  _auto_create: True
+  routers:
+    module: [ isis ]
+    members: [ r1, r2, r3, r4 ]
+
+links:
+- group: backup
+  isis.cost: 20
+  members: [ r1-r3, r3-r4, r4-r2 ]
+- group: core
+  isis.cost: 10
+  members: [ r1-r2 ]
+
+message: |
+  The "Configure IS-IS Fast Reroute Using TI-LFA" lab is ready. Connect to the
+  lab devices with "netlab connect".
