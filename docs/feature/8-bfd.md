@@ -1,9 +1,15 @@
 # Use BFD to Speed Up IS-IS Failure Detection
 
-In the [Adjust IS-IS Timers](6-timers.md) lab exercise, you've learned how to reduce the IS-IS hello interval and hold time to improve the failure detection speed, and how to tweak the SPF timers to minimize the overall convergence time. The minimum IS-IS hello interval is usually a second, resulting in a 3-second failure detection time; you must use BFD if you need faster convergence.
+In the [Adjust IS-IS Timers](6-timers.md) lab exercise, you've learned how to reduce the IS-IS hello interval to improve the failure detection speed (TL&DR: don't), and how to tweak the SPF timers to minimize the overall convergence time. 
 
-In this lab exercise, you'll combine BFD with IS-IS to reduce the failure detection time to less than one second. The lab topology is almost identical to the one we used in the [Adjust IS-IS Timers](6-timers.md) exercise; the only new element is a bridge[^L2S] we'll use to create a link failure *on the path* between two routers.
+The minimum IS-IS hello interval is usually a second, resulting in a 3-second failure detection time, but that works best in PowerPoint[^ISI]. You MUST [use BFD](https://blog.ipspace.net/2017/10/to-bfd-or-not-to-bfd/) if you want reliable failure detection faster than the one provided by the default IS-IS hello interval.
 
+In this lab exercise, you'll combine BFD with IS-IS to reduce the failure detection time to less than one second[^BFDF]. The lab topology is almost identical to the one we used in the [Adjust IS-IS Timers](6-timers.md) exercise; the only new element is a bridge[^L2S] we'll use to create a link failure *on the path* between two routers.
+
+[^ISI]: The reliability of hello-based failure detection depends heavily on IS-IS [implementation details](https://blog.ipspace.net/2021/11/multi-threaded-routing-daemons/) and operating system scheduling capabilities ([even more details](https://blog.ipspace.net/2021/12/highlights-multi-threaded-routing-daemons/)). While it's easy to get a sub-three-second failure detection in a small lab, things might not work so well over congested links, on routers with many IS-IS adjacencies, or during network instabilities. An overloaded IS-IS process might lose adjacencies due to missed hello packets, resulting in even further instabilities and potentially a network-wide meltdown.
+
+[^BFDF]: The minimum sane BFD timers depend on the implementation details. Do not use aggressive timers over long-distance links, [over Carrier Ethernet service](https://blog.ipspace.net/2019/06/know-thy-environment-before-redesigning/), or when your device [runs BFD in a process on the main CPU](https://blog.ipspace.net/2020/11/detecting-network-failure/); you can use shorter timers with linecard- or hardware-implemented BFD.
+ 
 [^L2S]: Sometimes lovingly called *layer-2 switch* by vendor marketing departments
 
 ![Lab topology](topology-bfd.png)
@@ -78,7 +84,7 @@ Now that you have a pretty decent[^FIC] measurement tool, tweak the IS-IS interf
 * Enable BFD for IS-IS (usually with an interface command like **isis bfd**). On some platforms, you might have to enable BFD for IPv4 and IPv6 separately[^AAI]. Other platforms (for example, FRRouting) have a single command, but run BFD in a single address family.
 
 !!! tip
-    While running BFD for IPv4 and IPv6 is recommended[^WH], it's not strictly necessary. A single BFD session failure will bring down the IS-IS adjacency.
+    While running BFD for IPv4 and IPv6 is recommended[^WH], it might not be strictly necessary. Some platforms bring down IS-IS adjacency after a single BFD session failure; others will just note that one of the address families is unavailable in their IS-IS hellos and LSPs.
 
 * If possible, tweak the BFD timers. The configuration differs widely between platforms. While many implementations have an interface configuration command similar to **bfd interval**, you must configure a BFD profile on FRRouting and apply it to IS-IS on each interface.
 
