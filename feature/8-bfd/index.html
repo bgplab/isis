@@ -248,8 +248,9 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="use-bfd-to-speed-up-is-is-failure-detection">Use BFD to Speed Up IS-IS Failure Detection</h1>
-<p>In the <a href="../6-timers/">Adjust IS-IS Timers</a> lab exercise, you&rsquo;ve learned how to reduce the IS-IS hello interval and hold time to improve the failure detection speed, and how to tweak the SPF timers to minimize the overall convergence time. The minimum IS-IS hello interval is usually a second, resulting in a 3-second failure detection time; you must use BFD if you need faster convergence.</p>
-<p>In this lab exercise, you&rsquo;ll combine BFD with IS-IS to reduce the failure detection time to less than one second. The lab topology is almost identical to the one we used in the <a href="../6-timers/">Adjust IS-IS Timers</a> exercise; the only new element is a bridge<sup id="fnref:L2S"><a class="footnote-ref" href="#fn:L2S">1</a></sup> we&rsquo;ll use to create a link failure <em>on the path</em> between two routers.</p>
+<p>In the <a href="../6-timers/">Adjust IS-IS Timers</a> lab exercise, you&rsquo;ve learned how to reduce the IS-IS hello interval to improve the failure detection speed (TL&amp;DR: don&rsquo;t), and how to tweak the SPF timers to minimize the overall convergence time. </p>
+<p>The minimum IS-IS hello interval is usually a second, resulting in a 3-second failure detection time, but that works best in PowerPoint<sup id="fnref:ISI"><a class="footnote-ref" href="#fn:ISI">1</a></sup>. You MUST <a href="https://blog.ipspace.net/2017/10/to-bfd-or-not-to-bfd/">use BFD</a> if you want reliable failure detection faster than the one provided by the default IS-IS hello interval.</p>
+<p>In this lab exercise, you&rsquo;ll combine BFD with IS-IS to reduce the failure detection time to less than one second<sup id="fnref:BFDF"><a class="footnote-ref" href="#fn:BFDF">2</a></sup>. The lab topology is almost identical to the one we used in the <a href="../6-timers/">Adjust IS-IS Timers</a> exercise; the only new element is a bridge<sup id="fnref:L2S"><a class="footnote-ref" href="#fn:L2S">3</a></sup> we&rsquo;ll use to create a link failure <em>on the path</em> between two routers.</p>
 <p><img alt="Lab topology" src="../topology-bfd.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
 <ul>
@@ -269,8 +270,8 @@
 <h2 id="measure-the-failure-detection-time">Measure the Failure Detection Time</h2>
 <ul>
 <li>Log into R1 and R2</li>
-<li>Enable IP routing debugging on R1<sup id="fnref:ZR"><a class="footnote-ref" href="#fn:ZR">2</a></sup> and IS-IS adjacency logging on R2</li>
-<li>Shut down an interface on BR with the <code>bash down.sh</code> command<sup id="fnref:DOWN"><a class="footnote-ref" href="#fn:DOWN">3</a></sup></li>
+<li>Enable IP routing debugging on R1<sup id="fnref:ZR"><a class="footnote-ref" href="#fn:ZR">4</a></sup> and IS-IS adjacency logging on R2</li>
+<li>Shut down an interface on BR with the <code>bash down.sh</code> command<sup id="fnref:DOWN"><a class="footnote-ref" href="#fn:DOWN">5</a></sup></li>
 </ul>
 <p>This is what you might get when using FRRouting on R1 and R2:</p>
 <p class="code-caption">The bridge interface is shut down (notice the timestamp)<br /></p>
@@ -295,15 +296,15 @@ Interface shut down @ 14:45:50.724834949
 <li>LSP flooding and SPF run were almost immediate. Less than 100 milliseconds passed between failure detection and routing table update on R1.</li>
 </ul>
 <p>Finally, use <code>bash up.sh</code> command to restore the R2-R3 link.</p>
-<p>Now that you have a pretty decent<sup id="fnref:FIC"><a class="footnote-ref" href="#fn:FIC">4</a></sup> measurement tool, tweak the IS-IS interface- and SPF timers to reduce the overall convergence time (see <a href="../6-timers/">Adjust IS-IS Timers</a> for more details).</p>
+<p>Now that you have a pretty decent<sup id="fnref:FIC"><a class="footnote-ref" href="#fn:FIC">6</a></sup> measurement tool, tweak the IS-IS interface- and SPF timers to reduce the overall convergence time (see <a href="../6-timers/">Adjust IS-IS Timers</a> for more details).</p>
 <h2 id="configuration-tasks">Configuration Tasks</h2>
 <ul>
 <li>Enable BFD on R2 and R3 (not needed on some devices)</li>
-<li>Enable BFD for IS-IS (usually with an interface command like <strong>isis bfd</strong>). On some platforms, you might have to enable BFD for IPv4 and IPv6 separately<sup id="fnref:AAI"><a class="footnote-ref" href="#fn:AAI">5</a></sup>. Other platforms (for example, FRRouting) have a single command, but run BFD in a single address family.</li>
+<li>Enable BFD for IS-IS (usually with an interface command like <strong>isis bfd</strong>). On some platforms, you might have to enable BFD for IPv4 and IPv6 separately<sup id="fnref:AAI"><a class="footnote-ref" href="#fn:AAI">7</a></sup>. Other platforms (for example, FRRouting) have a single command, but run BFD in a single address family.</li>
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>While running BFD for IPv4 and IPv6 is recommended<sup id="fnref:WH"><a class="footnote-ref" href="#fn:WH">6</a></sup>, it&rsquo;s not strictly necessary. A single BFD session failure will bring down the IS-IS adjacency.</p>
+<p>While running BFD for IPv4 and IPv6 is recommended<sup id="fnref:WH"><a class="footnote-ref" href="#fn:WH">8</a></sup>, it might not be strictly necessary. Some platforms bring down IS-IS adjacency after a single BFD session failure; others will just note that one of the address families is unavailable in their IS-IS hellos and LSPs.</p>
 </div>
 <ul>
 <li>If possible, tweak the BFD timers. The configuration differs widely between platforms. While many implementations have an interface configuration command similar to <strong>bfd interval</strong>, you must configure a BFD profile on FRRouting and apply it to IS-IS on each interface.</li>
@@ -363,7 +364,7 @@ Interface shut down @ 15:13:23.078914210
 2025-07-31 15:13:23.646 [INFO] isisd: [Q7SVW-YVKRH] %ADJCHANGE: Adjacency to r3 (eth2) for level-2 changed from Up to Down, bfd session went down
 2025-07-31 15:13:23.646 [DEBG] isisd: [M611R-YQPBQ] ISIS-SPF (Gandalf) L2 SPF scheduled immediately due to BFD 'down' message
 </code></pre>
-<p>According to the debugging messages, it took R2 approximately 600 milliseconds to detect the link failure, declare the IS-IS adjacency failure, and schedule the SPF run. Further reducing the BFD <strong>transmit</strong> and <strong>receive</strong> timers can bring the failure detection time down to ~100 milliseconds, at which point the routers detect failure before the Ansible playbook finishes<sup id="fnref:BA"><a class="footnote-ref" href="#fn:BA">7</a></sup> (the script timestamp is higher than the debugging timestamp).</p>
+<p>According to the debugging messages, it took R2 approximately 600 milliseconds to detect the link failure, declare the IS-IS adjacency failure, and schedule the SPF run. Further reducing the BFD <strong>transmit</strong> and <strong>receive</strong> timers can bring the failure detection time down to ~100 milliseconds, at which point the routers detect failure before the Ansible playbook finishes<sup id="fnref:BA"><a class="footnote-ref" href="#fn:BA">9</a></sup> (the script timestamp is higher than the debugging timestamp).</p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -479,26 +480,32 @@ Interface shut down @ 15:13:23.078914210
 <div class="footnote">
 <hr />
 <ol>
+<li id="fn:ISI">
+<p>The reliability of hello-based failure detection depends heavily on IS-IS <a href="https://blog.ipspace.net/2021/11/multi-threaded-routing-daemons/">implementation details</a> and operating system scheduling capabilities (<a href="https://blog.ipspace.net/2021/12/highlights-multi-threaded-routing-daemons/">even more details</a>). While it&rsquo;s easy to get a sub-three-second failure detection in a small lab, things might not work so well over congested links, on routers with many IS-IS adjacencies, or during network instabilities. An overloaded IS-IS process might lose adjacencies due to missed hello packets, resulting in even further instabilities and potentially a network-wide meltdown.&#160;<a class="footnote-backref" href="#fnref:ISI" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:BFDF">
+<p>The minimum sane BFD timers depend on the implementation details. Do not use aggressive timers over long-distance links, <a href="https://blog.ipspace.net/2019/06/know-thy-environment-before-redesigning/">over Carrier Ethernet service</a>, or when your device <a href="https://blog.ipspace.net/2020/11/detecting-network-failure/">runs BFD in a process on the main CPU</a>; you can use shorter timers with linecard- or hardware-implemented BFD.&#160;<a class="footnote-backref" href="#fnref:BFDF" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
 <li id="fn:L2S">
-<p>Sometimes lovingly called <em>layer-2 switch</em> by vendor marketing departments&#160;<a class="footnote-backref" href="#fnref:L2S" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>Sometimes lovingly called <em>layer-2 switch</em> by vendor marketing departments&#160;<a class="footnote-backref" href="#fnref:L2S" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ZR">
-<p>Use <strong>debug zebra rib</strong> on FRRouting&#160;<a class="footnote-backref" href="#fnref:ZR" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>Use <strong>debug zebra rib</strong> on FRRouting&#160;<a class="footnote-backref" href="#fnref:ZR" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 <li id="fn:DOWN">
-<p>The command starts the <code>down.sh</code> script in the current directory. The script uses the <strong>netlab config</strong> command to deploy a configuration template that shuts down the first interface on BR. It also prints the current date and time, which you can compare to the debugging printouts.&#160;<a class="footnote-backref" href="#fnref:DOWN" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>The command starts the <code>down.sh</code> script in the current directory. The script uses the <strong>netlab config</strong> command to deploy a configuration template that shuts down the first interface on BR. It also prints the current date and time, which you can compare to the debugging printouts.&#160;<a class="footnote-backref" href="#fnref:DOWN" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 <li id="fn:FIC">
-<p>Compared to its cost&#160;<a class="footnote-backref" href="#fnref:FIC" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>Compared to its cost&#160;<a class="footnote-backref" href="#fnref:FIC" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
 <li id="fn:AAI">
-<p>On Arista EOS, use <strong>isis bfd</strong> interface command to enable BFD for IPv4, and <strong>bfd all-interfaces</strong> router address family configuration command to enable BFD for IPv6.&#160;<a class="footnote-backref" href="#fnref:AAI" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<p>On Arista EOS, use <strong>isis bfd</strong> interface command to enable BFD for IPv4, and <strong>bfd all-interfaces</strong> router address family configuration command to enable BFD for IPv6.&#160;<a class="footnote-backref" href="#fnref:AAI" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 <li id="fn:WH">
-<p>I have seen weird hardware that treated IPv4 packets differently from IPv6 ones 🤦‍♂️. You&rsquo;d better run BFD in both address families if you have such hardware in the forwarding path.&#160;<a class="footnote-backref" href="#fnref:WH" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+<p>I have seen weird hardware that treated IPv4 packets differently from IPv6 ones 🤦‍♂️. You&rsquo;d better run BFD in both address families if you have such hardware in the forwarding path.&#160;<a class="footnote-backref" href="#fnref:WH" title="Jump back to footnote 8 in the text">&#8617;</a></p>
 </li>
 <li id="fn:BA">
-<p>Since we haven&rsquo;t seen tachions yet, I blame Ansible.&#160;<a class="footnote-backref" href="#fnref:BA" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+<p>Since we haven&rsquo;t seen tachions yet, I blame Ansible.&#160;<a class="footnote-backref" href="#fnref:BA" title="Jump back to footnote 9 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
