@@ -49,6 +49,7 @@ nav:
   - feature/8-bfd.md
 
 - Advanced:
+  - advanced/1-multilevel.md
   - advanced/10-sr.md
   - advanced/11-ti-lfa.md
 
