@@ -1,9 +1,7 @@
-# Multilevel ISIS networks
+# Multilevel IS-IS networks
 ---
-
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 2.0.0
-
 
 module: [isis]
 
@@ -31,5 +29,5 @@ links:
 - c2-x2
 
 message: |
-  The "Multilevel ISIS networks" lab is ready. Connect to the lab devices
+  The "Multilevel IS-IS networks" lab is ready. Connect to the lab devices
   with "netlab connect".
