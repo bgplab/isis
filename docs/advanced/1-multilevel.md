@@ -212,13 +212,13 @@ Since we're aiming to optimize the R1 routing and not to fragment the network, l
 Inter-area connectivity tests on R1
 { .code-caption }
 ```
-r1#ping x1
+r1#ping 10.0.0.4
 PING 10.0.0.4 (10.0.0.4) 72(100) bytes of data.
 80 bytes from 10.0.0.4: icmp_seq=1 ttl=63 time=0.479 ms
 80 bytes from 10.0.0.4: icmp_seq=2 ttl=63 time=0.144 ms
 ....
 
-r1#ping x2
+r1#ping 10.0.0.5
 PING 10.0.0.5 (10.0.0.5) 72(100) bytes of data.
 80 bytes from 10.0.0.5: icmp_seq=1 ttl=63 time=0.801 ms
 80 bytes from 10.0.0.5: icmp_seq=2 ttl=63 time=0.345 ms
@@ -382,13 +382,13 @@ Let's trace the paths towards X1 and X2 from R1. This is what Arista EOS has to 
 The **traceroute** command shows suboptimal routing from R1 toward X2
 { .code-caption }
 ```
-r1#traceroute x1
+r1#traceroute 10.0.0.4
 traceroute to x1 (10.0.0.4), 30 hops max,* it signals to level-1 routers in the same area that it's attached through an L2 adjacency to another area and can be used as a gateway to the transit 60 byte packets
  1  c1 (10.1.0.1)  0.043 ms  0.008 ms  0.007 ms
  2  x1 (10.0.0.4)  1.113 ms  1.132 ms  1.396 ms
  
  
-r1#traceroute x2
+r1#traceroute 10.0.0.5
 traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
  1  c1 (10.1.0.1)  0.040 ms  0.009 ms  0.007 ms
  2  c2 (10.1.0.10)  0.635 ms  0.656 ms  0.863 ms
@@ -416,7 +416,7 @@ Finally, let's see what happens when the level-2 backbone breaks (the official t
 Check transit connectivity through the IS-IS area 49.0100
 { .code-caption }
 ```
-$ netlab connect -q x1 ping x2
+$ netlab connect -q x1 ping 10.0.0.5
 PING x2 (10.0.0.5): 56 data bytes
 64 bytes from 10.0.0.5: seq=0 ttl=62 time=1.427 ms
 64 bytes from 10.0.0.5: seq=1 ttl=62 time=1.377 ms
@@ -428,7 +428,7 @@ Next, shut down the link between C1 and C2 (shutting down the Ethernet2 interfac
 X1 cannot reach X2 once the C1-C2 link is shut down
 { .code-caption }
 ```
-$ netlab connect -q x1 ping x2
+$ netlab connect -q x1 ping 10.0.0.5
 PING x2 (10.0.0.5): 56 data bytes
 ping: sendto: Network unreachable
 ```
