@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/advanced/1-multilevel/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Multilevel IS-IS Deployments &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Home</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Basics</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/7-unnumbered/" class="dropdown-item">Running IS-IS Over Unnumbered/LLA-only Interfaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Features</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../feature/1-passive/" class="dropdown-item">Passive IS-IS Interfaces</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/2-dis/" class="dropdown-item">Influence the Designated IS Election</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/3-md5/" class="dropdown-item">Protect IS-IS Routing Data with MD5 Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/4-hide-transit/" class="dropdown-item">Hide Transit Subnets in IS-IS Networks</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/5-drain/" class="dropdown-item">Drain Traffic Before Node Maintenance</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/6-timers/" class="dropdown-item">Adjust IS-IS Timers</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/7-redistribute/" class="dropdown-item">Route Redistribution into IS-IS</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/8-bfd/" class="dropdown-item">Use BFD to Speed Up IS-IS Failure Detection</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Advanced</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Multilevel IS-IS Deployments</a>
+</li>
+                                    
+<li>
+    <a href="../10-sr/" class="dropdown-item">Build an SR-MPLS Network with IS-IS</a>
+</li>
+                                    
+<li>
+    <a href="../11-ti-lfa/" class="dropdown-item">Configure IS-IS Fast Reroute Using TI-LFA</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Upcoming</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../../feature/8-bfd/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../10-sr/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#multilevel-is-is-deployments" class="nav-link">Multilevel IS-IS Deployments</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#existing-device-configuration" class="nav-link">Existing Device Configuration</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#initial-routing-tables" class="nav-link">Initial Routing Tables</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#initial-optimization-make-r1-a-level-1-router" class="nav-link">Initial Optimization: Make R1 a Level-1 Router</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#level-1-and-level-2-adjacency-rules-in-is-is" class="nav-link">Level-1 and Level-2 Adjacency Rules in IS-IS</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#make-c1-and-c2-level-1-2-routers" class="nav-link">Make C1 and C2 Level-1-2 Routers</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#l2-default-routing-mechanics" class="nav-link">L2 Default Routing Mechanics</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#distribution-of-l1-routes-into-l2-backbone" class="nav-link">Distribution of L1 Routes into L2 Backbone</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#suboptimal-inter-area-routing" class="nav-link">Suboptimal Inter-Area Routing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#partitioning-the-transit-network" class="nav-link">Partitioning the Transit Network</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#before-moving-on" class="nav-link">Before Moving On</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="multilevel-is-is-deployments">Multilevel IS-IS Deployments</h1>
+<p class="author-byline">By <a href="https://github.com/DanPartelly">Dan Partelly</a><br /></p>
+<p>Like OSPF, IS-IS was designed when router memory was measured in megabytes and CPU speeds in MHz. The scalability of a routing protocol and the reduced memory footprint on the edge (access) routers were crucial. OSPF solved that conundrum with <em>areas</em>, and IS-IS solved it with <em>multi-level</em> topology; some IS-IS routers know only about prefixes in their area (<em>level-1</em> routers), while others know the whole network topology (<em>level-2</em> routers), but might not be aware of the internal structure of other areas.</p>
+<p>Decent modern IS-IS implementations have no problems running a single-level IS-IS network with hundreds of routers, and the memory requirements are usually a non-issue. However, you might still find edge cases where a multi-level deployment might be beneficial. For example, your edge switches might have small hardware forwarding tables, or you might want to limit the <em>blast radius</em> of network failures &ndash; IS-IS limits the LSP flooding to a single area (or the level-2 backbone)<sup id="fnref:SPO"><a class="footnote-ref" href="#fn:SPO">1</a></sup>.</p>
+<p>In this exercise, you&rsquo;ll explore multi-level IS-IS deployment using a simple 5-router topology:</p>
+<p><img alt="Lab topology" src="../topology-multiarea.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> that correctly implements the distribution of intra-area (level-1) routes into inter-area (level-2) backbone.</p>
+<p>Unfortunately, this leaves FRRouting off the table. As of August 2025, FRRouting&rsquo;s IS-IS implementation is incomplete and does not propagate level-1 IP prefixes into the level-2 LSP database as required by <a href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a>. Nevertheless, the implemented parts are solid, and FRR can be used without problems in single-level IS-IS deployments.</p>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
+<ul>
+<li>Change directory to <code>advanced/1-multiarea</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into lab devices with <strong>netlab connect</strong></li>
+</ul>
+<h2 id="existing-device-configuration">Existing Device Configuration</h2>
+<p>When starting the lab, <em>netlab</em> configures IPv4 addresses and IS-IS protocol on the lab routers.</p>
+<p>All five routers are configured as L2 IS-IS routers, as recommended in <a href="../../basic/1-simple-ipv4/">Configure IS-IS Routing for IPv4</a>. This results in a flat level-2 multi-area topology. Routers use the following areas:</p>
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th style="text-align: right;">Router ID</th>
+<th style="text-align: right;">IS-IS Area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td style="text-align: right;">10.0.0.1</td>
+<td style="text-align: right;">49.0100</td>
+</tr>
+<tr>
+<td>c1</td>
+<td style="text-align: right;">10.0.0.2</td>
+<td style="text-align: right;">49.0100</td>
+</tr>
+<tr>
+<td>c2</td>
+<td style="text-align: right;">10.0.0.3</td>
+<td style="text-align: right;">49.0100</td>
+</tr>
+<tr>
+<td>x1</td>
+<td style="text-align: right;">10.0.0.4</td>
+<td style="text-align: right;">49.0001</td>
+</tr>
+<tr>
+<td>x2</td>
+<td style="text-align: right;">10.0.0.5</td>
+<td style="text-align: right;">49.0002</td>
+</tr>
+</tbody>
+</table>
+<h2 id="initial-routing-tables">Initial Routing Tables</h2>
+<p>After starting the lab, you should have full reachability between all routers&rsquo; loopback interfaces.</p>
+<p>For example, router R1 has a full topological view of the network. Its routing table is also relatively large, even for our small network of 5 routers. Now imagine a network with hundreds of routers, each advertising tens of networks. Remember that in past times, people were rightfully concerned about the routing (and forwarding) table size in a single-level network, and you can quickly see the need for smaller forwarding tables.</p>
+<p class="code-caption">IS-IS routes on R1 running Arista cEOS<br /></p>
+<pre><code>r1#show ip route isis
+
+VRF: default
+Source Codes:
+       I L1 - IS-IS level 1,
+       I L2 - IS-IS level 2,
+....
+
+ I L2     10.0.0.2/32 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L2     10.0.0.3/32 [115/20]
+           via 10.1.0.5, Ethernet2
+ I L2     10.0.0.4/32 [115/30]
+           via 10.1.0.1, Ethernet1
+ I L2     10.0.0.5/32 [115/30]
+           via 10.1.0.5, Ethernet2
+ I L2     10.1.0.8/30 [115/20]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
+ I L2     10.1.0.12/30 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L2     10.1.0.16/30 [115/20]
+           via 10.1.0.5, Ethernet2
+
+</code></pre>
+<h2 id="initial-optimization-make-r1-a-level-1-router">Initial Optimization: Make R1 a Level-1 Router</h2>
+<p>Let&rsquo;s see if we can minimize the size of the R1 routing table. Make router R1 a level-1 IS-IS router. The configuration command you need should be pretty familiar (after all, you configured the routers to be level-2 routers in one of the <a href="../../basic/6-level-2/">early lab exercises</a>).</p>
+<p>Examine the R1 routing table once it&rsquo;s configured as a level-1 router.</p>
+<p class="code-caption">IS-IS routes on R1 (Arista cEOS) running as a level-1 router<br /></p>
+<pre><code>r1#show ip route isis
+
+VRF: default
+Source Codes:
+       I L1 - IS-IS level 1,
+       I L2 - IS-IS level 2,
+....
+
+</code></pre>
+<p>We lost all IS-IS routes. Let&rsquo;s figure out what went wrong, starting with the IS-IS interfaces and IS-IS adjacencies:</p>
+<p class="code-caption">R1 (Arista cEOS) runs IS-IS on two Ethernet interfaces, but has no IS-IS adjacencies<br /></p>
+<pre><code>r1#show isis interface brief
+
+IS-IS Instance: Gandalf VRF: default
+
+Interface Level IPv4 Metric IPv6 Metric Type           Adjacency
+--------- ----- ----------- ----------- -------------- ---------
+Loopback0 L1             10          10 loopback       (passive)
+Ethernet2 L1             10          10 point-to-point         0
+Ethernet1 L1             10          10 point-to-point         0
+
+r1#show isis neighbors
+</code></pre>
+<p>Let&rsquo;s restore the lost adjacencies. Before doing that, we need a short detour through the IS-IS adjacency rules to understand why R1 lost all its neighbors.</p>
+<h2 id="level-1-and-level-2-adjacency-rules-in-is-is">Level-1 and Level-2 Adjacency Rules in IS-IS</h2>
+<p>As already mentioned, IS-IS uses areas (level-1 routing) connected via an overlay inter-area routing topology (level-2 routing). In many ways, the inter-area overlay is similar to an OSPF backbone, but with many significant differences. Every router can participate in intra-area routing (level-1 router), inter-area routing (level-2 router), or both (level-1-2 router).</p>
+<p>In OSPF, all inter-area traffic must go through area zero (the backbone area). Any other area must connect to the backbone area, resulting in a strict hierarchical network. Consequently, border routers must have at least one interface in the backbone area.</p>
+<p>Compared to OSPF, IS-IS has more flexible requirements. Backbone routers (L2 routers), often referred to as &ldquo;transit routers&rdquo; in IS-IS parlance, are not required to be part of a &ldquo;transit area&rdquo; or belong to the same area.</p>
+<p>The only requirement imposed on an IS-IS transit network is the end-to-end level-2 continuity through L2 adjacencies across all transit routers. Both L2 and L1/L2 routers can ensure the required level-2 continuity.</p>
+<p>The rules governing adjacency formation in IS-IS are simple:</p>
+<ul>
+<li>Level-1 (intra-area) routers) only form adjacencies with level-1 or level-1-2 routers in the same area. A direct consequence of this is that they cannot be border routers.</li>
+<li>Level-2 routers form L2 adjacencies with other level-2 routers, or with level-1-2 routers. They can form adjacencies with routers in other areas. This is important; the only way to connect two different areas in IS-IS is through an L2 adjacency.</li>
+<li>Level-1-2 routers can form both L1 and L2 adjacencies. They maintain a separate topological database for each of those levels. They act as border routers and manifest many similarities with the OSPF Area Border Routers.</li>
+</ul>
+<p>The adjacency that two routers try to establish depends on their configuration. You can specify the router type in the IS-IS routing process, or limit the adjacency type on a single interface with an interface configuration command. The two parameters limit the IS-IS hellos (ISH) sent through an interface<sup id="fnref:EX"><a class="footnote-ref" href="#fn:EX">2</a></sup>, thus directly limiting the adjacencies formed through that interface.</p>
+<h2 id="make-c1-and-c2-level-1-2-routers">Make C1 and C2 Level-1-2 Routers</h2>
+<p>Now that you know the rules, it&rsquo;s easy to see why R1 lost its adjacency with C1 and C2. A level-1 router cannot form an adjacency with a level-2 router.</p>
+<p>To fix the problem, change the IS-IS router type of C1 and C2 to level-1-2. Again, the command to do that should be familiar by now.</p>
+<p>When you are done, check the IS-IS adjacencies on R1 to see if you solved the adjacency problem we found at the end of the previous configuration task.</p>
+<p class="code-caption">IS-IS neighbors on R1 running Arista cEOS<br /></p>
+<pre><code>r1#show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  c1               L1   Ethernet1          P2P               UP    29          B0
+Gandalf   default  c2               L1   Ethernet2          P2P               UP    24          AF
+</code></pre>
+<p>As expected, the adjacency problem is solved. Next, check if we managed to reduce the size of the routing table:</p>
+<p class="code-caption">IS-IS database on R1 running Arista cEOS<br /></p>
+<pre><code>r1#show isis database
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 1 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                      7  24422   834    118 L1  0000.0000.0001.00-00  &lt;&gt;
+    c1.00-00                      4  12846   835    131 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
+    c2.00-00                      4  61785   835    131 L2  0000.0000.0003.00-00  &lt;DefaultAtt&gt;
+
+</code></pre>
+<p>You will immediately notice that R1 lost the full topological view of the network. The IS-IS database contains only LSPs originated by C1, C2, and R1.</p>
+<p>Finally, examine the R1 routing table:</p>
+<p class="code-caption">IS-IS routes on R1 <br /></p>
+<pre><code>r1#show ip route isis
+
+VRF: default
+     I L1 - IS-IS level 1,
+     I L2 - IS-IS level 2,
+...
+Gateway of last resort:
+ I L1     0.0.0.0/0 [115/10]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
+
+ I L1     10.0.0.2/32 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L1     10.0.0.3/32 [115/20]
+           via 10.1.0.5, Ethernet2
+ I L1     10.1.0.8/30 [115/20]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
+ I L1     10.1.0.12/30 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L1     10.1.0.16/30 [115/20]
+           via 10.1.0.5, Ethernet2
+
+</code></pre>
+<p>Observe that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. The reduction in the IP routing table size is trivial at the scale of a 5-router lab, but as you can easily imagine, it can be significant in large networks.</p>
+<p>Since we&rsquo;re aiming to optimize the R1 routing and not to fragment the network, let&rsquo;s confirm that we still have reachability to routers in other areas:</p>
+<p class="code-caption">Inter-area connectivity tests on R1<br /></p>
+<pre><code>r1#ping 10.0.0.4
+PING 10.0.0.4 (10.0.0.4) 72(100) bytes of data.
+80 bytes from 10.0.0.4: icmp_seq=1 ttl=63 time=0.479 ms
+80 bytes from 10.0.0.4: icmp_seq=2 ttl=63 time=0.144 ms
+....
+
+r1#ping 10.0.0.5
+PING 10.0.0.5 (10.0.0.5) 72(100) bytes of data.
+80 bytes from 10.0.0.5: icmp_seq=1 ttl=63 time=0.801 ms
+80 bytes from 10.0.0.5: icmp_seq=2 ttl=63 time=0.345 ms
+....
+
+</code></pre>
+<p>Despite no longer having a route to X1 and X2&rsquo;s loopbacks, R1 can still reach them.</p>
+<p>Astute engineers might have already noticed something interesting in the R1 routing table: an ECMP default route pointing towards C1 and C2. This route is used for L2 default routing, and it&rsquo;s the key to reaching the level-2 backbone and, implicitly, other IS-IS areas.</p>
+<p>Let&rsquo;s see how this default route is created.</p>
+<h2 id="l2-default-routing-mechanics">L2 Default Routing Mechanics</h2>
+<p>We&rsquo;ll start our exploration at C1. Here&rsquo;s its level-1 LSP database:</p>
+<p class="code-caption">IS-IS level-1 database on C1, running Arista cEOS<br /></p>
+<pre><code>c1#show isis database level-1
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 1 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                     18  32061   726    118 L1  0000.0000.0001.00-00  &lt;&gt;
+    c1.00-00                     20   6734  1193    120 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
+    c2.00-00                     20   6712  1193    120 L2  0000.0000.0003.00-00  &lt;DefaultAtt&gt;
+</code></pre>
+<p>Notice that the LSPs originated by C1 and C2 have the ATT flag set. The full name of this flag is &ldquo;Attached&rdquo;, and in the words of ISO_IEC_10589_2002, a level-1-2 router considers itself <em>attached</em> when</p>
+<ul>
+<li>it can reach at least one other area using the corresponding routeing metric, or</li>
+<li>It has at least one enabled reachable address prefix with the corresponding metric defined.</li>
+</ul>
+<p>If a router considers itself attached, it will originate L1 LSPs with the ATT flag set. This has the following effects:</p>
+<ul>
+<li>The ATT flag signals level-1 routers in the same area that the router advertising it can carry traffic to the level-2 backbone and into other areas. The level-1-2 router advertises itself as an exit point from a level-1 area.</li>
+<li>Level-1 routers receiving an LSP with the ATT bit set will insert a default route pointing to the router that sent the LSP into their IP routing table.</li>
+</ul>
+<p>Back to the default routes we saw earlier in R1&rsquo;s routing table. In our topology, both C1 and C2 consider themselves attached to the level-2 backbone, and they both originate L1 LSPs with the ATT bit set. </p>
+<p>Router R1 has ECMP enabled by default, so it uses both C1 and C2 as the exit points from the level-1 area and adds two default routes to its IP routing table.</p>
+<h2 id="distribution-of-l1-routes-into-l2-backbone">Distribution of L1 Routes into L2 Backbone</h2>
+<p>We have already checked that R1 can reach routers in other areas (X1 and X2), but there is another part of the puzzle that needs to be explored: how do X1 and X2 know about R1? After all, they are in different areas, and know nothing about the internal structure of R1&rsquo;s area (49.0100)</p>
+<p>IS-IS solves this problem by automatically distributing level-1 prefixes into level-2 LSPs on level-1-2 routers. Straight from RFC 1195:</p>
+<blockquote>
+<p>Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area. As described in section 3, this information may be obtained from a combination of the level 1 LSPs (obtained from level-1 routers in the same area) and/or by manual configuration.</p>
+</blockquote>
+<p>Distributing intra-area information into L2 LSP allows routers from other areas to reach destinations within the area.</p>
+<p>Let&rsquo;s check whether C1 is doing the right thing and inspect the contents of its level-1 and level-2 LSP databases:</p>
+<p class="code-caption">R1 LSP as observed in the IS-IS level-1 database on C1 (running Arista cEOS)<br /></p>
+<pre><code>c1#show isis database level-1 r1.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 1 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                     15  20334  1148    118 L1  0000.0000.0001.00-00  &lt;&gt;
+      LSP received time: 2025-08-12 13:50:15
+      Remaining lifetime received: 1199 s Modified to: 1200 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r1
+      Area addresses: 49.0100
+      Interface address: 10.1.0.6
+      Interface address: 10.1.0.2
+      Interface address: 10.0.0.1
+      IS Neighbor          : c2.00               Metric: 10
+      IS Neighbor          : c1.00               Metric: 10
+      Reachability         : 10.1.0.4/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.1/32 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.1 Flags: []
+        Area leader priority: 250 algorithm: 0
+
+</code></pre>
+<p class="code-caption">Level-2 LSP originated by C1 running Arista cEOS<br /></p>
+<pre><code>c1#show isis database level-2 c1.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    c1.00-00                     30  49359   687    169 L2  0000.0000.0002.00-00  &lt;&gt;
+      LSP generation remaining wait time: 0 ms
+      Time remaining until refresh: 387 s
+      NLPID: 0xCC(IPv4)
+      Hostname: c1
+      Area addresses: 49.0100
+      Interface address: 10.1.0.9
+      Interface address: 10.1.0.13
+      Interface address: 10.1.0.1
+      Interface address: 10.0.0.2
+      IS Neighbor          : c2.00               Metric: 10
+      IS Neighbor          : x1.00               Metric: 10
+      Reachability         : 10.1.0.16/30 Metric: 20 Type: 1 Up
+      Reachability         : 10.0.0.3/32 Metric: 20 Type: 1 Up
+      Reachability         : 10.0.0.1/32 Metric: 20 Type: 1 Up
+      Reachability         : 10.1.0.4/30 Metric: 20 Type: 1 Up
+      Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.2 Flags: []
+        Area leader priority: 250 algorithm: 0
+
+
+</code></pre>
+<p>As you can see, C1 inserted the information from R1 L1 LSP into its own L2 LSP. When that information is propagated across the level-2 backbone, other level-2 routers use it in their routing tables.</p>
+<p class="code-caption">IS-IS routing table on X1 running FRRouting<br /></p>
+<pre><code>$ netlab connect x1 --show ip route isis
+Connecting to container clab-multiarea-x1, executing vtysh -c &quot;show ip route isis&quot;
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv4 unicast VRF default:
+I&gt;* 10.0.0.1/32 [115/30] via 10.1.0.13, eth1, weight 1, 01:52:10
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.13, eth1, weight 1, 04:46:37
+I&gt;* 10.0.0.3/32 [115/30] via 10.1.0.13, eth1, weight 1, 01:51:40
+I&gt;* 10.0.0.5/32 [115/40] via 10.1.0.13, eth1, weight 1, 01:51:41
+I&gt;* 10.1.0.0/30 [115/20] via 10.1.0.13, eth1, weight 1, 04:46:37
+I&gt;* 10.1.0.4/30 [115/30] via 10.1.0.13, eth1, weight 1, 01:52:10
+I&gt;* 10.1.0.8/30 [115/20] via 10.1.0.13, eth1, weight 1, 04:46:37
+I   10.1.0.12/30 [115/20] via 10.1.0.13, eth1 inactive, weight 1, 04:46:37
+I&gt;* 10.1.0.16/30 [115/30] via 10.1.0.13, eth1, weight 1, 01:51:40
+</code></pre>
+<h2 id="suboptimal-inter-area-routing">Suboptimal Inter-Area Routing</h2>
+<p>Every time you have an L1 area with multiple gateways, you might get suboptimal routing toward some external destinations, as the level-1 routers always send their traffic toward the nearest level-2 router.</p>
+<p>Let&rsquo;s trace the paths towards X1 and X2 from R1. This is what Arista EOS has to say<sup id="fnref:ECMP"><a class="footnote-ref" href="#fn:ECMP">3</a></sup>:</p>
+<p class="code-caption">The <strong>traceroute</strong> command shows suboptimal routing from R1 toward X2<br /></p>
+<pre><code>r1#traceroute 10.0.0.4
+traceroute to x1 (10.0.0.4), 30 hops max,* it signals to level-1 routers in the same area that it's attached through an L2 adjacency to another area and can be used as a gateway to the transit 60 byte packets
+ 1  c1 (10.1.0.1)  0.043 ms  0.008 ms  0.007 ms
+ 2  x1 (10.0.0.4)  1.113 ms  1.132 ms  1.396 ms
+
+
+r1#traceroute 10.0.0.5
+traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
+ 1  c1 (10.1.0.1)  0.040 ms  0.009 ms  0.007 ms
+ 2  c2 (10.1.0.10)  0.635 ms  0.656 ms  0.863 ms
+ 3  x2 (10.0.0.5)  2.034 ms  2.077 ms  2.205 ms
+
+</code></pre>
+<p>Notice the suboptimal path R1 takes to reach X2. Although X2 is directly connected to C2, and C2 can be used as a default gateway, the outgoing traffic flows through C1.</p>
+<p>Disabling ECMP <sup id="fnref:ECAF"><a class="footnote-ref" href="#fn:ECAF">4</a></sup> does not solve the problem. If you do that, R1 will generate just one default route from the LSP database and choose the LSP with the ATT flag set following these rules<sup id="fnref:ECBC"><a class="footnote-ref" href="#fn:ECBC">5</a></sup>:</p>
+<ul>
+<li>The closest (based on the metric) level-1-2 router with the ATT flag set</li>
+<li>When multiple equidistant level-1-2 routers exist, choose the one with the highest SystemID.</li>
+</ul>
+<p><strong>Takeaway:</strong> Carefully consider using level-1 areas and accept that sub-optimal routing can occur. Consider the practical advice from <a href="../../basic/1-simple-ipv4/">Configure IS-IS Routing for IPv4</a> before resorting to level-1 areas. In most cases, performance or scalability is no longer a good reason to deploy multi-level IS-IS networks.</p>
+<h2 id="partitioning-the-transit-network">Partitioning the Transit Network</h2>
+<p>Finally, let&rsquo;s see what happens when the level-2 backbone breaks (the official term is <em>partitions</em>). Before starting, let&rsquo;s verify that we have connectivity from X1 to X2:</p>
+<p class="code-caption">Check transit connectivity through the IS-IS area 49.0100<br /></p>
+<pre><code>$ netlab connect -q x1 ping 10.0.0.5
+PING x2 (10.0.0.5): 56 data bytes
+64 bytes from 10.0.0.5: seq=0 ttl=62 time=1.427 ms
+64 bytes from 10.0.0.5: seq=1 ttl=62 time=1.377 ms
+....
+</code></pre>
+<p>Next, shut down the link between C1 and C2 (shutting down the Ethernet2 interface on C2 will do the trick). Although there&rsquo;s the physical path between X1 and X2 (X1→C1→R1→C2→X2), X1 cannot reach X2:</p>
+<p class="code-caption">X1 cannot reach X2 once the C1-C2 link is shut down<br /></p>
+<pre><code>$ netlab connect -q x1 ping 10.0.0.5
+PING x2 (10.0.0.5): 56 data bytes
+ping: sendto: Network unreachable
+</code></pre>
+<p><strong>Takeaway:</strong> The level-2 backbone MUST NOT become partitioned. IS-IS has no mechanism like OSPF virtual links that could stitch together a partitioned level-2 backbone.</p>
+<h2 id="before-moving-on">Before Moving On</h2>
+<p>Congratulations. You have completed the first step of the multi-level IS-IS journey.</p>
+<p>There is no specific validation test included with the lab. However, at the end of the exercise (and once you restored the C1-C2 link), you should have:</p>
+<ul>
+<li>R1 working as level-1 router</li>
+<li>C1 and C2 working as level-1-2 routers</li>
+<li>R1 being able to ping X1 and X2</li>
+<li>X1 being able to ping X2</li>
+</ul>
+<p><strong>Next</strong>: <a href="../10-sr/">Build an SR-MPLS Network with IS-IS</a></p>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>Ethernet1</td>
+<td>c1</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>Ethernet2</td>
+<td>c2</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>c1</td>
+<td>Ethernet2</td>
+<td>c2</td>
+<td>Ethernet2</td>
+</tr>
+<tr>
+<td>c1</td>
+<td>Ethernet3</td>
+<td>x1</td>
+<td>eth1</td>
+</tr>
+<tr>
+<td>c2</td>
+<td>Ethernet3</td>
+<td>x2</td>
+<td>eth1</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The interface names depend on the lab devices you use. The printout was generated with user routers running Arista EOS and X1/X2 running FRRouting.</p>
+</div>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; c1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; c2</td>
+</tr>
+<tr>
+<td><strong>c1</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.9/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; c2</td>
+</tr>
+<tr>
+<td>Ethernet3</td>
+<td style="text-align: right;">10.1.0.13/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; x1</td>
+</tr>
+<tr>
+<td><strong>c2</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>c2 -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.10/30</td>
+<td style="text-align: right;"></td>
+<td>c2 -&gt; c1</td>
+</tr>
+<tr>
+<td>Ethernet3</td>
+<td style="text-align: right;">10.1.0.17/30</td>
+<td style="text-align: right;"></td>
+<td>c2 -&gt; x2</td>
+</tr>
+<tr>
+<td><strong>x1</strong></td>
+<td style="text-align: right;">10.0.0.4/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.14/30</td>
+<td style="text-align: right;"></td>
+<td>x1 -&gt; c1</td>
+</tr>
+<tr>
+<td><strong>x2</strong></td>
+<td style="text-align: right;">10.0.0.5/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.18/30</td>
+<td style="text-align: right;"></td>
+<td>x2 -&gt; c2</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:SPO">
+<p>The flooding of changed LSPs is limited to a single level (area or backbone), but without the L1 → L2 route summarization, the changes in a level-1 area always spill over into the level-2 backbone.&#160;<a class="footnote-backref" href="#fnref:SPO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:EX">
+<p>For example, you could have a level-1-2 router, but limit an interface to be a level-1 circuit. The router will only send level-1 ISHs on that interface. You can also configure a router to be a level-1 router and limit an interface to be a level-2 circuit, resulting in no ISHs.&#160;<a class="footnote-backref" href="#fnref:EX" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ECMP">
+<p>Even though ECMP is enabled on Arista cEOS, only the first ECMP entry is inserted into the underlying Linux routing table. All inter-area traffic is thus sent to the first default gateway (C1). Other implementations might spray the probe packets across all potential next hops, resulting in an even more interesting <em>traceroute</em> printout.&#160;<a class="footnote-backref" href="#fnref:ECMP" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ECAF">
+<p>You can disable ECMP by setting <strong>maximum-paths</strong> to 1 in the IS-IS process. Some devices expect <strong>maximum-paths</strong> configured for a routing process, others expect it configured for individual address families.&#160;<a class="footnote-backref" href="#fnref:ECAF" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:ECBC">
+<p>When an IS-IS process uses N-way ECMP, it chooses the top N equidistant level-1-2 routers based on their SystemID.&#160;<a class="footnote-backref" href="#fnref:ECBC" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2025 Ivan Pepelnjak (ipSpace.net AG) and contributors</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
