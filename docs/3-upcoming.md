@@ -4,10 +4,9 @@ A large number of IS-IS labs are [already online](index.md), but we keep getting
 
 ## Advanced Labs
 
-Multi-Level IS-IS Networks
-: * Explain intra-area and inter-area routing
-  * Configure a network with multiple areas and L1/L2 routers
-  * Use L2 default routing (based on ATT bit) in L1 areas
+The Impact of IS-IS Area Partitioning
+: * Explain suboptimal routing within a poorly-designed area (L1 routes are preferred over L2 routes)
+  * Explore what happens when an area partitions
 
 Securing Multi-Level Networks at the Interface Level
 : * Use interface *circuit-type* to stop L1 or L2 adjacencies from forming
