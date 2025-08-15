@@ -1,4 +1,4 @@
-# Multilevel IS-IS Deployments
+# Leaking IS-IS L2 routes into L1 areas
 
 By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }
@@ -446,7 +446,7 @@ There is no specific validation test included with the lab. However, at the end 
 * R1 being able to ping X1 and X2
 * X1 being able to ping X2
 
-**Next**: [Leaking IS-IS L2 routes into L1 areas](2-route-leak.md)
+**Next**: [Build an SR-MPLS Network with IS-IS](10-sr.md)
 
 ## Reference Information
 
