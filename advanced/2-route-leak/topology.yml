@@ -11,9 +11,13 @@ isis.type: level-2
 groups:
   external:
     members: [x1, x2]
+  core:
+    members: [c1, c2] 
+    isis.type: level-1-2
 
 nodes:
   r1:
+    isis.type: level-1
   c1:
   c2:
   x1:
