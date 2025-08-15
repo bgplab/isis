@@ -267,7 +267,7 @@
 <ul>
 <li>Use any device supported by the <em>netlab</em> <a href="https://netlab.tools/module/isis/#platform-support">IS-IS</a> and <a href="https://netlab.tools/module/bgp/#platform-support">BGP</a> configuration modules for the routers in your lab. The device should also support SR-MPLS with IS-IS</li>
 <li>I recommend using a traditional networking device like Arista EOS. Configuring the MPLS data plane on a Linux container running FRRouting control plane can become an interesting exercise in tweaking underdocumented Linux kernel knobs.</li>
-<li>The hosts (H1, H2) attached to the PE-routers are Linux VMs or containers (depending on the virtualization provider you&rsquo;re using). You don&rsquo;t have to worry about them; <em>netlab</em> will take care of that detail.</li>
+<li>The hosts (H1, H2) attached to the PE-routers are Linux VMs or containers (depending on the virtualization provider you&rsquo;re using). You don&rsquo;t have to worry about them; <em>netlab</em> will handle that detail.</li>
 </ul>
 <h2 id="starting-the-lab">Starting the Lab</h2>
 <p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
@@ -453,6 +453,11 @@ IS-IS Instance: Gandalf VRF: default
         SR Capability: Flags: [I]
           SRGB Base: 900000 Range: 65536
 </code></pre>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The labels (SIDs) advertised in SR-MPLS TLVs should be <em>recognized by every node in the network</em>; all devices within the network should be able to use the same set of labels. That&rsquo;s so unrealistic that the IETF &ldquo;solved&rdquo; the problem with a Segment Routing Global Block (part of Router Capabilities TLV), allowing every node to use a different range of labels for the same SR-MPLS SID (<a href="https://blog.ipspace.net/2021/05/segment-routing-ids-mpls-labels/">more details</a>).</p>
+<p>It&rsquo;s highly recommended that you use the same SRGB settings throughout the network; your future self will be grateful when troubleshooting an SR-MPLS problem at 2 AM.</p>
+</div>
 <p>You can also check the PE1 MPLS forwarding table.</p>
 <p class="code-caption">Contents of MPLS forwarding table on PE1 running Arista EOS<br /></p>
 <pre><code>pe1#show mpls route
