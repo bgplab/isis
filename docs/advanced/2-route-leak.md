@@ -201,7 +201,7 @@ When discussing the configuration plan, I didn't give you any instructions to pr
 
 Most implementations of IS-IS have an in-built mechanism, based on the up/down bit, to prevent routing loops. [^NOD]
 
-[^NOD] You may accidentally come across an odd IS-IS implementation that does not implement the up/down bit. The solution is to tag the routes. 
+[^NOD]: You may accidentally come across an odd IS-IS implementation that does not implement the up/down bit. The solution is to tag the routes. 
 
 Let's explore this new mechanic. On R1, start by examining the level-1 LSPs originated by one of our core routers. 
 
