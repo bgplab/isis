@@ -12,10 +12,6 @@ Securing Multi-Level Networks at the Interface Level
 : * Use interface *circuit-type* to stop L1 or L2 adjacencies from forming
   * Use level-specific passwords
 
-Leaking L2 routes into L1 areas
-: * Redistribute L2 routes into L1 areas
-  * Combine redistributed routes with default routing
-
 Explore LSP Database Behavior
 : * What happens when an LSP is changed?
   * How is an LSP removed from a database?
