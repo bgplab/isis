@@ -1,4 +1,4 @@
-# Leaking L2 routes into L1 areas
+# Leaking Level-2 IS-IS Routes into Level-1 Areas
 
 This directory contains the *netlab* topology file for the
-**[Leaking L2 routes into L1 areas](../../docs/advanced/2-route-leak.md)** lab.
+**[Leaking Level-2 IS-IS Routes into Level-1 Areas](../../docs/advanced/2-route-leak.md)** lab.

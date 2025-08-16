@@ -1,23 +1,19 @@
-# Leaking IS-IS L2 routes into L1 areas
+# Leaking Level-2 IS-IS Routes into Level-1 Areas
 
 By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }
 
-By the end of the previous exercise, [Multilevel IS-IS Deployments](../advanced/1-multilevel.md), we saw that every time you engineer a level-1 area with multiple exit points towards the level-2 IS-IS backbone, you open up the potential for sub-optimal inter-area routing. 
+By the end of the [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) exercise, we saw that every time you use level-1 areas with multiple exit points towards the level-2 IS-IS backbone, you might end up with suboptimal inter-area routing. 
 
-In this exercise, you'll solve this problem with the help of the built-in IS-IS redistribution mechanism, called "leaking L2 routes into L1 databases". 
-
-You will work on a five-router topology, identical to the one used in the previous exercise.
+In this exercise, you'll solve the suboptimal routing problem for the five-router topology we used before, using the prefix distribution from the level-2 backbone into level-1 areas, a mechanism described in [RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302). 
 
 ![Lab topology](topology-multiarea.png)
 
-
 ## Device Requirements
 
-Use any device [supported by the _netlab_ IS-IS configuration module](https://netlab.tools/platforms/#platform-routing-support) that correctly implements the distribution of intra-area (level-1) routes into inter-area (level-2) backbone.
+Use any device [supported by the _netlab_ IS-IS configuration module](https://netlab.tools/platforms/#platform-routing-support) that correctly implements the distribution of inter-area (level-2) routes into level-1 areas as specified in RFC 5302.
 
-Unfortunately, this leaves FRRouting off the table. As of August 2025, FRRouting's IS-IS implementation is incomplete and does not propagate level-1 IP prefixes into the level-2 LSP database as required by [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195). Nevertheless, the implemented parts are solid, and FRR can be used without problems in single-level IS-IS deployments.
-
+Unfortunately, this leaves FRRouting off the table. As of August 2025, FRRouting's IS-IS implementation cannot distribute prefixes between level-1 areas and level-2 backbone.
 
 ## Starting the Lab
 
@@ -27,30 +23,23 @@ You can start the lab [on your own lab infrastructure](../1-setup.md) or in [Git
 * Execute **netlab up**
 * Log into lab devices with **netlab connect**
 
-
-
 ## Existing Device Configuration
 
-When starting the lab, _netlab_ configures IPv4 addresses and IS-IS protocol on the lab routers.
+When starting the lab, _netlab_ configures IPv4 addresses and IS-IS protocol on the lab routers, resulting in a configuration very similar to the end state of the [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) lab exercise. IS-IS parameters of individual lab devices are summarized in the following table:
 
-The configuration state of the IS-IS routing protocol is the end state of the configuration on all routers in the previous exercise, [Multilevel IS-IS Deployments](../advanced/1-multilevel.md). The result is a multi-level, multi-area topology. IS-IS configuration is described below:
+| Node | IS-IS Area | System ID | IS-IS type |
+|------|-----------:|----------:|------------|
+| x1 | 49.0001 | 0000.0000.0004 | level-2 |
+| x2 | 49.0002 | 0000.0000.0005 | level-2 |
+| r1 | 49.0100 | 0000.0000.0001 | level-1 |
+| c1 | 49.0100 | 0000.0000.0002 | level-1-2 |
+| c2 | 49.0100 | 0000.0000.0003 | level-1-2 |
 
-| Node | Router ID | IS-IS Area | IS-IS type   |
-|----------|----------:|-------:|-------------:|
-| r1 | 10.0.0.1 | 49.0100 |level-1|
-| c1 | 10.0.0.2 | 49.0100 |level-1-2|
-| c2 | 10.0.0.3 | 49.0100 |level-1-2|
-| x1 | 10.0.0.4 | 49.0001 |level-2|
-| x2 | 10.0.0.5 | 49.0002 |level-2|
+## The Problem
 
+Let's redo the *traceroute* commands we did at the [end of the Multilevel IS-IS Deployments](../advanced/1-multilevel.md) exercise:
 
-## The problem
-
-If you completed the previous exercise recently and it is still fresh in your mind, you may skip this section. 
-
-Let's illustrate our problem, inter-area suboptimal routing, by tracing the paths from R1 to X1 and X2. 
-
-The traceroute command shows sub-optimal routing from R1 toward X2(as viewed on Arista cEOS)
+The path from R1 to X1/X2 (as reported by Arista cEOS)
 { .code-caption }
 ```
 r1#traceroute 10.0.0.4
@@ -66,10 +55,9 @@ traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
  3  x2 (10.0.0.5)  2.034 ms  2.077 ms  2.205 ms
 ```
 
-Our objective is to ensure R1 can reach both X1 and X2 over an optimal path. Since the metrics on all links are the same, the problem reduces to reaching X1 and X2 with a minimal number of hops.
+As you can see, R1 uses one of the L1/L2 routers (but not necessarily the best one) to reach X1/X2. In this lab exercise, we want to ensure R1 can reach both X1 and X2 over an optimal path. Since the metrics on all links are the same, the problem reduces to reaching X1 and X2 with a minimal number of hops.
 
-
-## Configuration plan
+## Configuration Plan
 
 * Leak a route from the L2 LSP database of C1 into its L1 database. This route should ensure that R1 always uses C1 as a next hop for X1
 * Leak a routefrom the  L2 LSP database of C2 into its L1 database. This route should ensure that R1 always uses C2 as a next hop for X2
