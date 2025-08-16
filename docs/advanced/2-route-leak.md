@@ -130,6 +130,7 @@ Let's see if this solution solved our initial problem, sub-optimal inter-area ro
 
 The traceroute command now shows optimal routing towards both X1 and X2
 { .code-caption } 
+```
 r1#traceroute 10.0.0.4
 traceroute to 10.0.0.4 (10.0.0.4), 30 hops max, 60 byte packets
  1  c1 (10.1.0.1)  0.047 ms  0.009 ms  0.008 ms
@@ -138,6 +139,8 @@ r1#traceroute 10.0.0.5
 traceroute to 10.0.0.5 (10.0.0.5), 30 hops max, 60 byte packets
  1  c2 (10.1.0.5)  0.043 ms  0.008 ms  0.008 ms
  2  x2 (10.0.0.5)  0.898 ms  0.908 ms  1.085 ms
+```
+
  
  Please note that the default routes are still present in the routing table of R1 and will be used for any non-specific destination. 
  
