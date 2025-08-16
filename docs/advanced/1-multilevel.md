@@ -383,7 +383,7 @@ The **traceroute** command shows suboptimal routing from R1 toward X2
 { .code-caption }
 ```
 r1#traceroute 10.0.0.4
-traceroute to x1 (10.0.0.4), 30 hops max,* it signals to level-1 routers in the same area that it's attached through an L2 adjacency to another area and can be used as a gateway to the transit 60 byte packets
+traceroute to x1 (10.0.0.4), 30 hops max, 60 byte packets
  1  c1 (10.1.0.1)  0.043 ms  0.008 ms  0.007 ms
  2  x1 (10.0.0.4)  1.113 ms  1.132 ms  1.396 ms
  
