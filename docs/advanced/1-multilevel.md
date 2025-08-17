@@ -175,6 +175,122 @@ IS-IS Instance: Gandalf VRF: default
 
 You will immediately notice that R1 lost the full topological view of the network. The IS-IS database contains only LSPs originated by C1, C2, and R1.
 
+We made one step forward. Now let's have a detailed view of the LSPs originated by our L1/L2 routers. We will only examine C1 here:
+
+Detailed view of C1 originated LSP on R1 (running Arista cEOS)
+{ .code-caption }
+```
+r1#show isis database detail c1.00-00
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+IS-IS Level 1 Link State Database
+LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+c1.00-00                      4  20496   392    131 L2  0000.0000.0002.00-00  <DefaultAtt>
+LSP received time: 2025-08-17 10:03:40
+Remaining lifetime received: 1199 s Modified to: 1200 s
+NLPID: 0xCC(IPv4)
+Hostname: c1
+Area addresses: 49.0100
+Interface address: 10.1.0.9
+Interface address: 10.1.0.1
+Interface address: 10.0.0.2
+Interface address: 10.1.0.13
+IS Neighbor          : c2.00               Metric: 10
+IS Neighbor          : r1.00               Metric: 10
+Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
+Router Capabilities: Router Id: 10.0.0.2 Flags: []
+Area leader priority: 250 algorithm: 0
+
+```
+
+Interestingly enough, the L1 LSP originated by C1 advertises contains the interface address of C1's Ethernet3 interface (C1-X1 link) and subsequently advertises reachability to 10.1.0.12/30 transit network, despite X1 being a level-2 only IS and C1 and X1 having an L2 adjacency relation.
+
+To understand why, we need to delve into ISIS interface circuit types.
+
+## IS-IS interface level circuit type
+
+Move to C1. Start an examination of its adjacency types and its interfaces from the point of view of IS-IS.
+
+C1's neighbors and IS-IS interface status running on Arista cEOS
+{ .code-caption }
+```
+c1#show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  r1               L1   Ethernet1          P2P               UP    24          10
+Gandalf   default  c2               L1L2 Ethernet2          P2P               UP    27          17
+Gandalf   default  x1               L2   Ethernet3          P2P               UP    29          00
+c1#show isis interface brief
+
+IS-IS Instance: Gandalf VRF: default
+
+Interface Level IPv4 Metric IPv6 Metric Type           Adjacency
+--------- ----- ----------- ----------- -------------- ---------
+Ethernet3 L1L2           10          10 point-to-point         1
+Loopback0 L1L2           10          10 loopback       (passive)
+Ethernet1 L1L2           10          10 point-to-point         1
+Ethernet2 L1L2           10          10 point-to-point         2
+
+```
+
+At first glance, we can confirm that the adjacency relation between C1 and X1 is L2 only and established over the Ethernet3 interface.
+
+The second command shows the IS-IS circuit type (level) for all interfaces running IS-IS. Notice that the circuit type for Ethernet3 is L1L2. This has long-reaching implications. The IS-IS circuit type is configurable under interface settings and allows overriding the global is-type set in the routing process.
+
+More often than not, the purpose of this command is presented among those general lines:
+
+"The isis circuit-type command configures what type of IS-IS adjacencies an interface will form over the interface."
+
+This definition, while correct, is misleading. It leaves an important operational aspect of this command, namely its effects on the generation of LSPs. Those are:
+
+* circuit type level-1 interfaces, and the subnets reachable through them are included only in the L1 LSP database.
+* circuit type level-2 interfaces, and the subnets reachable through them are included only in the L1 LSP database.
+* circuit type level-1-2 interfaces, and the subnets reachable through them are included in both L1/L2 LSP databases. This will always happen, even if the interface has a pure L2 adjacency. This behavior is really determined by the circuit-type of the interface, and not the peer level.
+
+
+On both C1 and C2, change the circuit type on the links C1-X1 and C2-X2 to level-2 only. The command you need to use is very similar to "isis circuit-type"
+under interface settings.
+
+R1's view of C1's LSP after changing circuit-type, on Arista cEOS
+{ .code-caption }
+```
+r1#show isis database detail c1.00-00
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+IS-IS Level 1 Link State Database
+LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+c1.00-00                      9  38951  1047    118 L2  0000.0000.0002.00-00  <DefaultAtt>
+LSP received time: 2025-08-17 11:02:44
+Remaining lifetime received: 1199 s Modified to: 1200 s
+NLPID: 0xCC(IPv4)
+Hostname: c1
+Area addresses: 49.0100
+Interface address: 10.1.0.9
+Interface address: 10.1.0.1
+Interface address: 10.0.0.2
+IS Neighbor          : c2.00               Metric: 10
+IS Neighbor          : r1.00               Metric: 10
+Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+Router Capabilities: Router Id: 10.0.0.2 Flags: []
+Area leader priority: 250 algorithm: 0
+```
+
+
+As you can see, we no longer have C1's Ethernet3 interface address and reachability to its associated transit subnet. The same is true for C2.
+ 
+  
+
 Finally, examine the R1 routing table:
 
 IS-IS routes on R1 
@@ -198,14 +314,10 @@ Gateway of last resort:
  I L1     10.1.0.8/30 [115/20]
            via 10.1.0.1, Ethernet1
            via 10.1.0.5, Ethernet2
- I L1     10.1.0.12/30 [115/20]
-           via 10.1.0.1, Ethernet1
- I L1     10.1.0.16/30 [115/20]
-           via 10.1.0.5, Ethernet2
 
 ```
 
-Observe that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. The reduction in the IP routing table size is trivial at the scale of a 5-router lab, but as you can easily imagine, it can be significant in large networks.
+Observe that the type of IS-IS routes changed from L2 to L1, external transit networks and X1/X2 loopbacks,  are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. The reduction in the IP routing table size is trivial at the scale of a 5-router lab, but as you can easily imagine, it can be significant in large networks.
 
 Since we're aiming to optimize the R1 routing and not to fragment the network, let's confirm that we still have reachability to routers in other areas:
 
@@ -247,9 +359,9 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 1 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r1.00-00                     18  32061   726    118 L1  0000.0000.0001.00-00  <>
-    c1.00-00                     20   6734  1193    120 L2  0000.0000.0002.00-00  <DefaultAtt>
-    c2.00-00                     20   6712  1193    120 L2  0000.0000.0003.00-00  <DefaultAtt>
+    r1.00-00                      8  23911  1019    118 L1  0000.0000.0001.00-00  <>
+    c1.00-00                     10  38440  1051    118 L2  0000.0000.0002.00-00  <DefaultAtt>
+    c2.00-00                      9  47353   670    118 L2  0000.0000.0003.00-00  <DefaultAtt>
 ```
 
 Notice that the LSPs originated by C1 and C2 have the ATT flag set. The full name of this flag is "Attached", and in the words of ISO_IEC_10589_2002, a level-1-2 router considers itself *attached* when
@@ -289,8 +401,8 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 1 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r1.00-00                     15  20334  1148    118 L1  0000.0000.0001.00-00  <>
-      LSP received time: 2025-08-12 13:50:15
+    r1.00-00                      8  23911   982    118 L1  0000.0000.0001.00-00  <>
+      LSP received time: 2025-08-17 11:09:07
       Remaining lifetime received: 1199 s Modified to: 1200 s
       NLPID: 0xCC(IPv4)
       Hostname: r1
@@ -311,7 +423,7 @@ IS-IS Instance: Gandalf VRF: default
 Level-2 LSP originated by C1 running Arista cEOS
 { .code-caption }
 ```
-c1#show isis database level-2 c1.00-00 detail
+show isis database level-2 c1.00-00 detail
 Legend:
 H - hostname conflict
 U - node unreachable
@@ -319,29 +431,27 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 2 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    c1.00-00                     30  49359   687    169 L2  0000.0000.0002.00-00  <>
+    c1.00-00                     19  32881  1045    160 L2  0000.0000.0002.00-00  <>
       LSP generation remaining wait time: 0 ms
-      Time remaining until refresh: 387 s
+      Time remaining until refresh: 745 s
       NLPID: 0xCC(IPv4)
       Hostname: c1
       Area addresses: 49.0100
       Interface address: 10.1.0.9
-      Interface address: 10.1.0.13
       Interface address: 10.1.0.1
       Interface address: 10.0.0.2
-      IS Neighbor          : c2.00               Metric: 10
+      Interface address: 10.1.0.13
       IS Neighbor          : x1.00               Metric: 10
-      Reachability         : 10.1.0.16/30 Metric: 20 Type: 1 Up
+      IS Neighbor          : c2.00               Metric: 10
       Reachability         : 10.0.0.3/32 Metric: 20 Type: 1 Up
       Reachability         : 10.0.0.1/32 Metric: 20 Type: 1 Up
       Reachability         : 10.1.0.4/30 Metric: 20 Type: 1 Up
       Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
-      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
       Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
       Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
       Router Capabilities: Router Id: 10.0.0.2 Flags: []
         Area leader priority: 250 algorithm: 0
-
 
 ```
 
@@ -443,6 +553,7 @@ There is no specific validation test included with the lab. However, at the end 
 
 * R1 working as level-1 router
 * C1 and C2 working as level-1-2 routers
+* C1 and C2's interfaces connection to external routers configured as isis circuit type level-2
 * R1 being able to ping X1 and X2
 * X1 being able to ping X2
 
