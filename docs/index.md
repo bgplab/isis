@@ -43,6 +43,7 @@ The next set of exercises covers individual IS-IS features:
 Interested in advanced concepts? How about:
 
 * [Multilevel IS-IS Deployments](advanced/1-multilevel.md)<!--new-->
+* [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak.md)<!--new-->
 
 Ready for a challenge? Try to solve these lab exercises:
 

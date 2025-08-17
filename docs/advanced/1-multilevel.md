@@ -446,7 +446,7 @@ There is no specific validation test included with the lab. However, at the end 
 * R1 being able to ping X1 and X2
 * X1 being able to ping X2
 
-**Next**: [Build an SR-MPLS Network with IS-IS](10-sr.md)
+**Next**: [Distributing Level-2 IS-IS Routes into Level-1 Areas](2-route-leak.md)
 
 ## Reference Information
 
