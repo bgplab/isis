@@ -114,7 +114,26 @@ Gateway of last resort:
            via 10.1.0.5, Ethernet2
 ```
 
-Check that this solution solves the suboptimal inter-area routing challenge. R1 should reach X1 over C1 and X2 over C2.
+The routing table printout on Cisco IOS is even better -- it shows which routes are "real" `L1` routes and which ones are inter-area (`ia`) routes distributed into a level-1 area:
+
+R1 routing table on Cisco IOS
+{ .code-caption }
+```
+r1#show ip route isis | begin Gateway
+Gateway of last resort is 10.1.0.5 to network 0.0.0.0
+
+i*L1  0.0.0.0/0 [115/10] via 10.1.0.5, 00:02:23, Ethernet0/2
+                [115/10] via 10.1.0.1, 00:02:23, Ethernet0/1
+      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
+i L1     10.0.0.2/32 [115/20] via 10.1.0.1, 00:02:26, Ethernet0/1
+i L1     10.0.0.3/32 [115/20] via 10.1.0.5, 00:02:26, Ethernet0/2
+i ia     10.0.0.4/32 [115/30] via 10.1.0.1, 00:00:38, Ethernet0/1
+i ia     10.0.0.5/32 [115/40] via 10.1.0.1, 00:00:38, Ethernet0/1
+i L1     10.1.0.8/30 [115/20] via 10.1.0.5, 00:02:26, Ethernet0/2
+                     [115/20] via 10.1.0.1, 00:02:26, Ethernet0/1
+```
+
+Finally, let's check that this solution solves the suboptimal inter-area routing challenge. R1 should reach X1 over C1 and X2 over C2.
 
 Traceroute results on R1 running Arista EOS
 { .code-caption } 
