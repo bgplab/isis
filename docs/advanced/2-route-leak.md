@@ -5,7 +5,7 @@ By [Dan Partelly](https://github.com/DanPartelly)
 
 By the end of the [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) exercise, we saw that every time you use level-1 areas with multiple exit points towards the level-2 IS-IS backbone, you might end up with suboptimal inter-area routing.
 
-In this exercise, you'll solve the suboptimal routing problem for the five-router topology we used before, using the prefix distribution from the level-2 backbone into level-1 areas, a mechanism described in [RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302).
+In this exercise, you'll solve the suboptimal routing problem for the five-router topology we used before. You'll use the IP prefix distribution from the level-2 backbone into level-1 areas, a mechanism described in [RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302).
 
 ![Lab topology](topology-multiarea.png)
 
@@ -43,11 +43,10 @@ The path from R1 to X1/X2 (as reported by Arista cEOS)
 { .code-caption }
 ```
 r1#traceroute 10.0.0.4
-traceroute to x1 (10.0.0.4), 30 hops max,* it signals to level-1 routers in the same area that it's attached through an L2 adjacency to another area and can be used as a gateway to the transit 60 byte packets
+traceroute to x1 (10.0.0.4), 30 hops max, 60 byte packets
  1  c1 (10.1.0.1)  0.043 ms  0.008 ms  0.007 ms
  2  x1 (10.0.0.4)  1.113 ms  1.132 ms  1.396 ms
- 
- 
+
 r1#traceroute 10.0.0.5
 traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
  1  c1 (10.1.0.1)  0.040 ms  0.009 ms  0.007 ms
@@ -151,69 +150,18 @@ traceroute to 10.0.0.5 (10.0.0.5), 30 hops max, 60 byte packets
 !!! Note
     The default routes are still present in the R1 routing table and will be used for all other destinations outside of area 49.0100. 
  
-## Sub-optimal routes as backup routes
+## Behind the Scenes
 
-We have already convinced ourselves that we now have optimal routing towards X1 and X2. But let's check what happens if one of the links between r1 and the transit routers fails. 
+In the [Route Redistribution into IS-IS](../feature/7-redistribute.md) exercise, we mentioned how dangerous route redistribution could be, and yet we're doing two-way redistribution within IS-IS (L1 → L2 route distribution is built into IS-IS, and now we introduced L2 → L1 route distribution). 
 
-To simulate the failure, break the R1-C2 link. Shut down the Ethernet2 interface on R1.
+As the last part of this exercise, let's explore how IS-IS uses the mechanisms described in RFC 5302 to prevent redistribution loops[^NOD]. Looking at the C1 level-1 LSP should give you all the hints you need:
 
-!!! Note: The interface names depend on the lab devices you use.
+[^NOD]: You may accidentally come across an odd IS-IS implementation that does not implement the up/down bit. The correct solution is to change the vendor or run away. If you can't do that, try using route tags. 
 
-On R1:
-
-R1's adjacency relation and routing table after severing R1-C2 link (as viewed on Arista cEOS)
+C1 level-1 LSP (viewed on R1 running Arista cEOS). Note the Up/Down flags in *Reachability* TLVs
 { .code-caption }
 ```
-r1#show isis neighbors 
- 
-Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id          
-Gandalf   default  c1               L1   Ethernet1          P2P               UP    28          13   
-               
-r1#show ip route isis
-
-Gateway of last resort:
- I L1     0.0.0.0/0 [115/10]
-           via 10.1.0.1, Ethernet1
-
- I L1     10.0.0.2/32 [115/20]
-           via 10.1.0.1, Ethernet1
- I L1     10.0.0.3/32 [115/30]
-           via 10.1.0.1, Ethernet1
- I L1     10.0.0.4/32 [115/30]
-           via 10.1.0.1, Ethernet1
- I L1     10.0.0.5/32 [115/40]
-           via 10.1.0.1, Ethernet1
- I L1     10.1.0.8/30 [115/20]
-           via 10.1.0.1, Ethernet1
- I L1     10.1.0.12/30 [115/20]
-           via 10.1.0.1, Ethernet1
- I L1     10.1.0.16/30 [115/30]
-           via 10.1.0.1, Ethernet1
-
-```  
-
-As expected, we lost our adjacency to c2. We also note that we still have a specific route to X2 in the routing table. This shouldn't be surprising. 10.0.0.5/32 route is leaked by c2 into it's L1 database, and propagated through it's level-1 link with C1 into the whole level-1 area. Notice the route metric. It's 40 now. This makes it clear that it's not the same route we had before.
-
-The upside is that we have a backup path. The downside? We are back to sub-optimal routing for the R1-X2 path. If examining the routing table is not enough, you can convince yourself by running traceroute. You can also repeat the experiment for the R1-C2 link. We won't do any of those here.
-
-Please enable any interfaces you disabled, restoring full connectivity.
-
-## The Up/Down bit and IS-IS built-in loop prevention mechanism
-
-Redistribution is dangerous. Every time you redistribute routes, you open Pandora's Box. It's unusable without a coherent addressing scheme through the network. Filtering mechanisms must be used to prevent routing loops.  
-
-When discussing the configuration plan, I didn't give you any instructions to prevent routing loops.  How did we get away with this?
-
-Most implementations of IS-IS have an in-built mechanism, based on the up/down bit, to prevent routing loops. [^NOD]
-
-[^NOD]: You may accidentally come across an odd IS-IS implementation that does not implement the up/down bit. The solution is to tag the routes. 
-
-Let's explore this new mechanic. On R1, start by examining the level-1 LSPs originated by one of our core routers. 
-
-C1 originated level-1 LSP on R1. Notice the up/down flag (as viewed on Arista cEOS)
-{ .code-caption }
-```
-r1#show isis database c1.00-00 detail
+r1#show isis database detail c1.00-00
 Legend:
 H - hostname conflict
 U - node unreachable
@@ -221,49 +169,62 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 1 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    c1.00-00                     15   7142   890    142 L2  0000.0000.0002.00-00  <DefaultAtt>
-      LSP received time: 2025-08-16 08:52:56
+    c1.00-00                      5  64158  1188    138 L2  0000.0000.0002.00-00  <DefaultAtt>
       Remaining lifetime received: 1199 s Modified to: 1200 s
       NLPID: 0xCC(IPv4)
       Hostname: c1
       Area addresses: 49.0100
       Interface address: 10.1.0.9
       Interface address: 10.1.0.1
-      Interface address: 10.1.0.13
       Interface address: 10.0.0.2
-      IS Neighbor          : c2.00               Metric: 10
       IS Neighbor          : r1.00               Metric: 10
+      IS Neighbor          : c2.00               Metric: 10
       Reachability         : 10.0.0.4/32 Metric: 20 Type: 1 Down
+      Reachability         : 10.0.0.5/32 Metric: 30 Type: 1 Down
       Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
       Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
-      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
       Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
       Router Capabilities: Router Id: 10.0.0.2 Flags: []
         Area leader priority: 250 algorithm: 0
-
 ```
 
-Let's observe the reachability information for 10.0.0.4/32. It is a type 1 route (internal IS-IS route), and immediately to the right, you can see the current value of the up/down bit. 
+You can't glean the same amount of information from a Cisco IOS printout; it just claims a prefix is an `IP-Interarea` prefix.
 
-This Up/Down bit is the core of the IS-IS built-in loop protection mechanism. 
+C1 level-1 LSP (viewed on R1 running Cisco IOS). The prefixes with the Down bit are shown as IP-Interarea prefixes
+{ .code-caption }
 
-The up/down bit is set to "Down" automatically for all routes leaked from the L2 to the L1.
+```
+r1#show isis database level-1 c1.00-00 detail
 
-The loop prevention mechanism rules are simple:
+Tag Gandalf:
 
-* When an L1/L2 router receives an LSP containing routes with the up/down bit set to "Up", it will automatically propagate the routes to its L2 database, as we saw before
-* When an L1/L2 router receives an LSP containing routes with the up/down bit set to "Down", it will not propagate the route back up to its L2 database.
-* L2 routes leaked into L1 are automatically marked by IS-IS as "Down". This rule is reiterated here for its importance, even if I mentioned this already just a few lines above.  
+IS-IS Level-1 LSP c1.00-00
+LSPID                 LSP Seq Num  LSP Checksum  LSP Holdtime/Rcvd      ATT/P/OL
+c1.00-00              0x00000028   0xB53E                 771/1199      1/0/0
+  Area Address: 49.0100
+  NLPID:        0xCC
+  Hostname: c1
+  Metric: 10         IS-Extended r1.00
+  Metric: 10         IS-Extended c2.00
+  IP Address:   10.0.0.2
+  Metric: 10         IP 10.0.0.2/32
+  Metric: 10         IP 10.1.0.0/30
+  Metric: 10         IP 10.1.0.8/30
+  Metric: 20         IP-Interarea 10.0.0.4/32
+  Metric: 30         IP-Interarea 10.0.0.5/32
+```
 
+You did notice the Up/Down bit, right? It's defined in [RFC 5305](https://www.rfc-editor.org/rfc/rfc5305#section-4.1) and [RFC 5302](https://www.rfc-editor.org/rfc/rfc5302.html#section-2) as the high-order bit of the default metric field in the Extended IP Reachability TLV (see [Using IS-IS Metrics](../basic/4-metric.md) for more details). This is how IS-IS uses the *Down* bit to prevent route redistribution loops:
 
-## Before Moving On
+* After running an SPF algorithm, an L1/L2 router copies L1 routes without the *Down* bit into its L2 LSP (see [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) for details)
+* The L1 routes with the *Down* bit set are not copied into the L2 LSP.
+* L2 routes copied into an L1 LSP are marked with the *Down* bit, preventing other L1/L2 routers from copying them back into their L2 LSP.
 
+While the handling of the *Down* bit is trivial, there's another detail to consider: L1 routes are preferred over L2 routes, but that should not apply to the L1 routes that were copied from L2 routes. Thus, L1 routes with the *Down* bit are *less preferred* than the L2 routes.
 
-There is no specific validation test included with the lab. However, at the end of the exercise (and once you restored the C1-C2 link), you should have:
+But wait, there's more. In principle, IS-IS had different TLVs for *internal* and *external* routes[^IXT], and external routes could have *internal* and *external* metrics, resulting in a horrendously long list of IP prefix types and an *order of preference* list that's pretty close in complexity to the BGP one (see [RFC 5302](https://www.rfc-editor.org/rfc/rfc5302.html#section-3) for more details).
 
-* Optimal routing between R1 and X1/X2 
-* R1 should have level 1 IS-IS routes for both 10.0.0.4 and 10.0.0.5 in its routing table with a metric of 30.
-* C1/C2 level-1 LSP details as viewed on R1 should both show the up/down bit set to "DOWN"
+[^IXT]: Although they are no longer used now that we use *wide metrics* with TLV 135. Modern IS-IS implementations should use Prefix Attribute Flags (sub-TLV 4) in TLV 135 to mark external routes (see [RFC 7794](https://www.rfc-editor.org/rfc/rfc7794.html#section-2.1) for details).
 
 **Next**: [Build an SR-MPLS Network with IS-IS](10-sr.md)
 
