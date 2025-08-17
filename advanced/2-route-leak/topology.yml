@@ -1,4 +1,4 @@
-# Leaking Level-2 IS-IS Routes into Level-1 Areas
+# Distributing Level-2 IS-IS Routes into Level-1 Areas
 ---
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 2.0.0
@@ -25,12 +25,12 @@ nodes:
     isis.area: "49.0002"
 
 links:
-- r1-c1
-- r1-c2
-- c1-c2
-- c1-x1
-- c2-x2
+- group: area_100
+  members: [ r1-c1, r1-c2, c1-c2 ]
+- group: external
+  isis.type: level-2
+  members: [ c1-x1, c2-x2 ]
 
 message: |
-  The "Leaking Level-2 IS-IS Routes into Level-1 Areas" lab is ready.
+  The "Distributing Level-2 IS-IS Routes into Level-1 Areas" lab is ready.
   Connect to the lab devices with "netlab connect".

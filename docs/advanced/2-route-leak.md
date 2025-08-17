@@ -1,11 +1,11 @@
-# Leaking Level-2 IS-IS Routes into Level-1 Areas
+# Distributing Level-2 IS-IS Routes into Level-1 Areas
 
 By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }
 
-By the end of the [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) exercise, we saw that every time you use level-1 areas with multiple exit points towards the level-2 IS-IS backbone, you might end up with suboptimal inter-area routing. 
+By the end of the [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) exercise, we saw that every time you use level-1 areas with multiple exit points towards the level-2 IS-IS backbone, you might end up with suboptimal inter-area routing.
 
-In this exercise, you'll solve the suboptimal routing problem for the five-router topology we used before, using the prefix distribution from the level-2 backbone into level-1 areas, a mechanism described in [RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302). 
+In this exercise, you'll solve the suboptimal routing problem for the five-router topology we used before, using the prefix distribution from the level-2 backbone into level-1 areas, a mechanism described in [RFC 5302](https://datatracker.ietf.org/doc/html/rfc5302).
 
 ![Lab topology](topology-multiarea.png)
 
@@ -55,40 +55,47 @@ traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
  3  x2 (10.0.0.5)  2.034 ms  2.077 ms  2.205 ms
 ```
 
-As you can see, R1 uses one of the L1/L2 routers (but not necessarily the best one) to reach X1/X2. In this lab exercise, we want to ensure R1 can reach both X1 and X2 over an optimal path. Since the metrics on all links are the same, the problem reduces to reaching X1 and X2 with a minimal number of hops.
+As you can see, R1 uses one of the L1/L2 routers (but not necessarily the best one) to reach X1/X2. Its routing table does not contain routes for X1/X2 loopbacks, so it has to rely on the default route to reach other areas:
 
-## Configuration Plan
-
-* Leak a route from the L2 LSP database of C1 into its L1 database. This route should ensure that R1 always uses C1 as a next hop for X1
-* Leak a routefrom the  L2 LSP database of C2 into its L1 database. This route should ensure that R1 always uses C2 as a next hop for X2
-* Ensure that if R1<->C1 link fails, X1 is still reachable 
-* Ensure that if R1<->C2 link fails, X2 is still reachable 
-
-
-## Configuration hints
-
-This is an advanced exercise, so you will only get some configuration hints and not a list of commands ready to be input at the router's configuration prompt.
-
-Leaking routes is accomplished through a "redistribute"  command, somewhere in the routing process command hierarchy. You will have to redistribute the current IS-IS process into itself. As a reminder, we are leaking L2 routes into L1. 
-
-Find a way to filter what routes you are redistributing. A prefix list or a route map may help. Leak the routes with their correct subnet masks. 
-
-Once the configuration task is complete on all required routers, move on to the next section of the exercise.
- 
-
-## Examine the routing table of R1 
-
-Let's see if we managed to inject the routes we are interested in into the L1 area. 
-
-R1's routing table after leaking L2 routes down (as viewed on Arista cEOS)
+IS-IS routes on R1 (running Arista EOS)
 { .code-caption }
 ```
-r1#show ip route isis
-....
-I L1 - IS-IS level 1
-I L2 - IS-IS level 2
-.....
+r1#show ip route isis | begin Gateway
+Gateway of last resort:
+ I L1     0.0.0.0/0 [115/10]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
 
+ I L1     10.0.0.2/32 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L1     10.0.0.3/32 [115/20]
+           via 10.1.0.5, Ethernet2
+ I L1     10.1.0.8/30 [115/20]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
+```
+
+In this lab exercise, we want to ensure R1 can reach both X1 and X2 over an optimal path[^NH]. To do that, we'll distribute[^RT] select level-2 routes (X1/X2 loopbacks) into the level-1 area.
+
+[^NH]: Since the metrics on all links are the same, the problem reduces to reaching X1 and X2 with a minimal number of hops.
+
+[^RT]: The terminology used in RFC 5302. Individual implementations (for example, Cisco IOS) might call this feature *route leaking*.
+
+## Configuration Task
+
+* On C1 and C2, leak the /32 prefixes from the L2 LSP database into L1 database.
+* Check that R1 can reach X1 and X2 even if one of the R1-C1 or R1-C2 links fails.
+
+L2 → L1 route leaking is often configured with the **distribute** or **redistribute** command somewhere in the routing process hierarchy. That command should accept a **route-map** (or similar) parameter that allows you to filter the L2 routes inserted into L1 LSP.
+
+## Validation
+
+Examine the routing table on R1. It should contain the X1/X2 loopback prefixes, but not the C1-X2 or C2-X2 subnets. This is how the R1 routing table should look on Arista EOS:
+
+R1 routing table with distributed L2 routes (as viewed on Arista cEOS)
+{ .code-caption }
+```
+r1#show ip route isis | begin Gateway
 Gateway of last resort:
  I L1     0.0.0.0/0 [115/10]
            via 10.1.0.1, Ethernet1
@@ -105,34 +112,26 @@ Gateway of last resort:
  I L1     10.1.0.8/30 [115/20]
            via 10.1.0.1, Ethernet1
            via 10.1.0.5, Ethernet2
- I L1     10.1.0.12/30 [115/20]
-           via 10.1.0.1, Ethernet1
- I L1     10.1.0.16/30 [115/20]
-           via 10.1.0.5, Ethernet2
-
 ```
 
-As expected, we can now see two new routes towards X1 and X2. The metric is 30. Notice that those are host routes; they have the longest prefix match available for an IPv4 address. This makes them preferred over any other possible routes, including the default routes we have. 
+Check that this solution solves the suboptimal inter-area routing challenge. R1 should reach X1 over C1 and X2 over C2.
 
-Let's see if this solution solved our initial problem, sub-optimal inter-area routing:
-
-The traceroute command now shows optimal routing towards both X1 and X2
+Traceroute results on R1 running Arista EOS
 { .code-caption } 
 ```
 r1#traceroute 10.0.0.4
 traceroute to 10.0.0.4 (10.0.0.4), 30 hops max, 60 byte packets
- 1  c1 (10.1.0.1)  0.047 ms  0.009 ms  0.008 ms
- 2  x1 (10.0.0.4)  0.864 ms  0.874 ms  1.041 ms
+ 1  c1 (10.1.0.1)  0.071 ms  0.010 ms  0.008 ms
+ 2  x1 (10.0.0.4)  1.306 ms  1.323 ms  1.509 ms
 r1#traceroute 10.0.0.5
 traceroute to 10.0.0.5 (10.0.0.5), 30 hops max, 60 byte packets
- 1  c2 (10.1.0.5)  0.043 ms  0.008 ms  0.008 ms
- 2  x2 (10.0.0.5)  0.898 ms  0.908 ms  1.085 ms
+ 1  c2 (10.1.0.5)  0.071 ms  0.007 ms  0.005 ms
+ 2  x2 (10.0.0.5)  1.073 ms  1.085 ms  1.268 ms
 ```
 
+!!! Note
+    The default routes are still present in the R1 routing table and will be used for all other destinations outside of area 49.0100. 
  
- Please note that the default routes are still present in the routing table of R1 and will be used for any non-specific destination. 
- 
-
 ## Sub-optimal routes as backup routes
 
 We have already convinced ourselves that we now have optimal routing towards X1 and X2. But let's check what happens if one of the links between r1 and the transit routers fails. 
@@ -179,7 +178,6 @@ As expected, we lost our adjacency to c2. We also note that we still have a spec
 The upside is that we have a backup path. The downside? We are back to sub-optimal routing for the R1-X2 path. If examining the routing table is not enough, you can convince yourself by running traceroute. You can also repeat the experiment for the R1-C2 link. We won't do any of those here.
 
 Please enable any interfaces you disabled, restoring full connectivity.
-
 
 ## The Up/Down bit and IS-IS built-in loop prevention mechanism
 
