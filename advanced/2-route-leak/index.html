@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
-        <link rel="canonical" href="https://isis.bgplabs.net/advanced/10-sr/">
+        <link rel="canonical" href="https://isis.bgplabs.net/advanced/2-route-leak/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Build an SR-MPLS Network with IS-IS &#171; IS-IS Labs</title>
+  <title>Distributing Level-2 IS-IS Routes into Level-1 Areas &#171; IS-IS Labs</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -147,11 +147,11 @@
 </li>
                                     
 <li>
-    <a href="../2-route-leak/" class="dropdown-item">Distributing Level-2 IS-IS Routes into Level-1 Areas</a>
+    <a href="./" class="dropdown-item active" aria-current="page">Distributing Level-2 IS-IS Routes into Level-1 Areas</a>
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">Build an SR-MPLS Network with IS-IS</a>
+    <a href="../10-sr/" class="dropdown-item">Build an SR-MPLS Network with IS-IS</a>
 </li>
                                     
 <li>
@@ -177,12 +177,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../2-route-leak/" class="nav-link">
+                                <a rel="prev" href="../1-multilevel/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../11-ti-lfa/" class="nav-link">
+                                <a rel="next" href="../10-sr/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -210,7 +210,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
       <ul class="nav flex-column">
           
-      <li class="nav-item" data-level="1"><a href="#build-an-sr-mpls-network-with-is-is" class="nav-link">Build an SR-MPLS Network with IS-IS</a>
+      <li class="nav-item" data-level="1"><a href="#distributing-level-2-is-is-routes-into-level-1-areas" class="nav-link">Distributing Level-2 IS-IS Routes into Level-1 Areas</a>
         <ul class="nav flex-column">
       <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
         <ul class="nav flex-column">
@@ -220,7 +220,7 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#existing-routing-protocol-configuration" class="nav-link">Existing Routing Protocol Configuration</a>
+      <li class="nav-item" data-level="2"><a href="#existing-device-configuration" class="nav-link">Existing Device Configuration</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -228,11 +228,15 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#configuration-hints" class="nav-link">Configuration Hints</a>
+      <li class="nav-item" data-level="2"><a href="#configuration-task" class="nav-link">Configuration Task</a>
         <ul class="nav flex-column">
         </ul>
       </li>
       <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#behind-the-scenes" class="nav-link">Behind the Scenes</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -259,261 +263,213 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="build-an-sr-mpls-network-with-is-is">Build an SR-MPLS Network with IS-IS</h1>
-<p>Segment Routing with the MPLS dataplane is the best (control-plane) thing that has happened to MPLS in decades. Instead of building a forwarding table and then assigning local MPLS labels to the entries in the forwarding table, SR-MPLS advertises MPLS labels (called <em>Segment Identifiers</em>) directly in IGP. This approach completely eliminates the need for an additional control-plane protocol (LDP) and the <a href="https://blog.ipspace.net/2011/11/ldp-igp-synchronization-in-mpls/">synchronization headaches</a> LDP introduces.</p>
-<p>In this lab exercise, you&rsquo;ll build a <a href="https://blog.ipspace.net/2012/01/bgp-free-service-provider-core-in/">BGP-free network core</a> with segment routing (see the <a href="https://bgplabs.net/challenge/40-mpls-core/">BGP-Free Core in a Transit Network</a> lab exercise for a more traditional approach).</p>
-<p><img alt="Lab topology" src="../topology-sr-mpls.png" /></p>
-<div class="admonition expert">
-<p class="admonition-title">Expert</p>
-<p>This is an expert-level challenge lab &ndash; you are on your own. Good luck and Godspeed!</p>
-</div>
+<h1 id="distributing-level-2-is-is-routes-into-level-1-areas">Distributing Level-2 IS-IS Routes into Level-1 Areas</h1>
+<p class="author-byline">By <a href="https://github.com/DanPartelly">Dan Partelly</a><br /></p>
+<p>By the end of the <a href="../1-multilevel/">Multilevel IS-IS Deployments</a> exercise, we saw that every time you use level-1 areas with multiple exit points towards the level-2 IS-IS backbone, you might end up with suboptimal inter-area routing.</p>
+<p>In this exercise, you&rsquo;ll solve the suboptimal routing problem for the five-router topology we used before. You&rsquo;ll use the IP prefix distribution from the level-2 backbone into level-1 areas, a mechanism described in <a href="https://datatracker.ietf.org/doc/html/rfc5302">RFC 5302</a>.</p>
+<p><img alt="Lab topology" src="../topology-multiarea.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
-<ul>
-<li>Use any device supported by the <em>netlab</em> <a href="https://netlab.tools/module/isis/#platform-support">IS-IS</a> and <a href="https://netlab.tools/module/bgp/#platform-support">BGP</a> configuration modules for the routers in your lab. The device should also support SR-MPLS with IS-IS</li>
-<li>I recommend using a traditional networking device like Arista EOS. Configuring the MPLS data plane on a Linux container running FRRouting control plane can become an interesting exercise in tweaking underdocumented Linux kernel knobs.</li>
-<li>The hosts (H1, H2) attached to the PE-routers are Linux VMs or containers (depending on the virtualization provider you&rsquo;re using). You don&rsquo;t have to worry about them; <em>netlab</em> will handle that detail.</li>
-</ul>
+<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> that correctly implements the distribution of inter-area (level-2) routes into level-1 areas as specified in RFC 5302.</p>
+<p>Unfortunately, this leaves FRRouting off the table. As of August 2025, FRRouting&rsquo;s IS-IS implementation cannot distribute prefixes between level-1 areas and level-2 backbone.</p>
 <h2 id="starting-the-lab">Starting the Lab</h2>
 <p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
 <ul>
-<li>Change directory to <code>advanced/10-sr</code></li>
-<li>Execute <strong>netlab up</strong>.</li>
-<li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
+<li>Change directory to <code>advanced/2-route-leak</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into lab devices with <strong>netlab connect</strong></li>
 </ul>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>Use Arista EOS containers with GitHub Codespaces. You won&rsquo;t be able to load the kernel drivers needed by FRRouting or VyOS containers, and SR Linux containers need a license to run MPLS.</p>
-</div>
-<h2 id="existing-routing-protocol-configuration">Existing Routing Protocol Configuration</h2>
-<p>When starting the lab, <em>netlab</em> configures IPv4 addresses, IS-IS, and BGP on the lab routers. </p>
-<p>The PE-routers use the following BGP AS number. Both of them advertise the external (host-facing) subnets into BGP.</p>
-<table>
-<thead>
-<tr>
-<th>Node/ASN</th>
-<th style="text-align: right;">Router ID</th>
-<th style="text-align: right;">Advertised prefixes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>AS65000</strong></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-</tr>
-<tr>
-<td>pe1</td>
-<td style="text-align: right;">10.0.0.1</td>
-<td style="text-align: right;">172.16.0.0/24</td>
-</tr>
-<tr>
-<td>pe2</td>
-<td style="text-align: right;">10.0.0.3</td>
-<td style="text-align: right;">172.16.1.0/24</td>
-</tr>
-</tbody>
-</table>
-<p>Each PE-router has a single IBGP neighbor (the other PE-router):</p>
+<h2 id="existing-device-configuration">Existing Device Configuration</h2>
+<p>When starting the lab, <em>netlab</em> configures IPv4 addresses and IS-IS protocol on the lab routers, resulting in a configuration very similar to the end state of the <a href="../1-multilevel/">Multilevel IS-IS Deployments</a> lab exercise. IS-IS parameters of individual lab devices are summarized in the following table:</p>
 <table>
 <thead>
 <tr>
 <th>Node</th>
-<th>Router ID/<br />Neighbor</th>
-<th style="text-align: right;">Router AS/<br />Neighbor AS</th>
-<th style="text-align: right;">Neighbor IPv4</th>
+<th style="text-align: right;">IS-IS Area</th>
+<th style="text-align: right;">System ID</th>
+<th>IS-IS type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>pe1</strong></td>
-<td>10.0.0.1</td>
-<td style="text-align: right;">65000</td>
-<td style="text-align: right;"></td>
+<td>x1</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0004</td>
+<td>level-2</td>
 </tr>
 <tr>
-<td></td>
-<td>pe2</td>
-<td style="text-align: right;">65000</td>
-<td style="text-align: right;">10.0.0.3</td>
+<td>x2</td>
+<td style="text-align: right;">49.0002</td>
+<td style="text-align: right;">0000.0000.0005</td>
+<td>level-2</td>
 </tr>
 <tr>
-<td><strong>pe2</strong></td>
-<td>10.0.0.3</td>
-<td style="text-align: right;">65000</td>
-<td style="text-align: right;"></td>
+<td>r1</td>
+<td style="text-align: right;">49.0100</td>
+<td style="text-align: right;">0000.0000.0001</td>
+<td>level-1</td>
 </tr>
 <tr>
-<td></td>
-<td>pe1</td>
-<td style="text-align: right;">65000</td>
-<td style="text-align: right;">10.0.0.1</td>
+<td>c1</td>
+<td style="text-align: right;">49.0100</td>
+<td style="text-align: right;">0000.0000.0002</td>
+<td>level-1-2</td>
+</tr>
+<tr>
+<td>c2</td>
+<td style="text-align: right;">49.0100</td>
+<td style="text-align: right;">0000.0000.0003</td>
+<td>level-1-2</td>
 </tr>
 </tbody>
 </table>
-<p>All routers are running IS-IS on intra-AS links. They are configured as level-2 routers using point-to-point links.</p>
 <h2 id="the-problem">The Problem</h2>
-<p>After the IS-IS and BGP adjacencies are established, PE1 receives the BGP prefix for the external subnet advertised by PE2 (and vice versa):</p>
-<p class="code-caption">BGP table on PE1 running Arista EOS<br /></p>
-<pre><code>pe1#show ip bgp
-BGP routing table information for VRF default
-Router identifier 10.0.0.1, local AS number 65000
-Route status codes: s - suppressed contributor, * - valid, &gt; - active, E - ECMP head, e - ECMP
-                    S - Stale, c - Contributing to ECMP, b - backup, L - labeled-unicast
-                    % - Pending best path selection
-Origin codes: i - IGP, e - EGP, ? - incomplete
-RPKI Origin Validation codes: V - valid, I - invalid, U - unknown
-AS Path Attributes: Or-ID - Originator ID, C-LST - Cluster List, LL Nexthop - Link Local Nexthop
+<p>Let&rsquo;s redo the <em>traceroute</em> commands we did at the <a href="../1-multilevel/">end of the Multilevel IS-IS Deployments</a> exercise:</p>
+<p class="code-caption">The path from R1 to X1/X2 (as reported by Arista cEOS)<br /></p>
+<pre><code>r1#traceroute 10.0.0.4
+traceroute to x1 (10.0.0.4), 30 hops max, 60 byte packets
+ 1  c1 (10.1.0.1)  0.043 ms  0.008 ms  0.007 ms
+ 2  x1 (10.0.0.4)  1.113 ms  1.132 ms  1.396 ms
 
-          Network                Next Hop              Metric  AIGP       LocPref Weight  Path
- * &gt;      172.16.0.0/24          -                     -       -          -       0       i
- * &gt;      172.16.1.0/24          10.0.0.3              0       -          100     0       i
+r1#traceroute 10.0.0.5
+traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
+ 1  c1 (10.1.0.1)  0.040 ms  0.009 ms  0.007 ms
+ 2  c2 (10.1.0.10)  0.635 ms  0.656 ms  0.863 ms
+ 3  x2 (10.0.0.5)  2.034 ms  2.077 ms  2.205 ms
 </code></pre>
-<p>However, you can&rsquo;t ping H2 from H1:</p>
-<pre><code>$ netlab connect h1 ping h2
-Connecting to container clab-sr-h1, executing ping h2
-PING h2 (172.16.1.5): 56 data bytes
-^C
---- h2 ping statistics ---
-6 packets transmitted, 0 packets received, 100% packet loss
+<p>As you can see, R1 uses one of the L1/L2 routers (but not necessarily the best one) to reach X1/X2. Its routing table does not contain routes for X1/X2 loopbacks, so it has to rely on the default route to reach other areas:</p>
+<p class="code-caption">IS-IS routes on R1 (running Arista EOS)<br /></p>
+<pre><code>r1#show ip route isis | begin Gateway
+Gateway of last resort:
+ I L1     0.0.0.0/0 [115/10]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
+
+ I L1     10.0.0.2/32 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L1     10.0.0.3/32 [115/20]
+           via 10.1.0.5, Ethernet2
+ I L1     10.1.0.8/30 [115/20]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
 </code></pre>
-<p>A traceroute executed on H1 indicates that the probe packets arrive at PE1 and then get dropped by the P router. You <a href="https://bgplabs.net/ibgp/2-transit/">shouldn&rsquo;t be surprised</a> by that behavior; the P router is not running BGP and does not know how to reach the external subnets to which H1 and H2 are connected.</p>
-<pre><code>$ netlab connect h1 traceroute -n h2
-Connecting to container clab-sr-h1, executing traceroute -n h2
-traceroute to h2 (172.16.1.5), 30 hops max, 46 byte packets
- 1  172.16.0.1  0.004 ms  0.003 ms  0.001 ms
- 2^Cpipi@brick2:~/ISIS/advanced/10-sr$ netlab connect h1 traceroute h2
-Connecting to container clab-sr-h1, executing traceroute h2
-traceroute to h2 (172.16.1.5), 30 hops max, 46 byte packets
- 1  Ethernet1.pe1 (172.16.0.1)  0.004 ms  0.001 ms  0.001 ms
- 2  *  *  *
- 3  *  *  *
-</code></pre>
-<h2 id="configuration-hints">Configuration Hints</h2>
-<p>You must configure Segment Routing-based MPLS (SR-MPLS) transport across AS 65000 to hide transit traffic into an MPLS LSP. You would usually have to<sup id="fnref:CHEAT"><a class="footnote-ref" href="#fn:CHEAT">1</a></sup>:</p>
+<p>In this lab exercise, we want to ensure R1 can reach both X1 and X2 over an optimal path<sup id="fnref:NH"><a class="footnote-ref" href="#fn:NH">1</a></sup>. To do that, we&rsquo;ll distribute<sup id="fnref:RT"><a class="footnote-ref" href="#fn:RT">2</a></sup> select level-2 routes (X1/X2 loopbacks) into the level-1 area.</p>
+<h2 id="configuration-task">Configuration Task</h2>
 <ul>
-<li>Enable MPLS dataplane and IS-IS segment routing on all routers </li>
-<li>Assign a Segment Identifier to the loopback prefixes of the PE-routers</li>
+<li>On C1 and C2, leak the /32 prefixes from the L2 LSP database into L1 database.</li>
+<li>Check that R1 can reach X1 and X2 even if one of the R1-C1 or R1-C2 links fails.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<ul>
-<li>If you&rsquo;re using FRRouting containers, execute <code>sudo modprobe mpls-router mpls-iptunnel</code> before starting the lab.</li>
-<li>You must use <code>sysctl</code> commands to enable MPLS on FRRouting interfaces (see <a href="https://docs.frrouting.org/projects/dev-guide/en/latest/ospf-sr.html#linux-kernel">FRRouting OSPF Segment Routing </a> and <a href="https://docs.frrouting.org/en/latest/isisd.html#segment-routing">FRRouting IS-IS Segment Routing</a> documentation for more details).</li>
-</ul>
-</div>
+<p>L2 → L1 route leaking is often configured with the <strong>distribute</strong> or <strong>redistribute</strong> command somewhere in the routing process hierarchy. That command should accept a <strong>route-map</strong> (or similar) parameter that allows you to filter the L2 routes inserted into L1 LSP.</p>
 <h2 id="validation">Validation</h2>
-<p>Use a command similar<sup id="fnref:CSHT"><a class="footnote-ref" href="#fn:CSHT">2</a></sup> to <strong>show isis segment-routing</strong> to verify that you successfully enabled SR-MPLS for IS-IS (Arista EOS refuses to enable it unless you also enable the MPLS dataplane).</p>
-<p class="code-caption">IS-IS SR-MPLS status on PE1 running Arista EOS<br /></p>
-<pre><code>pe1#show isis segment-routing
+<p>Examine the routing table on R1. It should contain the X1/X2 loopback prefixes, but not the C1-X2 or C2-X2 subnets. This is how the R1 routing table should look on Arista EOS:</p>
+<p class="code-caption">R1 routing table with distributed L2 routes (as viewed on Arista cEOS)<br /></p>
+<pre><code>r1#show ip route isis | begin Gateway
+Gateway of last resort:
+ I L1     0.0.0.0/0 [115/10]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
 
-System ID: pe1                  Instance: Gandalf
-SR supported Data-plane: MPLS                   SR Router ID: 10.0.0.1
-SR Global Block( SRGB ): Base: 900000           Size: 65536
-Adj-SID allocation mode: SR-adjacencies
-Adj-SID allocation pool: Base: 100000     Size: 16384
-
-All Prefix Segments have    : P:0 E:0 V:0 L:0
-IS-IS Reachability Algorithm : SPF (0)
-Proxy-node segment attached flag: ignored
-
-Number of IS-IS segment routing capable nodes excluding self: 2
-
-Self-Originated Segment Statistics:
-Node-Segments       : 1
-Prefix-Segments     : 0
-Proxy-Node-Segments : 0
-Adjacency Segments  : 1
+ I L1     10.0.0.2/32 [115/20]
+           via 10.1.0.1, Ethernet1
+ I L1     10.0.0.3/32 [115/20]
+           via 10.1.0.5, Ethernet2
+ I L1     10.0.0.4/32 [115/30]
+           via 10.1.0.1, Ethernet1
+ I L1     10.0.0.5/32 [115/30]
+           via 10.1.0.5, Ethernet2
+ I L1     10.1.0.8/30 [115/20]
+           via 10.1.0.1, Ethernet1
+           via 10.1.0.5, Ethernet2
 </code></pre>
-<p>Check that the PE-routers advertise SR-MPLS TLVs in their LSPs:</p>
-<p class="code-caption">Contents of PE2.00-00 LSP on PE1 running Arista EOS<br /></p>
-<pre><code>pe1#show isis database pe2.00-00 detail
+<p>The routing table printout on Cisco IOS is even better &ndash; it shows which routes are &ldquo;real&rdquo; <code>L1</code> routes and which ones are inter-area (<code>ia</code>) routes distributed into a level-1 area:</p>
+<p class="code-caption">R1 routing table on Cisco IOS<br /></p>
+<pre><code>r1#show ip route isis | begin Gateway
+Gateway of last resort is 10.1.0.5 to network 0.0.0.0
+
+i*L1  0.0.0.0/0 [115/10] via 10.1.0.5, 00:02:23, Ethernet0/2
+                [115/10] via 10.1.0.1, 00:02:23, Ethernet0/1
+      10.0.0.0/8 is variably subnetted, 10 subnets, 2 masks
+i L1     10.0.0.2/32 [115/20] via 10.1.0.1, 00:02:26, Ethernet0/1
+i L1     10.0.0.3/32 [115/20] via 10.1.0.5, 00:02:26, Ethernet0/2
+i ia     10.0.0.4/32 [115/30] via 10.1.0.1, 00:00:38, Ethernet0/1
+i ia     10.0.0.5/32 [115/40] via 10.1.0.1, 00:00:38, Ethernet0/1
+i L1     10.1.0.8/30 [115/20] via 10.1.0.5, 00:02:26, Ethernet0/2
+                     [115/20] via 10.1.0.1, 00:02:26, Ethernet0/1
+</code></pre>
+<p>Finally, let&rsquo;s check that this solution solves the suboptimal inter-area routing challenge. R1 should reach X1 over C1 and X2 over C2.</p>
+<p class="code-caption">Traceroute results on R1 running Arista EOS<br /></p>
+<pre><code>r1#traceroute 10.0.0.4
+traceroute to 10.0.0.4 (10.0.0.4), 30 hops max, 60 byte packets
+ 1  c1 (10.1.0.1)  0.071 ms  0.010 ms  0.008 ms
+ 2  x1 (10.0.0.4)  1.306 ms  1.323 ms  1.509 ms
+r1#traceroute 10.0.0.5
+traceroute to 10.0.0.5 (10.0.0.5), 30 hops max, 60 byte packets
+ 1  c2 (10.1.0.5)  0.071 ms  0.007 ms  0.005 ms
+ 2  x2 (10.0.0.5)  1.073 ms  1.085 ms  1.268 ms
+</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default routes are still present in the R1 routing table and will be used for all other destinations outside of area 49.0100. </p>
+</div>
+<h2 id="behind-the-scenes">Behind the Scenes</h2>
+<p>In the <a href="../../feature/7-redistribute/">Route Redistribution into IS-IS</a> exercise, we mentioned how dangerous route redistribution could be, and yet we&rsquo;re doing two-way redistribution within IS-IS (L1 → L2 route distribution is built into IS-IS, and now we introduced L2 → L1 route distribution). </p>
+<p>As the last part of this exercise, let&rsquo;s explore how IS-IS uses the mechanisms described in RFC 5302 to prevent redistribution loops<sup id="fnref:NOD"><a class="footnote-ref" href="#fn:NOD">3</a></sup>. Looking at the C1 level-1 LSP should give you all the hints you need:</p>
+<p class="code-caption">C1 level-1 LSP (viewed on R1 running Arista cEOS). Note the Up/Down flags in <em>Reachability</em> TLVs<br /></p>
+<pre><code>r1#show isis database detail c1.00-00
 Legend:
 H - hostname conflict
 U - node unreachable
 
 IS-IS Instance: Gandalf VRF: default
-  IS-IS Level 2 Link State Database
+  IS-IS Level 1 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    pe2.00-00                     5  45011  1024    149 L2  0000.0000.0003.00-00  &lt;&gt;
+    c1.00-00                      5  64158  1188    138 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
       Remaining lifetime received: 1199 s Modified to: 1200 s
       NLPID: 0xCC(IPv4)
-      Hostname: pe2
-      Area addresses: 49.0001
-      Interface address: 10.1.0.6
-      Interface address: 10.0.0.3
-      IS Neighbor          : p.00                Metric: 10
-        IPv4 Neighbor Address: 10.1.0.5
-        IPv4 Interface Address: 10.1.0.6
-        Adj-sid: 100000 flags: [L V] weight: 0x0
-      Reachability         : 10.0.0.3/32 Metric: 10 Type: 1 Up
-        SR Prefix-SID: 3 Flags: [N] Algorithm: 0
-      Reachability         : 10.1.0.4/30 Metric: 10 Type: 1 Up
-      Router Capabilities: Router Id: 10.0.0.3 Flags: []
-        SR Local Block:
-          SRLB Base: 965536 Range: 65536
+      Hostname: c1
+      Area addresses: 49.0100
+      Interface address: 10.1.0.9
+      Interface address: 10.1.0.1
+      Interface address: 10.0.0.2
+      IS Neighbor          : r1.00               Metric: 10
+      IS Neighbor          : c2.00               Metric: 10
+      Reachability         : 10.0.0.4/32 Metric: 20 Type: 1 Down
+      Reachability         : 10.0.0.5/32 Metric: 30 Type: 1 Down
+      Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.2 Flags: []
         Area leader priority: 250 algorithm: 0
-        Maximum SID depth:
-          Base MPLS imposition (MSD type 1):  6
-        SR Capability: Flags: [I]
-          SRGB Base: 900000 Range: 65536
 </code></pre>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>The labels (SIDs) advertised in SR-MPLS TLVs should be <em>recognized by every node in the network</em>; all devices within the network should be able to use the same set of labels. That&rsquo;s so unrealistic that the IETF &ldquo;solved&rdquo; the problem with a Segment Routing Global Block (part of Router Capabilities TLV), allowing every node to use a different range of labels for the same SR-MPLS SID (<a href="https://blog.ipspace.net/2021/05/segment-routing-ids-mpls-labels/">more details</a>).</p>
-<p>It&rsquo;s highly recommended that you use the same SRGB settings throughout the network; your future self will be grateful when troubleshooting an SR-MPLS problem at 2 AM.</p>
-</div>
-<p>You can also check the PE1 MPLS forwarding table.</p>
-<p class="code-caption">Contents of MPLS forwarding table on PE1 running Arista EOS<br /></p>
-<pre><code>pe1#show mpls route
-MPLS forwarding table (Label [metric] Vias) - 2 routes
-MPLS next-hop resolution allow default route: False
-Metric Codes:
-          A - Active metric
-Via Type Codes:
-          M - MPLS via, LP - LDP pseudowire via,
-          I - IP lookup via, V - VLAN via,
-          VA - EVPN VLAN aware via, ES - EVPN ethernet segment via,
-          VF - EVPN VLAN flood via, AF - EVPN VLAN aware flood via,
-          NG - Nexthop group via, BP - BGP pseudowire via,
-          VP - VPWS pseudowire via, MSP - Static pseudowire via
+<p>You can&rsquo;t glean the same amount of information from a Cisco IOS printout; it just claims a prefix is an <code>IP-Interarea</code> prefix.</p>
+<p class="code-caption">C1 level-1 LSP (viewed on R1 running Cisco IOS). The prefixes with the Down bit are shown as IP-Interarea prefixes<br /></p>
+<pre><code>r1#show isis database level-1 c1.00-00 detail
 
- 100000  A[1]
-                via M, 10.1.0.1, pop
-                    EgressACL: apply
-                    directly connected, Ethernet2
-                    52:dc:ca:fe:02:01, vlan 1007
- 900003  A[1]
-                via M, 10.1.0.1, swap 900003
-                    EgressACL: apply
-                    directly connected, Ethernet2
-                    52:dc:ca:fe:02:01, vlan 1007
+Tag Gandalf:
+
+IS-IS Level-1 LSP c1.00-00
+LSPID                 LSP Seq Num  LSP Checksum  LSP Holdtime/Rcvd      ATT/P/OL
+c1.00-00              0x00000028   0xB53E                 771/1199      1/0/0
+  Area Address: 49.0100
+  NLPID:        0xCC
+  Hostname: c1
+  Metric: 10         IS-Extended r1.00
+  Metric: 10         IS-Extended c2.00
+  IP Address:   10.0.0.2
+  Metric: 10         IP 10.0.0.2/32
+  Metric: 10         IP 10.1.0.0/30
+  Metric: 10         IP 10.1.0.8/30
+  Metric: 20         IP-Interarea 10.0.0.4/32
+  Metric: 30         IP-Interarea 10.0.0.5/32
 </code></pre>
-<p>Notice the label 900003<sup id="fnref:DLDD"><a class="footnote-ref" href="#fn:DLDD">3</a></sup>; it&rsquo;s the label for the loopback address of PE2:</p>
+<p>You did notice the Up/Down bit, right? It&rsquo;s defined in <a href="https://www.rfc-editor.org/rfc/rfc5305#section-4.1">RFC 5305</a> and <a href="https://www.rfc-editor.org/rfc/rfc5302.html#section-2">RFC 5302</a> as the high-order bit of the default metric field in the Extended IP Reachability TLV (see <a href="../../basic/4-metric/">Using IS-IS Metrics</a> for more details). This is how IS-IS uses the <em>Down</em> bit to prevent route redistribution loops:</p>
 <ul>
-<li>PE-2 advertises an SR Prefix-SID 3 for IP prefix 10.0.0.3/32 (see above)</li>
-<li>Similar to PE-2<sup id="fnref:NCGB"><a class="footnote-ref" href="#fn:NCGB">4</a></sup>, the P-router advertises SR Global Block starting at 900000</li>
-<li>PE-1 thus has to use label 900003 when sending packets towards 10.0.0.3/32 to the P-router.</li>
+<li>After running an SPF algorithm, an L1/L2 router copies L1 routes without the <em>Down</em> bit into its L2 LSP (see <a href="../1-multilevel/">Multilevel IS-IS Deployments</a> for details)</li>
+<li>The L1 routes with the <em>Down</em> bit set are not copied into the L2 LSP.</li>
+<li>L2 routes copied into an L1 LSP are marked with the <em>Down</em> bit, preventing other L1/L2 routers from copying them back into their L2 LSP.</li>
 </ul>
-<p>Finally, check the IP forwarding table on PE-1. The BGP prefix 172.16.1.0/24 should have the MPLS label for the BGP next hop (PE-2 loopback interface):</p>
-<p class="code-caption">BGP prefixes in the IP routing table on PE1 running Arista EOS<br /></p>
-<pre><code>pe1#show ip route bgp
-...
- B I      172.16.1.0/24 [200/0]
-           via 10.0.0.3/32, IS-IS SR tunnel index 1
-              via 10.1.0.1, Ethernet2, label 900003
-</code></pre>
-<p>Last but definitely not least, let&rsquo;s retry that failed <strong>ping</strong>:</p>
-<pre><code>$ netlab connect h1 ping h2
-Connecting to container clab-sr-h1, executing ping h2
-PING h2 (172.16.1.5): 56 data bytes
-64 bytes from 172.16.1.5: seq=0 ttl=61 time=2.843 ms
-64 bytes from 172.16.1.5: seq=1 ttl=61 time=2.450 ms
-^C
---- h2 ping statistics ---
-2 packets transmitted, 2 packets received, 0% packet loss
-round-trip min/avg/max = 2.450/2.646/2.843 ms
-</code></pre>
-<p>Mission Accomplished 😎</p>
+<p>While the handling of the <em>Down</em> bit is trivial, there&rsquo;s another detail to consider: L1 routes are preferred over L2 routes, but that should not apply to the L1 routes that were copied from L2 routes. Thus, L1 routes with the <em>Down</em> bit are <em>less preferred</em> than the L2 routes.</p>
+<p>But wait, there&rsquo;s more. In principle, IS-IS had different TLVs for <em>internal</em> and <em>external</em> routes<sup id="fnref:IXT"><a class="footnote-ref" href="#fn:IXT">4</a></sup>, and external routes could have <em>internal</em> and <em>external</em> metrics, resulting in a horrendously long list of IP prefix types and an <em>order of preference</em> list that&rsquo;s pretty close in complexity to the BGP one (see <a href="https://www.rfc-editor.org/rfc/rfc5302.html#section-3">RFC 5302</a> for more details).</p>
+<p><strong>Next</strong>: <a href="../10-sr/">Build an SR-MPLS Network with IS-IS</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>
@@ -527,32 +483,41 @@ round-trip min/avg/max = 2.450/2.646/2.843 ms
 </thead>
 <tbody>
 <tr>
-<td>pe1</td>
+<td>r1</td>
 <td>Ethernet1</td>
-<td>h1</td>
+<td>c1</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>Ethernet2</td>
+<td>c2</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>c1</td>
+<td>Ethernet2</td>
+<td>c2</td>
+<td>Ethernet2</td>
+</tr>
+<tr>
+<td>c1</td>
+<td>Ethernet3</td>
+<td>x1</td>
 <td>eth1</td>
 </tr>
 <tr>
-<td>pe2</td>
-<td>Ethernet1</td>
-<td>h2</td>
+<td>c2</td>
+<td>Ethernet3</td>
+<td>x2</td>
 <td>eth1</td>
-</tr>
-<tr>
-<td>pe1</td>
-<td>Ethernet2</td>
-<td>p</td>
-<td>Ethernet1</td>
-</tr>
-<tr>
-<td>pe2</td>
-<td>Ethernet2</td>
-<td>p</td>
-<td>Ethernet2</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running Arista EOS.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The interface names depend on the lab devices you use. The printout was generated with user routers running Arista EOS and X1/X2 running FRRouting.</p>
+</div>
 <h3 id="lab-addressing">Lab Addressing</h3>
 <table>
 <thead>
@@ -565,25 +530,25 @@ round-trip min/avg/max = 2.450/2.646/2.843 ms
 </thead>
 <tbody>
 <tr>
-<td><strong>pe1</strong></td>
+<td><strong>r1</strong></td>
 <td style="text-align: right;">10.0.0.1/32</td>
 <td style="text-align: right;"></td>
 <td>Loopback</td>
 </tr>
 <tr>
 <td>Ethernet1</td>
-<td style="text-align: right;">172.16.0.1/24</td>
+<td style="text-align: right;">10.1.0.2/30</td>
 <td style="text-align: right;"></td>
-<td>pe1 -&gt; h1</td>
+<td>r1 -&gt; c1</td>
 </tr>
 <tr>
 <td>Ethernet2</td>
-<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;">10.1.0.6/30</td>
 <td style="text-align: right;"></td>
-<td>pe1 -&gt; p</td>
+<td>r1 -&gt; c2</td>
 </tr>
 <tr>
-<td><strong>p</strong></td>
+<td><strong>c1</strong></td>
 <td style="text-align: right;">10.0.0.2/32</td>
 <td style="text-align: right;"></td>
 <td>Loopback</td>
@@ -592,72 +557,84 @@ round-trip min/avg/max = 2.450/2.646/2.843 ms
 <td>Ethernet1</td>
 <td style="text-align: right;">10.1.0.1/30</td>
 <td style="text-align: right;"></td>
-<td>p -&gt; pe1</td>
+<td>c1 -&gt; r1</td>
 </tr>
 <tr>
 <td>Ethernet2</td>
-<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;">10.1.0.9/30</td>
 <td style="text-align: right;"></td>
-<td>p -&gt; pe2</td>
+<td>c1 -&gt; c2</td>
 </tr>
 <tr>
-<td><strong>pe2</strong></td>
+<td>Ethernet3</td>
+<td style="text-align: right;">10.1.0.13/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; x1</td>
+</tr>
+<tr>
+<td><strong>c2</strong></td>
 <td style="text-align: right;">10.0.0.3/32</td>
 <td style="text-align: right;"></td>
 <td>Loopback</td>
 </tr>
 <tr>
 <td>Ethernet1</td>
-<td style="text-align: right;">172.16.1.3/24</td>
+<td style="text-align: right;">10.1.0.5/30</td>
 <td style="text-align: right;"></td>
-<td>pe2 -&gt; h2</td>
+<td>c2 -&gt; r1</td>
 </tr>
 <tr>
 <td>Ethernet2</td>
-<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;">10.1.0.10/30</td>
 <td style="text-align: right;"></td>
-<td>pe2 -&gt; p</td>
+<td>c2 -&gt; c1</td>
 </tr>
 <tr>
-<td><strong>h1</strong></td>
+<td>Ethernet3</td>
+<td style="text-align: right;">10.1.0.17/30</td>
 <td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td></td>
+<td>c2 -&gt; x2</td>
 </tr>
 <tr>
-<td>eth1</td>
-<td style="text-align: right;">172.16.0.4/24</td>
+<td><strong>x1</strong></td>
+<td style="text-align: right;">10.0.0.4/32</td>
 <td style="text-align: right;"></td>
-<td>h1 -&gt; pe1</td>
-</tr>
-<tr>
-<td><strong>h2</strong></td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;"></td>
-<td></td>
+<td>Loopback</td>
 </tr>
 <tr>
 <td>eth1</td>
-<td style="text-align: right;">172.16.1.5/24</td>
+<td style="text-align: right;">10.1.0.14/30</td>
 <td style="text-align: right;"></td>
-<td>h2 -&gt; pe2</td>
+<td>x1 -&gt; c1</td>
+</tr>
+<tr>
+<td><strong>x2</strong></td>
+<td style="text-align: right;">10.0.0.5/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.18/30</td>
+<td style="text-align: right;"></td>
+<td>x2 -&gt; c2</td>
 </tr>
 </tbody>
 </table>
 <div class="footnote">
 <hr />
 <ol>
-<li id="fn:CHEAT">
-<p>You could also cheat, add the <strong>sr</strong> module to all routers in the lab topology, and start the lab with SR-MPLS already configured.&#160;<a class="footnote-backref" href="#fnref:CHEAT" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:NH">
+<p>Since the metrics on all links are the same, the problem reduces to reaching X1 and X2 with a minimal number of hops.&#160;<a class="footnote-backref" href="#fnref:NH" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn:CSHT">
-<p>Use the <a href="https://blog.ipspace.net/2021/05/segment-routing-ids-mpls-labels/">Segment Routing Segment IDs and MPLS Labels</a> and <a href="https://blog.ipspace.net/2021/05/segment-routing-mpls-bgp-free-core/">BGP-Free MPLS Core with Segment Routing</a> blog posts for further inspiration&#160;<a class="footnote-backref" href="#fnref:CSHT" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:RT">
+<p>The terminology used in RFC 5302. Individual implementations (for example, Cisco IOS) might call this feature <em>route leaking</em>.&#160;<a class="footnote-backref" href="#fnref:RT" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn:DLDD">
-<p>The label depends on the SR Global Block advertised by the P-router (<a href="https://blog.ipspace.net/2021/05/segment-routing-ids-mpls-labels/">more details</a>)&#160;<a class="footnote-backref" href="#fnref:DLDD" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:NOD">
+<p>You may accidentally come across an odd IS-IS implementation that does not implement the up/down bit. The correct solution is to change the vendor or run away. If you can&rsquo;t do that, try using route tags.&#160;<a class="footnote-backref" href="#fnref:NOD" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn:NCGB">
-<p>Because I was running Arista EOS on both of them and did not change the SRGB configuration&#160;<a class="footnote-backref" href="#fnref:NCGB" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<li id="fn:IXT">
+<p>Although they are no longer used now that we use <em>wide metrics</em> with TLV 135. Modern IS-IS implementations should use Prefix Attribute Flags (sub-TLV 4) in TLV 135 to mark external routes (see <a href="https://www.rfc-editor.org/rfc/rfc7794.html#section-2.1">RFC 7794</a> for details).&#160;<a class="footnote-backref" href="#fnref:IXT" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
