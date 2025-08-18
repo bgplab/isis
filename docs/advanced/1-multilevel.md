@@ -41,12 +41,11 @@ All five routers are configured as L2 IS-IS routers, as recommended in [Configur
 | x1 | 10.0.0.4 | 49.0001 |
 | x2 | 10.0.0.5 | 49.0002 |
 
-
 ## Initial Routing Tables
 
-After starting the lab, you should have full reachability between all routers' loopback interfaces.
+After starting the lab, you should have full reachability between all routers' loopback interfaces, and every router will have a full view of the network.
 
-For example, router R1 has a full topological view of the network. Its routing table is also relatively large, even for our small network of 5 routers. Now imagine a network with hundreds of routers, each advertising tens of networks. Remember that in past times, people were rightfully concerned about the routing (and forwarding) table size in a single-level network, and you can quickly see the need for smaller forwarding tables.
+The routing tables you can observe on your devices are relatively large for a small network of 5 routers. Now imagine a network with hundreds of routers, each advertising tens of subnets, and remember that decades ago, people were rightfully concerned about the routing (and forwarding) table sizes.
 
 IS-IS routes on R1 running Arista cEOS
 { .code-caption }
@@ -77,7 +76,7 @@ Source Codes:
 
 ```
 
-## Initial Optimization: Make R1 a Level-1 Router
+## Make R1 a Level-1 Router
 
 Let's see if we can minimize the size of the R1 routing table. Make router R1 a level-1 IS-IS router. The configuration command you need should be pretty familiar (after all, you configured the routers to be level-2 routers in one of the [early lab exercises](../basic/6-level-2.md)).
 
@@ -154,7 +153,7 @@ Gandalf   default  c1               L1   Ethernet1          P2P               UP
 Gandalf   default  c2               L1   Ethernet2          P2P               UP    24          AF
 ```
 
-As expected, the adjacency problem is solved. Next, let's check if we managed to reduce the size of the routing table:
+As expected, the adjacency problem is solved. Next, let's check the IS-IS LSP database and the routing table on R1:
 
 IS-IS database on R1 running Arista cEOS
 { .code-caption }
@@ -175,11 +174,10 @@ IS-IS Instance: Gandalf VRF: default
 
 You will immediately notice that R1 lost the full topological view of the network. The IS-IS database contains only LSPs originated by C1, C2, and R1.
 
-Next, examine the R1 routing table:
+What about the R1 routing table?
 
 IS-IS routes on R1 
 { .code-caption }
-
 ```
 r1#show ip route isis
 
@@ -205,51 +203,38 @@ Gateway of last resort:
            via 10.1.0.5, Ethernet2
 ```
 
+We can see that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. However, the transit subnets C1-X1 and C2-X2 are still in the routing table.
 
-We can see that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology.
+This is unexpected. X1 and X2 are level-2 routers, and we already know they formed level-2 adjacencies with C1 and C2. It would be logical to have those subnets only in the level-2 LSPs.
 
-We also notice the presence of two L1 routes pointing to the transit networks connecting us to the external routers X1 and X2.
+To understand why those routes are present as L1 routes and what we can do about them, we must explore the concept of *IS-IS circuit types*.
 
-This is unexpected. X1 and X2 are level-2 routers, and we know they both formed level-2 adjacencies with C1 and C2. We expect to have their transit networks only in the L2 LSPs.
+## IS-IS Circuit Type
 
-To understand why those routes are present as L1 routes, and what we can do about it, we need to explore the concept of IS-IS interface circuit types.
+You can define an IS-IS router as level-1, level-1-2, or level-2-only. IS-IS allows you to do the same for links[^NAMS] (which they call *circuits*).
 
+[^NAMS]: It does not make sense to configure IS-IS circuit types on level-1 or level-2 routers. They only matter on devices running as level-1-2 IS-IS routers.
 
+The purpose of the IS-IS *circuit type* is often described as controlling the adjacencies that can be formed over a link. While that's true, it's also misleading. ISO DP 10589 and [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195) describe how you can use the IS-IS circuit type (applied to an interface) to: 
 
-## Circuit type
+* Determine whether an interface operates at level-1, level-2, or both levels
+* Control which types of IS-IS adjacencies can form on the interface
+* Specify which LSP types (L1, L2, or both) are exchanged on the interface
+* Enforce network hierarchy (use circuit type as part of the implementation of the IS-IS two-level hierarchical design)
 
+From a practical point of view:
 
-The "isis circuit-type" command configures the IS-IS level operation on an interface, determining which IS-IS levels the interface participates in.
+* A level-1 circuit participates only in intra-area routing
+* A level-2 circuit participates only in inter-area backbone routing
+* A level-1-2 circuit can and will participate in both levels
 
-More often than not, the purpose of this command is described as defining the level of participation and control over adjacency level formation at the interface level. This is true, but also misleading.
+Now for the interesting bit: the *participates in routing* part affects whether the interface subnet is inserted into L1 and L2 LSPs that a router generates:
 
-A more complete view of the purpose of this command can be gleaned from RFC 1195:
+* level-1 circuit: the subnet is included only in the L1 LSP
+* level-2 circuit: the subnet is included only in the L2 LSP
+* level-1-2 circuit: the subnet is included in L1 LSP and L2 LSP, *regardless of the adjacencies formed over that circuit*.
 
-* Level participation control - determines whether the interface operates at Level-1, Level-2, or both levels
-* Adjacency formation - controls which types of IS-IS adjacencies can form on the interface
-* LSP Generation and exchange control - specifies which LSP types (L1, L2, or both) are exchanged on the interface
-* Network hierarchy enforcement - part of the implementation of the IS-IS two-level hierarchy design
-
-From a practical point of view, we have the following cases:
-
-level-1 interface: Circuit participates only in intra-area routing
-level-2 interface: Circuit participates only in inter-area backbone routing
-level-1-2 interface: Circuit can and will participate in both levels
-
-The effect on LSP Generation and exchange control is essential and has deep-reaching practical implications, especially on L1/L2 routers:
-
-* level-1 interfaces:  the interface and the subnets reachable through it are included only in the L1 LSP database.
-* level-2 interfaces: the interface and the subnets reachable through them are included only in the L1 LSP database.
-* level-1-2 interfaces: the interface and the subnets reachable through them are included in both L1/L2 LSP databases. This will always happen, even if the interface has a pure adjacency (a L1/L2 interface can participate in both L1 and L2 routing ).
-
-This behavior is determined by the circuit type of the interface, and not the peer level. 
-An example is in order:  for a level-1-2 interface on a level-1-2 router, even if the peer is connected through an L2 adjacency, we will have  IP Interface Address and IP Internal Reachability TLVs present in the LSP generated by the router.
-
-Armed with this knowledge, let's unpack what is happening in our case. We will focus on the core routers. Only C1 will be covered here.  
-
-Looking at the topology and addressing information, we can easily see that the 10.1.0.12/30 transit network can only be directly advertised through the LSPs originated by C1.
-
-Start by confirming C1's adjacency to X1 and the circuit type on the C1-X1 interface. [^IOS]
+For example, even if a router has only a level-2 adjacency on a level-1-2 circuit, the IP Interface Address TLV and the IP Internal Reachability TLV will still appear in the L1 LSP. Let's check whether that's what we're dealing with, and inspect the IS-IS adjacencies and circuit types on C1[^IOS]:
 
 C1's neighbors and IS-IS interface status -  Arista cEOS
 { .code-caption }
@@ -260,6 +245,7 @@ Instance  VRF      System Id        Type Interface          SNPA              St
 Gandalf   default  r1               L1   Ethernet1          P2P               UP    24          10
 Gandalf   default  c2               L1L2 Ethernet2          P2P               UP    27          17
 Gandalf   default  x1               L2   Ethernet3          P2P               UP    29          00
+
 c1#show isis interface brief
 
 IS-IS Instance: Gandalf VRF: default
@@ -273,15 +259,16 @@ Ethernet2 L1L2           10          10 point-to-point         2
 
 ```
 
-[^IOS]: Cisco IOS does not have a "show isis interface" command. The same information can be obtained through the "show clns interface" command.
+[^IOS]: Most platforms have a **show isis adjacency** or a **show isis neighbor** command to inspect IS-IS neighbors, and a **show isis interface** command to display the interface parameters. Cisco IOS (because its IS-IS implementation predates RFC 1195) has a **show clns interface** command.
 
-At first glance, we can confirm that the adjacency relation between C1 and X1 is L2 only and established over the Ethernet3 interface.
+Looking at the printouts, it's easy to confirm that:
 
-The second command shows the IS-IS circuit type (level) for all interfaces running IS-IS. Notice that the circuit type for Ethernet3 is L1L2.
+* We have a level-2-only adjacency between C1 and X1 (over Ethernet3 interface)
+* The IS-IS circuit type (shown as *Level* in Arista EOS printout) of that interface is L1L2, which means that the interface subnet appears in C1's L1 LSP and L2 LSP.
 
-Knowing this, an examination of the TLVs on the LSP generated by C1, as viewed by R1, should not present any surprises:
+The information in C1's L1 LSPs should no longer surprise us:
 
-Detailed view of C1 originated LSP on R1 (running Arista cEOS)
+The details of C1 level-1 LSP (inspected on R1 running Arista cEOS)
 { .code-caption }
 ```
 r1#show isis database detail c1.00-00
@@ -313,17 +300,19 @@ Area leader priority: 250 algorithm: 0
 
 ```
 
-We already know from the theoretical section above that an L1/L2 interface will generate IP Interface Address and  IP Internal Reachability TLVs for both level 1 and level 2 LSPs, and we quickly realize that fragments of our topology that should be level-2 only are leaked into level-1.
+## Configure IS-IS Circuit Types
 
+Let's remove the external subnets (C1-X1, C2-X2) from the L1 LSP.
 
-This is undesirable.  We are gonna do this by changing the circuit type on the interfaces connecting to our external routers, X1 and X2.
+Change the IS-IS circuit type on the C1-X1 and C2-X2 links to *level-2-only* using an interface configuration command similar to **isis circuit-type**[^JX]
 
-On both C1 and C2, change the circuit type on the links C1-X1 and C2-X2 to level-2 only. The command you need to use is very similar to "isis circuit-type"
-under interface settings.
+[^JX]: Some implementations, for example Junos and IOS XR, define interface parameters within the **interface** hierarchy in the routing process.
 
-Once the configuration is done,  examine the LSP again (only shown for the C1-originated LSP):
+## Revalidating R1 Routing Information
 
-R1's view of C1's LSP after changing circuit-type, on Arista cEOS
+Once the configuration is done, examine the C1 and C2 LSPs on R1.
+
+C1's L1 LSP after the IS-IS circuit type has been changed (observed on R1 running Arista cEOS)
 { .code-caption }
 ```
 r1#show isis database detail c1.00-00
@@ -352,9 +341,7 @@ Router Capabilities: Router Id: 10.0.0.2 Flags: []
 Area leader priority: 250 algorithm: 0
 ```
 
-Notice that the LSP no longer contains the troublesome TLVs.  The same should be true for C2's LSPs if you executed the required configuration tasks.
-
-Finally, let's examine R1's routing table again:
+We did it. The troublesome TLVs are no longer in the LSP. That should be reflected in the R1's routing table:
 
 IS-IS routes on R1
 { .code-caption }
@@ -380,10 +367,11 @@ via 10.1.0.5, Ethernet2
 
 ```
 
+Mission accomplished. The transit networks towards our external routers are gone from the intra-area (level-1) topology, but you can still find them in the level-2 LSPs[^TOK]. The reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. 
 
-The transit networks towards our external routers are gone from the L1 topology. You can still find them in L2 topology. That is OK. They belong there.   The size reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. 
+[^TOK]: That's OK. They belong there.   
 
-Since we're aiming to optimize the R1 routing and not to fragment the network, let's confirm that we still have reachability to routers in other areas:
+Finally, let's confirm that the smaller routing table on R1 did not break the end-to-end connectivity. R1 should still be able to reach X1 and X2:
 
 Inter-area connectivity tests on R1
 { .code-caption }
@@ -404,15 +392,15 @@ PING 10.0.0.5 (10.0.0.5) 72(100) bytes of data.
  
 Despite no longer having a route to X1 and X2's loopbacks, R1 can still reach them.
 
-Astute engineers might have already noticed something interesting in the R1 routing table: an ECMP default route pointing towards C1 and C2. This route is used for L2 default routing, and it's the key to reaching the level-2 backbone and, implicitly, other IS-IS areas.
+Astute engineers might have noticed something interesting in the R1 routing table: an ECMP default route pointing towards C1 and C2. This route is the key to reaching the level-2 backbone and, implicitly, other IS-IS areas.
 
 Let's see how this default route is created.
 
-## L2 Default Routing Mechanics
+## IS-IS Default Routing
 
-We'll start our exploration at C1. Here's its level-1 LSP database:
+Let's start our exploration with the high-level overview of the contents of the level-1 LSP database:
 
-IS-IS level-1 database on C1, running Arista cEOS
+IS-IS level-1 database (observed on C1 running Arista cEOS)
 { .code-caption }
 ```
 c1#show isis database level-1
@@ -444,7 +432,7 @@ Router R1 has ECMP enabled by default, so it uses both C1 and C2 as the exit poi
 
 ## Distribution of L1 Routes into L2 Backbone
 
-We have already checked that R1 can reach routers in other areas (X1 and X2), but there is another part of the puzzle that needs to be explored: how do X1 and X2 know about R1? After all, they are in different areas, and know nothing about the internal structure of R1's area (49.0100)
+We have already checked that R1 can reach routers in other areas (X1 and X2), but there is another part of the puzzle that needs to be explored: how do X1 and X2 know about R1? After all, they are in different areas, and don't know anything about the internal structure of R1's area (49.0100)
 
 IS-IS solves this problem by automatically distributing level-1 prefixes into level-2 LSPs on level-1-2 routers. Straight from RFC 1195:
 
@@ -617,7 +605,7 @@ There is no specific validation test included with the lab. However, at the end 
 
 * R1 working as level-1 router
 * C1 and C2 working as level-1-2 routers
-* C1 and C2's interfaces connection to external routers configured as isis circuit type level-2
+* C1 and C2's interfaces connecting them to external routers configured as level-2 IS-IS circuits
 * R1 being able to ping X1 and X2
 * X1 being able to ping X2
 
