@@ -228,7 +228,7 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#initial-optimization-make-r1-a-level-1-router" class="nav-link">Initial Optimization: Make R1 a Level-1 Router</a>
+      <li class="nav-item" data-level="2"><a href="#make-r1-a-level-1-router" class="nav-link">Make R1 a Level-1 Router</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -240,7 +240,19 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#l2-default-routing-mechanics" class="nav-link">L2 Default Routing Mechanics</a>
+      <li class="nav-item" data-level="2"><a href="#is-is-circuit-type" class="nav-link">IS-IS Circuit Type</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configure-is-is-circuit-types" class="nav-link">Configure IS-IS Circuit Types</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#revalidating-r1-routing-information" class="nav-link">Revalidating R1 Routing Information</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#is-is-default-routing" class="nav-link">IS-IS Default Routing</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -339,8 +351,8 @@
 </tbody>
 </table>
 <h2 id="initial-routing-tables">Initial Routing Tables</h2>
-<p>After starting the lab, you should have full reachability between all routers&rsquo; loopback interfaces.</p>
-<p>For example, router R1 has a full topological view of the network. Its routing table is also relatively large, even for our small network of 5 routers. Now imagine a network with hundreds of routers, each advertising tens of networks. Remember that in past times, people were rightfully concerned about the routing (and forwarding) table size in a single-level network, and you can quickly see the need for smaller forwarding tables.</p>
+<p>After starting the lab, you should have full reachability between all routers&rsquo; loopback interfaces, and every router will have a full view of the network.</p>
+<p>The routing tables you can observe on your devices are relatively large for a small network of 5 routers. Now imagine a network with hundreds of routers, each advertising tens of subnets, and remember that decades ago, people were rightfully concerned about the routing (and forwarding) table sizes.</p>
 <p class="code-caption">IS-IS routes on R1 running Arista cEOS<br /></p>
 <pre><code>r1#show ip route isis
 
@@ -367,7 +379,7 @@ Source Codes:
            via 10.1.0.5, Ethernet2
 
 </code></pre>
-<h2 id="initial-optimization-make-r1-a-level-1-router">Initial Optimization: Make R1 a Level-1 Router</h2>
+<h2 id="make-r1-a-level-1-router">Make R1 a Level-1 Router</h2>
 <p>Let&rsquo;s see if we can minimize the size of the R1 routing table. Make router R1 a level-1 IS-IS router. The configuration command you need should be pretty familiar (after all, you configured the routers to be level-2 routers in one of the <a href="../../basic/6-level-2/">early lab exercises</a>).</p>
 <p>Examine the R1 routing table once it&rsquo;s configured as a level-1 router.</p>
 <p class="code-caption">IS-IS routes on R1 (Arista cEOS) running as a level-1 router<br /></p>
@@ -418,7 +430,7 @@ Instance  VRF      System Id        Type Interface          SNPA              St
 Gandalf   default  c1               L1   Ethernet1          P2P               UP    29          B0
 Gandalf   default  c2               L1   Ethernet2          P2P               UP    24          AF
 </code></pre>
-<p>As expected, the adjacency problem is solved. Next, check if we managed to reduce the size of the routing table:</p>
+<p>As expected, the adjacency problem is solved. Next, let&rsquo;s check the IS-IS LSP database and the routing table on R1:</p>
 <p class="code-caption">IS-IS database on R1 running Arista cEOS<br /></p>
 <pre><code>r1#show isis database
 Legend:
@@ -434,7 +446,7 @@ IS-IS Instance: Gandalf VRF: default
 
 </code></pre>
 <p>You will immediately notice that R1 lost the full topological view of the network. The IS-IS database contains only LSPs originated by C1, C2, and R1.</p>
-<p>Finally, examine the R1 routing table:</p>
+<p>What about the R1 routing table?</p>
 <p class="code-caption">IS-IS routes on R1 <br /></p>
 <pre><code>r1#show ip route isis
 
@@ -458,10 +470,142 @@ Gateway of last resort:
            via 10.1.0.1, Ethernet1
  I L1     10.1.0.16/30 [115/20]
            via 10.1.0.5, Ethernet2
+</code></pre>
+<p>We can see that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. However, the transit subnets C1-X1 and C2-X2 are still in the routing table.</p>
+<p>This is unexpected. X1 and X2 are level-2 routers, and we already know they formed level-2 adjacencies with C1 and C2. It would be logical to have those subnets only in the level-2 LSPs.</p>
+<p>To understand why those routes are present as L1 routes and what we can do about them, we must explore the concept of <em>IS-IS circuit types</em>.</p>
+<h2 id="is-is-circuit-type">IS-IS Circuit Type</h2>
+<p>You can define an IS-IS router as level-1, level-1-2, or level-2-only. IS-IS allows you to do the same for links<sup id="fnref:NAMS"><a class="footnote-ref" href="#fn:NAMS">3</a></sup> (which they call <em>circuits</em>).</p>
+<p>The purpose of the IS-IS <em>circuit type</em> is often described as controlling the adjacencies that can be formed over a link. While that&rsquo;s true, it&rsquo;s also misleading. ISO DP 10589 and <a href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a> describe how you can use the IS-IS circuit type (applied to an interface) to: </p>
+<ul>
+<li>Determine whether an interface operates at level-1, level-2, or both levels</li>
+<li>Control which types of IS-IS adjacencies can form on the interface</li>
+<li>Specify which LSP types (L1, L2, or both) are exchanged on the interface</li>
+<li>Enforce network hierarchy (use circuit type as part of the implementation of the IS-IS two-level hierarchical design)</li>
+</ul>
+<p>From a practical point of view:</p>
+<ul>
+<li>A level-1 circuit participates only in intra-area routing</li>
+<li>A level-2 circuit participates only in inter-area backbone routing</li>
+<li>A level-1-2 circuit can and will participate in both levels</li>
+</ul>
+<p>Now for the interesting bit: the <em>participates in routing</em> part affects whether the interface subnet is inserted into L1 and L2 LSPs that a router generates:</p>
+<ul>
+<li>level-1 circuit: the subnet is included only in the L1 LSP</li>
+<li>level-2 circuit: the subnet is included only in the L2 LSP</li>
+<li>level-1-2 circuit: the subnet is included in L1 LSP and L2 LSP, <em>regardless of the adjacencies formed over that circuit</em>.</li>
+</ul>
+<p>For example, even if a router has only a level-2 adjacency on a level-1-2 circuit, the IP Interface Address TLV and the IP Internal Reachability TLV will still appear in the L1 LSP. Let&rsquo;s check whether that&rsquo;s what we&rsquo;re dealing with, and inspect the IS-IS adjacencies and circuit types on C1<sup id="fnref:IOS"><a class="footnote-ref" href="#fn:IOS">4</a></sup>:</p>
+<p class="code-caption">C1&rsquo;s neighbors and IS-IS interface status -  Arista cEOS<br /></p>
+<pre><code>c1#show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  r1               L1   Ethernet1          P2P               UP    24          10
+Gandalf   default  c2               L1L2 Ethernet2          P2P               UP    27          17
+Gandalf   default  x1               L2   Ethernet3          P2P               UP    29          00
+
+c1#show isis interface brief
+
+IS-IS Instance: Gandalf VRF: default
+
+Interface Level IPv4 Metric IPv6 Metric Type           Adjacency
+--------- ----- ----------- ----------- -------------- ---------
+Ethernet3 L1L2           10          10 point-to-point         1
+Loopback0 L1L2           10          10 loopback       (passive)
+Ethernet1 L1L2           10          10 point-to-point         1
+Ethernet2 L1L2           10          10 point-to-point         2
 
 </code></pre>
-<p>Observe that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. The reduction in the IP routing table size is trivial at the scale of a 5-router lab, but as you can easily imagine, it can be significant in large networks.</p>
-<p>Since we&rsquo;re aiming to optimize the R1 routing and not to fragment the network, let&rsquo;s confirm that we still have reachability to routers in other areas:</p>
+<p>Looking at the printouts, it&rsquo;s easy to confirm that:</p>
+<ul>
+<li>We have a level-2-only adjacency between C1 and X1 (over Ethernet3 interface)</li>
+<li>The IS-IS circuit type (shown as <em>Level</em> in Arista EOS printout) of that interface is L1L2, which means that the interface subnet appears in C1&rsquo;s L1 LSP and L2 LSP.</li>
+</ul>
+<p>The information in C1&rsquo;s L1 LSPs should no longer surprise us:</p>
+<p class="code-caption">The details of C1 level-1 LSP (inspected on R1 running Arista cEOS)<br /></p>
+<pre><code>r1#show isis database detail c1.00-00
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+IS-IS Level 1 Link State Database
+LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+c1.00-00                      4  20496   392    131 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
+LSP received time: 2025-08-17 10:03:40
+Remaining lifetime received: 1199 s Modified to: 1200 s
+NLPID: 0xCC(IPv4)
+Hostname: c1
+Area addresses: 49.0100
+Interface address: 10.1.0.9
+Interface address: 10.1.0.1
+Interface address: 10.0.0.2
+Interface address: 10.1.0.13
+IS Neighbor          : c2.00               Metric: 10
+IS Neighbor          : r1.00               Metric: 10
+Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
+Router Capabilities: Router Id: 10.0.0.2 Flags: []
+Area leader priority: 250 algorithm: 0
+
+</code></pre>
+<h2 id="configure-is-is-circuit-types">Configure IS-IS Circuit Types</h2>
+<p>Let&rsquo;s remove the external subnets (C1-X1, C2-X2) from the L1 LSP.</p>
+<p>Change the IS-IS circuit type on the C1-X1 and C2-X2 links to <em>level-2-only</em> using an interface configuration command similar to <strong>isis circuit-type</strong><sup id="fnref:JX"><a class="footnote-ref" href="#fn:JX">5</a></sup></p>
+<h2 id="revalidating-r1-routing-information">Revalidating R1 Routing Information</h2>
+<p>Once the configuration is done, examine the C1 and C2 LSPs on R1.</p>
+<p class="code-caption">C1&rsquo;s L1 LSP after the IS-IS circuit type has been changed (observed on R1 running Arista cEOS)<br /></p>
+<pre><code>r1#show isis database detail c1.00-00
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+IS-IS Level 1 Link State Database
+LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+c1.00-00                      9  38951  1047    118 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
+LSP received time: 2025-08-17 11:02:44
+Remaining lifetime received: 1199 s Modified to: 1200 s
+NLPID: 0xCC(IPv4)
+Hostname: c1
+Area addresses: 49.0100
+Interface address: 10.1.0.9
+Interface address: 10.1.0.1
+Interface address: 10.0.0.2
+IS Neighbor          : c2.00               Metric: 10
+IS Neighbor          : r1.00               Metric: 10
+Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+Router Capabilities: Router Id: 10.0.0.2 Flags: []
+Area leader priority: 250 algorithm: 0
+</code></pre>
+<p>We did it. The troublesome TLVs are no longer in the LSP. That should be reflected in the R1&rsquo;s routing table:</p>
+<p class="code-caption">IS-IS routes on R1<br /></p>
+<pre><code>r1#show ip route isis
+
+VRF: default
+I L1 - IS-IS level 1,
+I L2 - IS-IS level 2,
+...
+Gateway of last resort:
+I L1     0.0.0.0/0 [115/10]
+via 10.1.0.1, Ethernet1
+via 10.1.0.5, Ethernet2
+
+I L1     10.0.0.2/32 [115/20]
+via 10.1.0.1, Ethernet1
+I L1     10.0.0.3/32 [115/20]
+via 10.1.0.5, Ethernet2
+I L1     10.1.0.8/30 [115/20]
+via 10.1.0.1, Ethernet1
+via 10.1.0.5, Ethernet2
+
+</code></pre>
+<p>Mission accomplished. The transit networks towards our external routers are gone from the intra-area (level-1) topology, but you can still find them in the level-2 LSPs<sup id="fnref:TOK"><a class="footnote-ref" href="#fn:TOK">6</a></sup>. The reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. </p>
+<p>Finally, let&rsquo;s confirm that the smaller routing table on R1 did not break the end-to-end connectivity. R1 should still be able to reach X1 and X2:</p>
 <p class="code-caption">Inter-area connectivity tests on R1<br /></p>
 <pre><code>r1#ping 10.0.0.4
 PING 10.0.0.4 (10.0.0.4) 72(100) bytes of data.
@@ -477,11 +621,11 @@ PING 10.0.0.5 (10.0.0.5) 72(100) bytes of data.
 
 </code></pre>
 <p>Despite no longer having a route to X1 and X2&rsquo;s loopbacks, R1 can still reach them.</p>
-<p>Astute engineers might have already noticed something interesting in the R1 routing table: an ECMP default route pointing towards C1 and C2. This route is used for L2 default routing, and it&rsquo;s the key to reaching the level-2 backbone and, implicitly, other IS-IS areas.</p>
+<p>Astute engineers might have noticed something interesting in the R1 routing table: an ECMP default route pointing towards C1 and C2. This route is the key to reaching the level-2 backbone and, implicitly, other IS-IS areas.</p>
 <p>Let&rsquo;s see how this default route is created.</p>
-<h2 id="l2-default-routing-mechanics">L2 Default Routing Mechanics</h2>
-<p>We&rsquo;ll start our exploration at C1. Here&rsquo;s its level-1 LSP database:</p>
-<p class="code-caption">IS-IS level-1 database on C1, running Arista cEOS<br /></p>
+<h2 id="is-is-default-routing">IS-IS Default Routing</h2>
+<p>Let&rsquo;s start our exploration with the high-level overview of the contents of the level-1 LSP database:</p>
+<p class="code-caption">IS-IS level-1 database (observed on C1 running Arista cEOS)<br /></p>
 <pre><code>c1#show isis database level-1
 Legend:
 H - hostname conflict
@@ -490,9 +634,9 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 1 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r1.00-00                     18  32061   726    118 L1  0000.0000.0001.00-00  &lt;&gt;
-    c1.00-00                     20   6734  1193    120 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
-    c2.00-00                     20   6712  1193    120 L2  0000.0000.0003.00-00  &lt;DefaultAtt&gt;
+    r1.00-00                      8  23911  1019    118 L1  0000.0000.0001.00-00  &lt;&gt;
+    c1.00-00                     10  38440  1051    118 L2  0000.0000.0002.00-00  &lt;DefaultAtt&gt;
+    c2.00-00                      9  47353   670    118 L2  0000.0000.0003.00-00  &lt;DefaultAtt&gt;
 </code></pre>
 <p>Notice that the LSPs originated by C1 and C2 have the ATT flag set. The full name of this flag is &ldquo;Attached&rdquo;, and in the words of ISO_IEC_10589_2002, a level-1-2 router considers itself <em>attached</em> when</p>
 <ul>
@@ -507,7 +651,7 @@ IS-IS Instance: Gandalf VRF: default
 <p>Back to the default routes we saw earlier in R1&rsquo;s routing table. In our topology, both C1 and C2 consider themselves attached to the level-2 backbone, and they both originate L1 LSPs with the ATT bit set. </p>
 <p>Router R1 has ECMP enabled by default, so it uses both C1 and C2 as the exit points from the level-1 area and adds two default routes to its IP routing table.</p>
 <h2 id="distribution-of-l1-routes-into-l2-backbone">Distribution of L1 Routes into L2 Backbone</h2>
-<p>We have already checked that R1 can reach routers in other areas (X1 and X2), but there is another part of the puzzle that needs to be explored: how do X1 and X2 know about R1? After all, they are in different areas, and know nothing about the internal structure of R1&rsquo;s area (49.0100)</p>
+<p>We have already checked that R1 can reach routers in other areas (X1 and X2), but there is another part of the puzzle that needs to be explored: how do X1 and X2 know about R1? After all, they are in different areas, and don&rsquo;t know anything about the internal structure of R1&rsquo;s area (49.0100)</p>
 <p>IS-IS solves this problem by automatically distributing level-1 prefixes into level-2 LSPs on level-1-2 routers. Straight from RFC 1195:</p>
 <blockquote>
 <p>Level 2 routers include in their level 2 LSPs a complete list of [IP address, subnet mask, metric] specifying all IP addresses reachable in their area. As described in section 3, this information may be obtained from a combination of the level 1 LSPs (obtained from level-1 routers in the same area) and/or by manual configuration.</p>
@@ -523,8 +667,8 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 1 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    r1.00-00                     15  20334  1148    118 L1  0000.0000.0001.00-00  &lt;&gt;
-      LSP received time: 2025-08-12 13:50:15
+    r1.00-00                      8  23911   982    118 L1  0000.0000.0001.00-00  &lt;&gt;
+      LSP received time: 2025-08-17 11:09:07
       Remaining lifetime received: 1199 s Modified to: 1200 s
       NLPID: 0xCC(IPv4)
       Hostname: r1
@@ -542,7 +686,7 @@ IS-IS Instance: Gandalf VRF: default
 
 </code></pre>
 <p class="code-caption">Level-2 LSP originated by C1 running Arista cEOS<br /></p>
-<pre><code>c1#show isis database level-2 c1.00-00 detail
+<pre><code>show isis database level-2 c1.00-00 detail
 Legend:
 H - hostname conflict
 U - node unreachable
@@ -550,29 +694,27 @@ U - node unreachable
 IS-IS Instance: Gandalf VRF: default
   IS-IS Level 2 Link State Database
     LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
-    c1.00-00                     30  49359   687    169 L2  0000.0000.0002.00-00  &lt;&gt;
+    c1.00-00                     19  32881  1045    160 L2  0000.0000.0002.00-00  &lt;&gt;
       LSP generation remaining wait time: 0 ms
-      Time remaining until refresh: 387 s
+      Time remaining until refresh: 745 s
       NLPID: 0xCC(IPv4)
       Hostname: c1
       Area addresses: 49.0100
       Interface address: 10.1.0.9
-      Interface address: 10.1.0.13
       Interface address: 10.1.0.1
       Interface address: 10.0.0.2
-      IS Neighbor          : c2.00               Metric: 10
+      Interface address: 10.1.0.13
       IS Neighbor          : x1.00               Metric: 10
-      Reachability         : 10.1.0.16/30 Metric: 20 Type: 1 Up
+      IS Neighbor          : c2.00               Metric: 10
       Reachability         : 10.0.0.3/32 Metric: 20 Type: 1 Up
       Reachability         : 10.0.0.1/32 Metric: 20 Type: 1 Up
       Reachability         : 10.1.0.4/30 Metric: 20 Type: 1 Up
       Reachability         : 10.1.0.8/30 Metric: 10 Type: 1 Up
-      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
       Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
       Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
       Router Capabilities: Router Id: 10.0.0.2 Flags: []
         Area leader priority: 250 algorithm: 0
-
 
 </code></pre>
 <p>As you can see, C1 inserted the information from R1 L1 LSP into its own L2 LSP. When that information is propagated across the level-2 backbone, other level-2 routers use it in their routing tables.</p>
@@ -599,7 +741,7 @@ I&gt;* 10.1.0.16/30 [115/30] via 10.1.0.13, eth1, weight 1, 01:51:40
 </code></pre>
 <h2 id="suboptimal-inter-area-routing">Suboptimal Inter-Area Routing</h2>
 <p>Every time you have an L1 area with multiple gateways, you might get suboptimal routing toward some external destinations, as the level-1 routers always send their traffic toward the nearest level-2 router.</p>
-<p>Let&rsquo;s trace the paths towards X1 and X2 from R1. This is what Arista EOS has to say<sup id="fnref:ECMP"><a class="footnote-ref" href="#fn:ECMP">3</a></sup>:</p>
+<p>Let&rsquo;s trace the paths towards X1 and X2 from R1. This is what Arista EOS has to say<sup id="fnref:ECMP"><a class="footnote-ref" href="#fn:ECMP">7</a></sup>:</p>
 <p class="code-caption">The <strong>traceroute</strong> command shows suboptimal routing from R1 toward X2<br /></p>
 <pre><code>r1#traceroute 10.0.0.4
 traceroute to x1 (10.0.0.4), 30 hops max, 60 byte packets
@@ -615,7 +757,7 @@ traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
 
 </code></pre>
 <p>Notice the suboptimal path R1 takes to reach X2. Although X2 is directly connected to C2, and C2 can be used as a default gateway, the outgoing traffic flows through C1.</p>
-<p>Disabling ECMP <sup id="fnref:ECAF"><a class="footnote-ref" href="#fn:ECAF">4</a></sup> does not solve the problem. If you do that, R1 will generate just one default route from the LSP database and choose the LSP with the ATT flag set following these rules<sup id="fnref:ECBC"><a class="footnote-ref" href="#fn:ECBC">5</a></sup>:</p>
+<p>Disabling ECMP <sup id="fnref:ECAF"><a class="footnote-ref" href="#fn:ECAF">8</a></sup> does not solve the problem. If you do that, R1 will generate just one default route from the LSP database and choose the LSP with the ATT flag set following these rules<sup id="fnref:ECBC"><a class="footnote-ref" href="#fn:ECBC">9</a></sup>:</p>
 <ul>
 <li>The closest (based on the metric) level-1-2 router with the ATT flag set</li>
 <li>When multiple equidistant level-1-2 routers exist, choose the one with the highest SystemID.</li>
@@ -643,6 +785,7 @@ ping: sendto: Network unreachable
 <ul>
 <li>R1 working as level-1 router</li>
 <li>C1 and C2 working as level-1-2 routers</li>
+<li>C1 and C2&rsquo;s interfaces connecting them to external routers configured as level-2 IS-IS circuits</li>
 <li>R1 being able to ping X1 and X2</li>
 <li>X1 being able to ping X2</li>
 </ul>
@@ -807,14 +950,26 @@ ping: sendto: Network unreachable
 <li id="fn:EX">
 <p>For example, you could have a level-1-2 router, but limit an interface to be a level-1 circuit. The router will only send level-1 ISHs on that interface. You can also configure a router to be a level-1 router and limit an interface to be a level-2 circuit, resulting in no ISHs.&#160;<a class="footnote-backref" href="#fnref:EX" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
+<li id="fn:NAMS">
+<p>It does not make sense to configure IS-IS circuit types on level-1 or level-2 routers. They only matter on devices running as level-1-2 IS-IS routers.&#160;<a class="footnote-backref" href="#fnref:NAMS" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:IOS">
+<p>Most platforms have a <strong>show isis adjacency</strong> or a <strong>show isis neighbor</strong> command to inspect IS-IS neighbors, and a <strong>show isis interface</strong> command to display the interface parameters. Cisco IOS (because its IS-IS implementation predates RFC 1195) has a <strong>show clns interface</strong> command.&#160;<a class="footnote-backref" href="#fnref:IOS" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:JX">
+<p>Some implementations, for example Junos and IOS XR, define interface parameters within the <strong>interface</strong> hierarchy in the routing process.&#160;<a class="footnote-backref" href="#fnref:JX" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TOK">
+<p>That&rsquo;s OK. They belong there.&#160;<a class="footnote-backref" href="#fnref:TOK" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
 <li id="fn:ECMP">
-<p>Even though ECMP is enabled on Arista cEOS, only the first ECMP entry is inserted into the underlying Linux routing table. All inter-area traffic is thus sent to the first default gateway (C1). Other implementations might spray the probe packets across all potential next hops, resulting in an even more interesting <em>traceroute</em> printout.&#160;<a class="footnote-backref" href="#fnref:ECMP" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>Even though ECMP is enabled on Arista cEOS, only the first ECMP entry is inserted into the underlying Linux routing table. All inter-area traffic is thus sent to the first default gateway (C1). Other implementations might spray the probe packets across all potential next hops, resulting in an even more interesting <em>traceroute</em> printout.&#160;<a class="footnote-backref" href="#fnref:ECMP" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ECAF">
-<p>You can disable ECMP by setting <strong>maximum-paths</strong> to 1 in the IS-IS process. Some devices expect <strong>maximum-paths</strong> configured for a routing process, others expect it configured for individual address families.&#160;<a class="footnote-backref" href="#fnref:ECAF" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>You can disable ECMP by setting <strong>maximum-paths</strong> to 1 in the IS-IS process. Some devices expect <strong>maximum-paths</strong> configured for a routing process, others expect it configured for individual address families.&#160;<a class="footnote-backref" href="#fnref:ECAF" title="Jump back to footnote 8 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ECBC">
-<p>When an IS-IS process uses N-way ECMP, it chooses the top N equidistant level-1-2 routers based on their SystemID.&#160;<a class="footnote-backref" href="#fnref:ECBC" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<p>When an IS-IS process uses N-way ECMP, it chooses the top N equidistant level-1-2 routers based on their SystemID.&#160;<a class="footnote-backref" href="#fnref:ECBC" title="Jump back to footnote 9 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
