@@ -387,7 +387,7 @@ Stub Links
 
 
 !!! Note
-The interface names depend on the lab devices you use. The printout was generated with user routers running Arista EOS and X1 running FRRouting.
+	The interface names depend on the lab devices you use. The printout was 		generated with user routers running Arista EOS and X1 running FRRouting.
 
 
 ### Lab Addressing
