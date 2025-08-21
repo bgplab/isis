@@ -8,9 +8,8 @@ The Impact of IS-IS Area Partitioning
 : * Explain suboptimal routing within a poorly-designed area (L1 routes are preferred over L2 routes)
   * Explore what happens when an area partitions
 
-Securing Multi-Level Networks at the Interface Level
-: * Use interface *circuit-type* to stop L1 or L2 adjacencies from forming
-  * Use level-specific passwords
+Securing Multi-Level Networks at the Area Level
+:  * Use level-specific passwords
 
 Explore LSP Database Behavior
 : * What happens when an LSP is changed?

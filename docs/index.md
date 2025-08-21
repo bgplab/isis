@@ -44,7 +44,7 @@ Interested in advanced concepts? How about:
 
 * [Multilevel IS-IS Deployments](advanced/1-multilevel.md)<!--new-->
 * [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak.md)<!--new-->
-
+* [Manual Configuration of Summary Addresses](advanced/3-summarization.md)<!--new-->
 Ready for a challenge? Try to solve these lab exercises:
 
 * [Build an SR-MPLS Network with IS-IS](advanced/10-sr.md)<!--new-->
