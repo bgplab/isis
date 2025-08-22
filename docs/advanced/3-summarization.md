@@ -4,15 +4,13 @@ By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }
 
 
-A foreshadowing of the problems we will solve today can be found in the first footnote of the [Multilevel IS-IS Deployments](../advanced/1-multilevel.md) exercise. Without summarization, changes in an L1 area will be propagated into L2 areas(backbone).
-
-In this exercise, we will continue the trend of simplifying the routing tables and minimizing the shared state between level-1 and level-2 IS-IS hierarchies. [^NE]
+In this exercise, we continue our focus on routing table simplification by addressing a critical propagation issue in multilevel IS-IS networks. While IS-IS flooding mechanisms are designed to limit LSP changes to a single hierarchical level, without level-1 to level-2 route summarization topology changes within level-1 areas invariably propagate into the level-2 backbone.[^NE]
 
 You'll use manual configuration of summary addresses on the level-1 - level-2 boundary, a mechanism described in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195), on a three-router topology.
 
 ![Lab topology](topology-summarization.png)
 
-[^NE]: Network engineers with a background in programming will quickly realize that, besides performance implications, minimizing information in routing tables, and implicitly, the shared state between level-1 and level-2 IS-IS hierarchy is a good tool to control complexity.
+[^NE]: Network engineers with a background in programming will quickly realize that, besides hypothetical performance implications, minimizing information in routing tables, and implicitly, the shared state between level-1 and level-2 IS-IS hierarchy is also a tool to control complexity.
 
 ## Device Requirements
 
@@ -44,9 +42,9 @@ IS-IS parameters of individual lab devices are summarized in the following table
 
 
 
-## The Problem
+## Level-1 to Level 2 Spillover Effect
 
-Let's illustrate how changes in the topology of a level-1 area can spill into the backbone. Start with an examination of the routing table on X1:
+Let's illustrate how changes in the topology of a level-1 area can spill into the L2 backbone. Start with an examination of the routing table on X1:
 
 X1 routing table. Notice the presence of our stub networks (as viewed on FRR)
 { .code-caption }
@@ -70,7 +68,7 @@ I>* 172.16.2.0/24 [115/30] via 10.1.0.5, eth1, weight 1, 00:00:16
 ```
 
 
-This should not be surprising. We already know that L1/L2 routers perform automatic distribution of L1 Routes into L2 areas.
+This should not be surprising. We already know that L1/L2 routers perform automatic distribution of L1 routes into the L2  backbone. Let's confirm the presence of reachability TLVs for the stub networks in the L2 LSP of C1:
 
 C1's level-2 LSP as viewed on X1. Notice extended reachability to our stub networks. { .code-caption }
 ```
@@ -97,22 +95,19 @@ Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
 
 ```
 
-Now let's look at what happens when a topology change occurs in the level-1 area.
+To observe the IS-IS process behavior on a router, you can monitor the real-time execution of the Shortest Path First (SPF) algorithm. This provides visibility into when and why the SPF algorithm runs, which is essential for troubleshooting and understanding network convergence behavior.
 
-Start by tracing in real-time the execution of the SPF algorithm in IS-IS, on X1.
-Connect to X1 and ensure that your SSH session monitors the terminal.
-
-Enable debugging of isis SPF events.[^SN] On FRR, the command is:
+Let's do that. Connect to the target router (X1) via SSH and ensure your session is configured to monitor terminal output. [^TM] Execute the following command to enable real-time debugging of IS-IS SPF events:
 
 ```
 x1# debug isis spf-events
 ```
 
-This will give you a trace of all executions of the SPF algorithm by the IS-IS process, and the execution reason.
+Now that we have observability inside the IS-Is process running on X, we can illustrate the spilling of L1 topological changes into L2 backbone.
 
-Connect to R1 in a separate session. Shutdown one of the stub network interfaces. We are gonna shutdown R1's Ethernet2 here:
+Connect to R1 in a separate session. Shut down one of the stub network interfaces. I choose to shut down R1's Ethernet2 interface here, but really, shutting down any of the stub interfaces will do the job.
 
-Almost instantly, on X1, you get a trace of SPF execution:
+Almost instantly, on X1, you get a trace of an SPF execution:
 
 SPF execution trace on X1 as viewed on FRR)
 { .code-caption }
@@ -122,9 +117,9 @@ SPF execution trace on X1 as viewed on FRR)
 [DEBG] isisd: [N48RF-Z09QJ] ISIS-SPF (Gandalf) L2 SPF needed, periodic SPF
 ```
 
-The SPF algorithm was executed in response to an LSP update. We now know the potential culprit. Look again at C1s  LSP:
+You can see that the SPF algorithm was executed in response to an LSP update. This is your next hint. Let's have a detailed look at C1's L2 LSP:
 
-C1's LSP on X1. Notice the propagation of reachability information from L1 (missing 172.16.0.0/24)
+C1's LSP on X1 after R1's Ethernet2 interface is shutdown. Notice the reachability TLV for 172.16.0.0/24 is missing
 { .code-caption }
 ```
 x1# show isis database detail c1.00-00
@@ -148,15 +143,28 @@ Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
 Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
 ```
 
-On interface shutdown, R1 sends an updated level-1 LSP to C1. C1 - a level-1-2 router -  receives the LSP, updates the level-1, and copies the relevant changes into the level-2 database. Then, a level-2 LSP is sent by C1 into the backbone, containing the topological changes, triggering the mass execution of the SPF algorithm.
+It looks like we found the LSP that forced X1 IS-IS process to run SPF. Let's have a look at the whole sequence of events:
 
-Before moving on to the next section, make sure you enable the interface you previously disabled on R1. This, of course, will trigger an SPF update on X1.
+When an interface shutdown occurs on R1, the following sequence of events takes place:
 
-[^SN]: On some network devices, including Arista cEOS, you do not necessarily need debug logging. They have a command similar to "show isis spf log" which will give you the same SPF information on demand. 
+* R1 generates and transmits an updated level-1 LSP to reflect the topology change
+* C1 receives the LSP and performs two critical updates: Updates its level-1 LSDB with the received information, then  updates its level-2 database to reflect changes
+* C1 then generates and sends a Level-2 LSP into the backbone network
+* the level-2 LSP propagation triggers widespread execution of the SPF algorithm across all L2 routers in the backbone
+
+This cascading effect demonstrates how local topology changes in level-1 areas can impact the entire IS-IS network hierarchy.
+
+Before proceeding to the next section, re-enable any interfaces that were previously disabled on R1. This action will trigger another SPF update on X1, providing an opportunity to observe the convergence behavior with your newly acquired understanding of the IS-IS propagation mechanisms.
+
+[^TM] You need to enable terminal monitoring to have the data outputted to the terminal copied to an SSH session.  Terminal monitoring is enabled with a command similar to "terminal monitor". Requires separate enablement for each separate SSH session.
+
+[^SN]: On some network devices, including Arista cEOS, you do not necessarily need debug logging. They have a command similar to "show isis spf log" which will give you the same SPF information on demand.
 
 ## Manual summarization
 
-You are going to solve this problem by manually summarizing the stub networks from the level-1 area on the level-1-2 router C1. First, let's see the routing table on c1, so that we can refer back to it after the configuration task.
+To address the route propagation issue, you will configure manual summarization of R1's stub networks on the Level-1-2 router C1. This will prevent individual route advertisements from flooding the level-2 backbone.
+
+Before implementing the summarization configuration, examine C1's current routing table to establish a baseline for comparison:
 
 C1's routing table
 { .code-caption }
@@ -179,27 +187,50 @@ via 10.1.0.2, Ethernet1
 
 ```
 
-Unsurprisingly, we see L1 IS-IS routes to the loopback of R1, and all the stub networks attached to it. From the examination of C1's L2 LSP on X1, we also know that all those routes are propagated into the L2 backbone.
+The routing table confirms the expected behavior. L1 routes to R1's stub networks and loopback interface are present. From the examination of C1's L2 LSP on X1, we also know that all those routes are propagated into the L2 backbone.
 
 ## Configuration Task
 
-* On C1, summarize all the stub networks present on the R1 as a single level-2 summary route:
+On C1, summarize all the stub networks present on the R1 as a single level-2 summary route:
 
 Summarization of level-1 routes is often done under the IS-IS process with a **summary address** command. Other devices, including cEOS, use a  **redistribute** command somewhere in the routing process hierarchy. That command should accept a **summary-address** (or similar) parameter that allows you to specify the summary route.
 
-## Summarization Effects
+## Summarization Rules and Effects
 
 The most important rules of manual summarization are simple: [^RF]
 
-* the set of reachable addresses from L1 LSP is compared against the set of reachable addresses in L2 LSP. Redundant information is not copied from L1 to L2
+* the set of reachable addresses from L1 LSP is compared against the set of reachable addresses in L2 LSP. Redundant information is not copied from L1 to L2.
 * manually entered summary addresses are only included in the L2 LSP if they correspond to an address reachable in the level-1 area
 * Any address in an L1 LSP that is not covered by a manually entered summary address is still copied in the L2 LSP.
 
-Let's look at the effects produced by summarization in our case. Examine the routing table on C1 again. If you are on a modern device, like cEOS, note the absence of the summary route. You cannot see it in the routing table,  but you will find it in the level 2 LSPs generated by C1.
+Let's look at the effects produced by summarizing R1's stub networks. Examine the routing table on C1 again. You will notice that it's pretty much the same as before:
 
-On a Cisco IOS device, you will see a slightly different view:
+C1's routing table after summarization, as viewed on Arista cEOS
+{ .code-caption }
+```
+c1#show ip route isis
 
-C1's routing table on IOS devices. Note the IS-IS summary route with a null0 next hop
+VRF: default
+.....
+
+I L1     10.0.0.1/32 [115/20]
+via 10.1.0.2, Ethernet1
+I L2     10.0.0.3/32 [115/20]
+via 10.1.0.6, Ethernet2
+I L1     172.16.0.0/24 [115/20]
+via 10.1.0.2, Ethernet1
+I L1     172.16.1.0/24 [115/20]
+via 10.1.0.2, Ethernet1
+I L1     172.16.2.0/24 [115/20]
+via 10.1.0.2, Ethernet1
+
+```
+
+If you are on a device like cEOS, note the absence of any summary routes in the routing table. You will find it in the level 2 LSPs generated by C1.
+
+Cisco IOS devices have a different behavior. Notice the presence of an IS-IS summary route with a next hop at interface Null0:
+
+C1's routing table after summarization as viewed on Cisco IOL
 { .code-caption }
 ```
 c1# show ip route isis
@@ -217,10 +248,11 @@ i L1     172.16.2.0/24 [115/10] via 10.1.0.2, 00:07:19, Ethernet0/1
 
 ```
 
-Cisco IOS has added an explicit summary route in the IS-IS process with a next hop of null0. The relevance of this route will become apparent soon.
+The relevance of this route will become apparent soon.
 
+Examine C1's L2 LSP to confirm the presence of our summary route in the reachability TLVs:
 
-C1's L2 LSP detail. Notice the presence of the summary route in the L2 LSP.
+C1's L2 LSP detail.
 { .code-caption }
 ```
 c1#show isis database level-2 detail c1.00-00
@@ -251,22 +283,47 @@ Area leader priority: 250 algorithm: 0
 
 ```
 
-Observe that the presence of the summary route stopped individual propagation of the sub-networks it summarizes from level-1 to level-2. There are no reachability TLVs present for the individual stub networks anymore. The networks for which we do not have summary addresses are still propagated. Notice R1's loopback (10.0.0.1/32)  propagation.
+And last but not least, examine X1's routing table:
 
-In addition to simplifying the routing table of the devices in the L2 area, another immediate effect is that a topological change to any of the summarized networks will not be propagated into the L2 backbone anymore.
+IS-IS routes on X1. The summary network is present.
+{ .code-caption }
+```
+x1# show ip route isis
+.....
+IPv4 unicast VRF default
+I>* 10.0.0.1/32 [115/30] via 10.1.0.5, eth1, weight 1, 01:38:52
+I>* 10.0.0.2/32 [115/20] via 10.1.0.5, eth1, weight 1, 01:38:53
+I>* 10.1.0.0/30 [115/20] via 10.1.0.5, eth1, weight 1, 01:38:53
+I   10.1.0.4/30 [115/20] via 10.1.0.5, eth1 inactive, weight 1, 01:38:53
+I>* 172.16.0.0/22 [115/20] via 10.1.0.5, eth1, weight 1, 00:17:06
 
-Lastly, ensure that changes in stub network topology from level-1 are no longer propagated to the L2 backbone:
+```
+
+
+Summarization has immediate effects at multiple levels:
+
+* Individual reachability TLVs for the summarized stub networks are no longer present in Level-2 LSPs, replaced by the configured summary route
+* Routes without corresponding summary addresses continue to propagate individually (observe R1's loopback 10.0.0.1/32 still being advertised)
+* level-2 routers now have significantly simplified routing tables.
+
+An important consequence of summarization is enhanced network stability. Topological changes affecting any of the summarized networks will no longer trigger SPF recalculations in the L2 backbone, containing the convergence impact to the local L1 area.
+
+To confirm that stub network topology changes are now isolated from the Level-2 backbone:
 
 On R1, shut down the Ethernet2 interface.
 The SPF debug log on X1 should remain silent. [^SPF]
 
-If you are on a cEOS device, as I am here, or any other devices that didn't introduce a summary route in the routing table of c1, continue shutting down all other stub network interfaces, Ethernet3, and Ethernet4.
+## Platform-specific behavior
 
-Suddenly, once the last stub network interface is shut down, the IS-IS SPF debug log comes to life and reports the SPF calculation as a result of an LSP change.
+If you run the lab on an Arista cEOS, we have the opportunity to illustrate additional summarization behavior.
+
+Continue the exercise by shutting down all remaining stub network interfaces on R1. Assuming you are on an Arisa cEOS as I am, and disabled Ethernet2 earlier, shut down Ethernet3 and Ethernet4 interfaces.
+
+Once the last stub network interface is shut down, the IS-IS SPF debug log reports a new SPF calculation as a result of an LSP change.
 
 Let's unpack what is happening. On C1:
 
-C1's routing table after shutting down all stub network interfaces on R1
+C1's routing table after shutting down all stub network interfaces on R1 (Arista cEOS)
 { .code-caption }
 ```
 c1#show ip route isis
@@ -280,11 +337,11 @@ via 10.1.0.6, Ethernet2
 ```
 
 
-According to the manual summarization rules outlined above, the summary route in the L2 LSP exists only as long as it corresponds to an address reachable in the level-1 area.
+According to the IS-IS manual summarization rules outlined above, summary routes in L2 LSPs are maintained only when they correspond to at least one reachable address within the L1 area. When all constituent networks become unreachable, the summary route is withdrawn.
 
-Confirm that the summary address was removed from the L2 LSP:
+Let's confirm this:
 
-C1's L2 LSP detail after shutting down all stub network interfaces on R1
+C1's L2 LSP detail after shutting down all stub network interfaces on R1 (Arista cEOS)
 { .code-caption }
 ```
 c1#show isis database level-2 c1.00-00 detail
@@ -314,21 +371,22 @@ Area leader priority: 250 algorithm: 0
 
 ```
 
-In the printout above, you can see that the reachability TLV  for the 172.16.0.0/22 summary address is gone. The L2 LSP was updated, and consequently the update propagated across the L2 backbone.
+In the printout above, you can see that the reachability TLV  for the 172.16.0.0/22 summary address is gone. The L2 LSP was updated, and the update propagated across the L2 backbone.
 
 This stands in stark contrast to what happens on an IOS device. Shutting down all stub interfaces on R1 has no ill effects. The presence of the IS-IS summary route in the routing table is enough to prevent the removal of the summary route from the L2 LSP of C1. No new LSP will be generated.
 
-
+Before moving on, enable all stub interfaces previously disabled on router R1.
 
 [^RF]: Manual summarization and the full rule set are described in detail in section 3.2 of RFC 1195
 
 
 ## Validation
 
-Move to X1 and examine its routing table:
+Ensure the summary route 172.16.0.0/22 is present in X1 routing table:
 
-IS-IS routes on X1. The summary network is present. 
+IS-IS routes on X1. The summary network is present.
 { .code-caption }
+
 ```
 x1# show ip route isis
 .....
@@ -338,16 +396,13 @@ I>* 10.0.0.2/32 [115/20] via 10.1.0.5, eth1, weight 1, 01:38:53
 I>* 10.1.0.0/30 [115/20] via 10.1.0.5, eth1, weight 1, 01:38:53
 I   10.1.0.4/30 [115/20] via 10.1.0.5, eth1 inactive, weight 1, 01:38:53
 I>* 172.16.0.0/22 [115/20] via 10.1.0.5, eth1, weight 1, 00:17:06
-
 ```
 
-The summary network 172.16.0.0/22 should be present. 
 
-Ensure we have end to end reachability :
+Ensure we have full reachability:
 
-Dataplane reachability test between X1 and r1
+Dataplane reachability test between X1 and R1
 { .code-caption }
-
 ```
 x1# show ip route isis
 x1# ping 10.0.0.1
@@ -358,7 +413,9 @@ PING 10.0.0.1 (10.0.0.1): 56 data bytes
 --- 10.0.0.1 ping statistics ---
 3 packets transmitted, 3 packets received, 0% packet loss
 round-trip min/avg/max = 0.845/1.423/1.877 ms
+
 ```
+
 
 
 [^SPF]: Unless you are unlucky and witness a periodic SPF run by pure coincidence. But it's easy to distinguish between the two.
@@ -387,7 +444,7 @@ Stub Links
 
 
 !!! Note
-	The interface names depend on the lab devices you use. The printout was 		generated with user routers running Arista EOS and X1 running FRRouting.
+The interface names depend on the lab devices you use. The printout was generated with user routers running Arista EOS and X1 running FRRouting.
 
 
 ### Lab Addressing
