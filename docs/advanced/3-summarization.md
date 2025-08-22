@@ -103,7 +103,7 @@ Let's do that. Connect to the target router (X1) via SSH and ensure your session
 x1# debug isis spf-events
 ```
 
-Now that we have observability inside the IS-Is process running on X, we can illustrate the spilling of L1 topological changes into L2 backbone.
+Now that we have observability inside the IS-IS process running on X, we can illustrate the spilling of L1 topological changes into L2 backbone.
 
 Connect to R1 in a separate session. Shut down one of the stub network interfaces. I choose to shut down R1's Ethernet2 interface here, but really, shutting down any of the stub interfaces will do the job.
 
@@ -156,7 +156,7 @@ This cascading effect demonstrates how local topology changes in level-1 areas c
 
 Before proceeding to the next section, re-enable any interfaces that were previously disabled on R1. This action will trigger another SPF update on X1, providing an opportunity to observe the convergence behavior with your newly acquired understanding of the IS-IS propagation mechanisms.
 
-[^TM] You need to enable terminal monitoring to have the data outputted to the terminal copied to an SSH session.  Terminal monitoring is enabled with a command similar to "terminal monitor". Requires separate enablement for each separate SSH session.
+[^TM]: You need to enable terminal monitoring to have the data outputted to the terminal copied to an SSH session.  Terminal monitoring is enabled with a command similar to "terminal monitor". Requires separate enablement for each separate SSH session.
 
 [^SN]: On some network devices, including Arista cEOS, you do not necessarily need debug logging. They have a command similar to "show isis spf log" which will give you the same SPF information on demand.
 
@@ -193,13 +193,13 @@ The routing table confirms the expected behavior. L1 routes to R1's stub network
 
 On C1, summarize all the stub networks present on the R1 as a single level-2 summary route:
 
-Summarization of level-1 routes is often done under the IS-IS process with a **summary address** command. Other devices, including cEOS, use a  **redistribute** command somewhere in the routing process hierarchy. That command should accept a **summary-address** (or similar) parameter that allows you to specify the summary route.
+Summarization of level-1 routes is often done under the IS-IS process with a **summary address** command. Other devices, including Arista EOS, use a  **redistribute** command somewhere in the routing process hierarchy. That command should accept a **summary-address** (or similar) parameter that allows you to specify the summary route.
 
 ## Summarization Rules and Effects
 
-The most important rules of manual summarization are simple: [^RF]
+The most important rules of manual summarization are simple. Paraphrasing the RFC:[^RF]
 
-* the set of reachable addresses from L1 LSP is compared against the set of reachable addresses in L2 LSP. Redundant information is not copied from L1 to L2.
+* the set of reachable addresses from L1 LSP is compared against the set of reachable addresses in L2 LSP. Redundant information is not copied from L1 to L2.It is expected that L2 configured information will specify more inclusive addresses.
 * manually entered summary addresses are only included in the L2 LSP if they correspond to an address reachable in the level-1 area
 * Any address in an L1 LSP that is not covered by a manually entered summary address is still copied in the L2 LSP.
 
@@ -444,7 +444,7 @@ Stub Links
 
 
 !!! Note
-The interface names depend on the lab devices you use. The printout was generated with user routers running Arista EOS and X1 running FRRouting.
+	The interface names depend on the lab devices you use. The printout was 		generated with user routers running Arista EOS and X1 running FRRouting.
 
 
 ### Lab Addressing
