@@ -6,11 +6,13 @@ By [Dan Partelly](https://github.com/DanPartelly)
 
 In this exercise, we continue our focus on routing table simplification, this time on level-2 routers, and we will address a critical propagation issue in multilevel IS-IS networks. While IS-IS flooding mechanisms are designed to limit LSP changes to a single hierarchical level, without level-1 to level-2 route summarization topology changes within level-1 areas invariably propagate into the level-2 backbone.[^NE]
 
-You'll use manual configuration of summary addresses on the level-1 - level-2 boundary, a mechanism described in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195), on a three-router topology.
+You'll use manual configuration of summary addresses[^SUM] on the level-1 - level-2 boundary, a mechanism described in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195), on a three-router topology.
 
 ![Lab topology](topology-summarization.png)
 
 [^NE]: Network engineers with a background in programming will quickly realize that, besides hypothetical performance implications, minimizing information in routing tables, and implicitly, the shared state between level-1 and level-2 IS-IS hierarchy is also a tool to control complexity.
+
+[^SUM]: Summarization is a powerful techniques. It simplifies route tables, improves network scalability and decreases complexity. Unfortunately, it cannot be employed in all situations. There are situations where you want to maintain  full L1-L2 wide visibility  to run BGP or other control plane protocols.  
 
 ## Device Requirements
 
