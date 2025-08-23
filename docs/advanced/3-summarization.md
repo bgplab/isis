@@ -4,7 +4,7 @@ By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }
 
 
-In this exercise, we continue our focus on routing table simplification by addressing a critical propagation issue in multilevel IS-IS networks. While IS-IS flooding mechanisms are designed to limit LSP changes to a single hierarchical level, without level-1 to level-2 route summarization topology changes within level-1 areas invariably propagate into the level-2 backbone.[^NE]
+In this exercise, we continue our focus on routing table simplification, this time on level-2 routers, and we will address a critical propagation issue in multilevel IS-IS networks. While IS-IS flooding mechanisms are designed to limit LSP changes to a single hierarchical level, without level-1 to level-2 route summarization topology changes within level-1 areas invariably propagate into the level-2 backbone.[^NE]
 
 You'll use manual configuration of summary addresses on the level-1 - level-2 boundary, a mechanism described in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195), on a three-router topology.
 
