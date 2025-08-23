@@ -12,7 +12,7 @@ You'll use manual configuration of summary addresses[^SUM] on the level-1 - leve
 
 [^NE]: Network engineers with a background in programming will quickly realize that, besides hypothetical performance implications, minimizing information in routing tables, and implicitly, the shared state between level-1 and level-2 IS-IS hierarchy is also a tool to control complexity.
 
-[^SUM]: Summarization is a powerful techniques. It simplifies route tables, improves network scalability and decreases complexity. Unfortunately, it cannot be employed in all situations. There are situations where you want to maintain  full L1-L2 wide visibility  to run BGP or other control plane protocols.  
+[^SUM]: Summarization is a powerful techniques. It simplifies route tables, improves network scalability and decreases complexity, but it cannot be employed in all situations. There are situations where you want to maintain full L1-L2 wide visibility, to run BGP. Can you eat the cake and still have it? Perhaps. You can summarize everything, except /32 loopbacks. 
 
 ## Device Requirements
 
