@@ -189,6 +189,12 @@ An even more important consequence of summarization is enhanced network stabilit
 
 ## Validation
 
+You can use the **netlab validate** command if you’re using netlab release 1.8.4 or later and run FRRouting on the external routers. This is the printout you should get after completing the lab exercise:
+
+![](validate-summary.png)
+
+You could also do manual validation on C1 and X1:
+
 After configuring the summary prefix, examine C1's L2 LSP:
 
 C1's L2 LSP detail.

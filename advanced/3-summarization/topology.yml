@@ -6,10 +6,14 @@ version: 2.0.0
 module: [ isis ]
 isis.area: '49.0100'
 
+_include: [ validate.yml ]
+
 groups:
   external:
     members: [ x1 ]
     isis.type: level-2
+  validate:
+    members: [ x1 ]
 
 nodes:
   r1:
