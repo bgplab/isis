@@ -1,4 +1,4 @@
-# Manual Configuration of Summary Addresses
+# Summarizing Level-1 Routes into Level-2 Backbone
 ---
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 2.0.0
@@ -24,8 +24,8 @@ links:
   members: [ r1-c1, r1, r1, r1 ]
 - group: external
   isis.type: level-2
-  members: [ c1-x1  ]
+  members: [ c1-x1 ]
 
 message: |
-  The "Manual Configuration of Summary Addresses" lab is ready.
+  The "Summarizing Level-1 Routes into Level-2 Backbone" lab is ready.
   Connect to the lab devices with "netlab connect".
