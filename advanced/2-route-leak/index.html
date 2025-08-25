@@ -151,6 +151,10 @@
 </li>
                                     
 <li>
+    <a href="../3-summarization/" class="dropdown-item">Summarizing Level-1 Routes into Level-2 Backbone</a>
+</li>
+                                    
+<li>
     <a href="../10-sr/" class="dropdown-item">Build an SR-MPLS Network with IS-IS</a>
 </li>
                                     
@@ -182,7 +186,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../10-sr/" class="nav-link">
+                                <a rel="next" href="../3-summarization/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -469,7 +473,7 @@ c1.00-00              0x00000028   0xB53E                 771/1199      1/0/0
 </ul>
 <p>While the handling of the <em>Down</em> bit is trivial, there&rsquo;s another detail to consider: L1 routes are preferred over L2 routes, but that should not apply to the L1 routes that were copied from L2 routes. Thus, L1 routes with the <em>Down</em> bit are <em>less preferred</em> than the L2 routes.</p>
 <p>But wait, there&rsquo;s more. In principle, IS-IS had different TLVs for <em>internal</em> and <em>external</em> routes<sup id="fnref:IXT"><a class="footnote-ref" href="#fn:IXT">4</a></sup>, and external routes could have <em>internal</em> and <em>external</em> metrics, resulting in a horrendously long list of IP prefix types and an <em>order of preference</em> list that&rsquo;s pretty close in complexity to the BGP one (see <a href="https://www.rfc-editor.org/rfc/rfc5302.html#section-3">RFC 5302</a> for more details).</p>
-<p><strong>Next</strong>: <a href="../10-sr/">Build an SR-MPLS Network with IS-IS</a></p>
+<p><strong>Next</strong>: <a href="../3-summarization/">Summarizing Level-1 Routes into Level-2 Backbone</a></p>
 <h2 id="reference-information">Reference Information</h2>
 <h3 id="lab-wiring">Lab Wiring</h3>
 <table>

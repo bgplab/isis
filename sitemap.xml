@@ -2,106 +2,110 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://isis.bgplabs.net/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/1-setup/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/3-upcoming/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/4-codespaces/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/99-about/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/advanced/1-multilevel/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/advanced/10-sr/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/advanced/11-ti-lfa/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/advanced/2-route-leak/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
+    </url>
+    <url>
+         <loc>https://isis.bgplabs.net/advanced/3-summarization/</loc>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/0-frrouting/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/1-simple-ipv4/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/2-explore/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/3-p2p/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/4-metric/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/5-ipv6/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/6-level-2/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/basic/7-unnumbered/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/1-passive/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/2-dis/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/3-md5/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/4-hide-transit/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/5-drain/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/6-timers/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/7-redistribute/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
     <url>
          <loc>https://isis.bgplabs.net/feature/8-bfd/</loc>
-         <lastmod>2025-08-22</lastmod>
+         <lastmod>2025-08-25</lastmod>
     </url>
 </urlset>

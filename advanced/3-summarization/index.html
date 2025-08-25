@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/advanced/3-summarization/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Summarizing Level-1 Routes into Level-2 Backbone &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Home</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Basics</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/7-unnumbered/" class="dropdown-item">Running IS-IS Over Unnumbered/LLA-only Interfaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Features</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../feature/1-passive/" class="dropdown-item">Passive IS-IS Interfaces</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/2-dis/" class="dropdown-item">Influence the Designated IS Election</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/3-md5/" class="dropdown-item">Protect IS-IS Routing Data with MD5 Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/4-hide-transit/" class="dropdown-item">Hide Transit Subnets in IS-IS Networks</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/5-drain/" class="dropdown-item">Drain Traffic Before Node Maintenance</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/6-timers/" class="dropdown-item">Adjust IS-IS Timers</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/7-redistribute/" class="dropdown-item">Route Redistribution into IS-IS</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/8-bfd/" class="dropdown-item">Use BFD to Speed Up IS-IS Failure Detection</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Advanced</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../1-multilevel/" class="dropdown-item">Multilevel IS-IS Deployments</a>
+</li>
+                                    
+<li>
+    <a href="../2-route-leak/" class="dropdown-item">Distributing Level-2 IS-IS Routes into Level-1 Areas</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Summarizing Level-1 Routes into Level-2 Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../10-sr/" class="dropdown-item">Build an SR-MPLS Network with IS-IS</a>
+</li>
+                                    
+<li>
+    <a href="../11-ti-lfa/" class="dropdown-item">Configure IS-IS Fast Reroute Using TI-LFA</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Upcoming</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../2-route-leak/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../10-sr/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#summarizing-level-1-routes-into-level-2-backbone" class="nav-link">Summarizing Level-1 Routes into Level-2 Backbone</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#existing-device-configuration" class="nav-link">Existing Device Configuration</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#level-1-to-level-2-spillover-effect" class="nav-link">Level-1 to Level 2 Spillover Effect</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configure-route-summarization" class="nav-link">Configure Route Summarization</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#the-effects-of-route-summarization" class="nav-link">The Effects of Route Summarization</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#platform-specific-behavior" class="nav-link">Platform-Specific Behavior</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#lab-addressing" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="summarizing-level-1-routes-into-level-2-backbone">Summarizing Level-1 Routes into Level-2 Backbone</h1>
+<p class="author-byline">By <a href="https://github.com/DanPartelly">Dan Partelly</a><br /></p>
+<p>In this exercise, we continue to reduce the amount of routing information in our network, this time on level-2 routers. At the same time, we&rsquo;ll address a critical instability issue in multilevel IS-IS networks. IS-IS was designed to limit the impact of topology changes in a CLNP<sup id="fnref:CLNP"><a class="footnote-ref" href="#fn:CLNP">1</a></sup> network to a single hierarchical level; the automatic distribution of level-1 IP routes into level-2 backbone (introduced in RFC 1195) broke that. Without route summarization, every change in IP reachability in a level-1 area is inevitably propagated into the level-2 backbone<sup id="fnref:NE"><a class="footnote-ref" href="#fn:NE">2</a></sup>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Summarization is a powerful technique. It simplifies route tables, improves network scalability, and decreases complexity, but cannot be employed in all situations. For example, you might want to maintain the end-to-end visibility of router loopbacks (the /32 prefixes) to run a BGP-free MPLS core.</p>
+</div>
+<p>You&rsquo;ll practice the summarization of level-1 IS-IS routes (called <em>‌<a href="https://datatracker.ietf.org/doc/html/rfc1195#section-3.2">Hierarchical Abbreviation of IP Reachability Information</a></em> in <a href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a>) on a very simple three-router topology.</p>
+<p><img alt="Lab topology" src="../topology-summarization.png" /></p>
+<h2 id="device-requirements">Device Requirements</h2>
+<p>Use any device <a href="https://netlab.tools/platforms/#platform-routing-support">supported by the <em>netlab</em> IS-IS configuration module</a> that correctly implements the propagation of level-1 IP prefixes into the level-2 LSP database as required by RFC 1195.</p>
+<p>Unfortunately, as of August 2025, FRRouting&rsquo;s IS-IS implementation does not distribute prefixes between level-1 areas and level-2 backbone, and thus cannot be used in this lab exercise.</p>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
+<ul>
+<li>Change directory to <code>advanced/3-summarization</code></li>
+<li>Execute <strong>netlab up</strong></li>
+<li>Log into lab devices with <strong>netlab connect</strong></li>
+</ul>
+<h2 id="existing-device-configuration">Existing Device Configuration</h2>
+<p>When starting the lab, <em>netlab</em> configures IPv4 addresses and the IS-IS protocol on the lab routers, resulting in a small multi-area, multi-level topology.</p>
+<p>IS-IS parameters of individual lab devices are summarized in the following table:</p>
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th style="text-align: right;">IS-IS Area</th>
+<th style="text-align: right;">System ID</th>
+<th>IS type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x1</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0003</td>
+<td>level-2</td>
+</tr>
+<tr>
+<td>r1</td>
+<td style="text-align: right;">49.0100</td>
+<td style="text-align: right;">0000.0000.0001</td>
+<td>level-1</td>
+</tr>
+<tr>
+<td>c1</td>
+<td style="text-align: right;">49.0100</td>
+<td style="text-align: right;">0000.0000.0002</td>
+<td>level-1-2</td>
+</tr>
+</tbody>
+</table>
+<p>R1 has three stub networks; their prefixes are advertised in the level-1 area 49.0100.</p>
+<h2 id="level-1-to-level-2-spillover-effect">Level-1 to Level 2 Spillover Effect</h2>
+<p>Before rushing into the router configuration, let&rsquo;s see what problem we&rsquo;re dealing with. This is what X1 has in its routing table after the lab is started:</p>
+<p class="code-caption">IP routing table on X1 running FRR. It includes the three stub networks from the 172.16.0.0/16 range<br /></p>
+<pre><code>$ netlab connect x1 --show ip route
+Connecting to container clab-summarization-x1, executing vtysh -c &quot;show ip route&quot;
+...
+
+IPv4 unicast VRF default:
+I&gt;* 10.0.0.1/32 [115/30] via 10.1.0.5, eth1, weight 1, 00:00:16
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.5, eth1, weight 1, 00:00:17
+L * 10.0.0.3/32 is directly connected, lo, weight 1, 00:00:35
+C&gt;* 10.0.0.3/32 is directly connected, lo, weight 1, 00:00:35
+I&gt;* 10.1.0.0/30 [115/20] via 10.1.0.5, eth1, weight 1, 00:00:17
+I   10.1.0.4/30 [115/20] via 10.1.0.5, eth1 inactive, weight 1, 00:00:17
+C&gt;* 10.1.0.4/30 is directly connected, eth1, weight 1, 00:00:35
+L&gt;* 10.1.0.6/32 is directly connected, eth1, weight 1, 00:00:35
+I&gt;* 172.16.0.0/24 [115/30] via 10.1.0.5, eth1, weight 1, 00:00:16
+I&gt;* 172.16.1.0/24 [115/30] via 10.1.0.5, eth1, weight 1, 00:00:16
+I&gt;* 172.16.2.0/24 [115/30] via 10.1.0.5, eth1, weight 1, 00:00:16
+</code></pre>
+<p>This should not be surprising (we learned in the <a href="../1-multilevel/">Multilevel IS-IS Deployments</a> exercise that L1/L2 routers distribute L1 routes into the L2  backbone). Let&rsquo;s confirm the presence of reachability TLVs for the R1&rsquo;s stub networks in the L2 LSP of C1:</p>
+<p class="code-caption">C1&rsquo;s level-2 LSP as viewed on X1. The stub networks are included in the LSP<br /></p>
+<pre><code>x1# show isis database detail c1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+c1.00-00                  142   0x00000007  0xd869     874    0/0/0
+Protocols Supported: IPv4
+Area Address: 49.0100
+Hostname: c1
+Router Capability: 10.0.0.2 , D:0, S:0
+Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+IPv4 Interface Address: 10.1.0.5
+IPv4 Interface Address: 10.1.0.1
+IPv4 Interface Address: 10.0.0.2
+Extended IP Reachability: 172.16.0.0/24 (Metric: 20)
+Extended IP Reachability: 10.0.0.1/32 (Metric: 20)
+Extended IP Reachability: 172.16.1.0/24 (Metric: 20)
+Extended IP Reachability: 172.16.2.0/24 (Metric: 20)
+Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
+</code></pre>
+<p>Next, let&rsquo;s verify that a change in the topology of the level-1 area 49.0100 propagates into the level-2 backbone and triggers the IS-IS Shortest Path First (SPF) algorithm on other level-2 routers:</p>
+<ul>
+<li>Connect to the target router (X1) via SSH</li>
+<li>Ensure your session is configured to monitor logging messages<sup id="fnref:TM"><a class="footnote-ref" href="#fn:TM">3</a></sup></li>
+<li>Enable debugging of IS-IS SPF events<sup id="fnref:SN"><a class="footnote-ref" href="#fn:SN">4</a></sup>.</li>
+</ul>
+<p class="code-caption">Enable IS-IS SPF debugging on X1 running FRRouting<br /></p>
+<pre><code>x1# terminal monitor
+x1# debug isis spf-events
+</code></pre>
+<p>Now we&rsquo;re ready to observe whether the changes in level-1 area 49.0100 are spilling over into the level-2 backbone:</p>
+<ul>
+<li>Connect to R1 in a separate session</li>
+<li>Shut down one of the stub network interfaces.</li>
+</ul>
+<p>Almost instantly, the SPF algorithm runs on X1:</p>
+<p class="code-caption">SPF events on X1 (running FRRouting) triggered by a subnet loss on R1<br /></p>
+<pre><code>[DEBG] isisd: [SFWMK-K9QH2] ISIS-SPF (Gandalf) L2 SPF schedule called, lastrun 298 sec ago Caller: lsp_update isisd/isis_lsp.c:551
+[DEBG] isisd: [KD9RA-6JFGA] ISIS-SPF (Gandalf) L2 SPF scheduled 0 sec from now
+[DEBG] isisd: [N48RF-Z09QJ] ISIS-SPF (Gandalf) L2 SPF needed, periodic SPF
+</code></pre>
+<p>You can also check that the C1 L2 LSP has been changed:</p>
+<p class="code-caption">C1&rsquo;s LSP on X1 after R1&rsquo;s Ethernet2 interface is shut down. The reachability TLV for 172.16.0.0/24 is missing<br /></p>
+<pre><code>x1# show isis database detail c1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+c1.00-00                  134   0x00000008  0x6bc6    1195    0/0/0
+Protocols Supported: IPv4
+Area Address: 49.0100
+Hostname: c1
+Router Capability: 10.0.0.2 , D:0, S:0
+Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+IPv4 Interface Address: 10.1.0.5
+IPv4 Interface Address: 10.1.0.1
+IPv4 Interface Address: 10.0.0.2
+Extended IP Reachability: 10.0.0.1/32 (Metric: 20)
+Extended IP Reachability: 172.16.1.0/24 (Metric: 20)
+Extended IP Reachability: 172.16.2.0/24 (Metric: 20)
+Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+Extended IP Reachability: 10.1.0.0/30 (Metric: 10)
+Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
+</code></pre>
+<p>Let&rsquo;s recap the whole sequence of events triggered by the interface shutdown on R1:</p>
+<ul>
+<li>R1 generates and transmits an updated level-1 LSP to reflect the topology change</li>
+<li>C1 receives the LSP and updates its level-1 LSDB</li>
+<li>C1 runs L1 SPF and calculates the new best routes</li>
+<li>C1 updates its level-2 LSP to reflect the changes in level-1 routes</li>
+<li>C1 sends the updated Level-2 LSP to its neighbors</li>
+<li>The updated C1 level-2 LSP triggers the SPF algorithm on all L2 routers</li>
+</ul>
+<p>This cascading effect demonstrates how a local topology change in a level-1 area can impact the entire level-2 backbone.</p>
+<p>Before proceeding to the next section, re-enable any interfaces you shut down on R1. This action will trigger another SPF update on X1 (but now you know what&rsquo;s causing it).</p>
+<h2 id="configure-route-summarization">Configure Route Summarization</h2>
+<p>To minimize the impact of changes in a level-1 area<sup id="fnref:WC"><a class="footnote-ref" href="#fn:WC">5</a></sup>, configure summarization of R1&rsquo;s stub networks on the Level-1-2 router C1 into a single level-2 summary route (172.16.0.0/22).</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Summarization of level-1 routes is often done under the IS-IS process with a <strong>summary address</strong> command. Other devices, including Arista EOS, use a  <strong>redistribute</strong> command somewhere in the routing process hierarchy. That command should accept a <strong>summary-address</strong> (or similar) parameter that allows you to specify the summary route.</p>
+</div>
+<h2 id="the-effects-of-route-summarization">The Effects of Route Summarization</h2>
+<p>Here are the highlights of the <a href="https://datatracker.ietf.org/doc/html/rfc1195#section-3.2">lengthy RFC 1195 section</a> describing the route summarization process (read the original if you&rsquo;re interested in gory details):</p>
+<ul>
+<li>Each level-2 router may be configured with one or more summary prefixes</li>
+<li>The set of reachable addresses from L1 LSPs is compared against those in the L2 LSP. Redundant information is not copied from L1 to L2.</li>
+<li>The metric of the summary prefixes is configured, not calculated from the costs of level-1 prefixes<sup id="fnref:SPM"><a class="footnote-ref" href="#fn:SPM">6</a></sup></li>
+<li>Summary prefixes are only included in the L2 LSP if they correspond to at least one in-area prefix.</li>
+<li>Any address in an L1 LSP not covered by a summary prefix is still copied in the L2 LSP.</li>
+</ul>
+<p>We should thus see the following effects of route summarization in our network:</p>
+<ul>
+<li>Individual reachability TLVs for the summarized level-1 prefixes are no longer present in Level-2 LSPs; the configured summary route replaces them. Instead of the three TLVs for the R1 stub subnets, the C1 L2 LSP should contain a single reachability TLV for the summary prefix.</li>
+<li>Level-1 routes without a corresponding summary prefix are still distributed into level-2 LSP (we should see R1&rsquo;s loopback 10.0.0.1/32 still being advertised)</li>
+<li>Level-2 routers have smaller routing tables.</li>
+</ul>
+<p>An even more important consequence of summarization is enhanced network stability. Topological changes within a level-1 area no longer trigger the SPF algorithm in the L2 backbone <em>as long as the impact of the changes is limited to the summarized prefixes</em>. </p>
+<h2 id="validation">Validation</h2>
+<p>You can use the <strong>netlab validate</strong> command if you’re using netlab release 2.0 or later and running FRRouting on the external routers. This is the printout you should get after completing the lab exercise:</p>
+<p><img alt="" src="../validate-summary.png" /></p>
+<p>You could also do manual validation on C1 and X1:</p>
+<p>After configuring the summary prefix, examine C1&rsquo;s L2 LSP:</p>
+<p class="code-caption">C1&rsquo;s L2 LSP detail.<br /></p>
+<pre><code>c1#show isis database level-2 detail c1.00-00
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+IS-IS Level 2 Link State Database
+LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+c1.00-00                     14   5909   619    126 L2  0000.0000.0002.00-00  &lt;&gt;
+LSP generation remaining wait time: 0 ms
+Time remaining until refresh: 319 s
+NLPID: 0xCC(IPv4)
+Hostname: c1
+Area addresses: 49.0100
+Interface address: 10.1.0.5
+Interface address: 10.1.0.1
+Interface address: 10.0.0.2
+IS Neighbor          : x1.00               Metric: 10
+Reachability         : 172.16.0.0/22 Metric: 10 Type: 1 Up
+Reachability         : 10.0.0.1/32 Metric: 20 Type: 1 Up
+Reachability         : 10.1.0.4/30 Metric: 10 Type: 1 Up
+Reachability         : 10.1.0.0/30 Metric: 10 Type: 1 Up
+Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+Router Capabilities: Router Id: 10.0.0.2 Flags: []
+Area leader priority: 250 algorithm: 0
+
+</code></pre>
+<p>The three TLVs describing the R1 stub networks should be gone, replaced by a single 172.16.0.0/22 reachability TLV.</p>
+<p>Next, examine the X1&rsquo;s routing table to verify that it can still reach R1&rsquo;s stub networks.</p>
+<p class="code-caption">IS-IS routes on X1 include the summary prefix advertised by C1<br /></p>
+<pre><code>x1# show ip route isis
+.....
+IPv4 unicast VRF default
+I&gt;* 10.0.0.1/32 [115/30] via 10.1.0.5, eth1, weight 1, 01:38:52
+I&gt;* 10.0.0.2/32 [115/20] via 10.1.0.5, eth1, weight 1, 01:38:53
+I&gt;* 10.1.0.0/30 [115/20] via 10.1.0.5, eth1, weight 1, 01:38:53
+I   10.1.0.4/30 [115/20] via 10.1.0.5, eth1 inactive, weight 1, 01:38:53
+I&gt;* 172.16.0.0/22 [115/20] via 10.1.0.5, eth1, weight 1, 00:17:06
+
+</code></pre>
+<p>Finally, to confirm that the changes in stub networks are no longer propagated into the level-2 backbone:</p>
+<ul>
+<li>Enable IS-IS SPF debugging on X1</li>
+<li>Shut down the loopback interface on R1. You should observe an SPF event on X1</li>
+<li>Shut down a stub interface on R1</li>
+<li>Verify that the change in a stub network reachability does not trigger an SPF event on X1<sup id="fnref:SPF"><a class="footnote-ref" href="#fn:SPF">7</a></sup></li>
+<li>Reenable all interfaces on R1.</li>
+</ul>
+<h2 id="platform-specific-behavior">Platform-Specific Behavior</h2>
+<p>Unfortunately, different vendors tend to read RFC 1195 in slightly different ways. In this section, we&rsquo;ll explore how Arista cEOS and Cisco IOS/XE interpret various requirements from the <em>‌<a href="https://datatracker.ietf.org/doc/html/rfc1195#section-3.2">Hierarchical Abbreviation of IP Reachability Information</a></em> of <a href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a>.</p>
+<blockquote>
+<p>For manually configured level 2 addresses, the associated metric values to announce in level 2 LSPs are also manually configured.</p>
+</blockquote>
+<ul>
+<li>Cisco IOS/XE accepts a <strong>metric</strong> option in the <strong>summary-address</strong> command.</li>
+<li>Arista EOS has no such option in the <strong>redistribute &hellip; summary-address</strong> command. It advertises the summary prefix with a default cost of 10 (see the printout of the C1 L2 LSP above)</li>
+</ul>
+<blockquote>
+<p>There may be some IP addresses which match the manually configured addresses, but which are not reachable via level 1 routing. If a level 2 router receives an IP packet whose IP address matches a manually configured address which it is including in its level 2 LSP, but which is not reachable via level 1 routing in the area, then the packet must be discarded.</p>
+</blockquote>
+<p>Cisco IOS/XE implements this requirement with a <em>summary route</em> (similar to its OSPF implementation). Here&rsquo;s the routing table of C1 running Cisco IOS/XE after the route summarization has been configured:</p>
+<p class="code-caption">C1&rsquo;s routing table after summarization (Cisco IOS/XE)<br /></p>
+<pre><code>c1# show ip route isis
+
+Gateway of last resort is not set
+
+10.0.0.0/8 is variably subnetted, 7 subnets, 2 masks
+i L1     10.0.0.1/32 [115/20] via 10.1.0.2, 00:07:19, Ethernet0/1
+i L2     10.0.0.3/32 [115/20] via 10.1.0.6, 00:07:16, Ethernet0/2
+172.16.0.0/16 is variably subnetted, 4 subnets, 2 masks
+i su     172.16.0.0/22 [115/10], 00:03:41, Null0
+i L1     172.16.0.0/24 [115/10] via 10.1.0.2, 00:07:19, Ethernet0/1
+i L1     172.16.1.0/24 [115/10] via 10.1.0.2, 00:07:19, Ethernet0/1
+i L1     172.16.2.0/24 [115/10] via 10.1.0.2, 00:07:19, Ethernet0/1
+
+</code></pre>
+<p>The traceroute to an unreachable destination within the summary prefix therefore stops at C1:</p>
+<pre><code>x1(bash)# traceroute 172.16.3.1 -s 10.0.0.3
+traceroute to 172.16.3.1 (172.16.3.1) from 10.0.0.3, 30 hops max, 46 byte packets
+ 1  Ethernet0-2.c1 (10.1.0.5)  0.984 ms  0.307 ms  0.205 ms
+ 2  Ethernet0-2.c1 (10.1.0.5)  0.136 ms !H  *  0.691 ms !H
+</code></pre>
+<p>Arista EOS does not insert the summary prefix into its IP routing table, even though it adds the summary prefix to its L2 LSP, violating one of the fundamental principles of sane IP routing implementations: <em>never advertise something you don&rsquo;t know how to reach.</em></p>
+<p class="code-caption">C1&rsquo;s routing table after summarization (Arista cEOS)<br /></p>
+<pre><code>c1#show ip route isis
+
+VRF: default
+.....
+
+I L1     10.0.0.1/32 [115/20]
+via 10.1.0.2, Ethernet1
+I L2     10.0.0.3/32 [115/20]
+via 10.1.0.6, Ethernet2
+I L1     172.16.0.0/24 [115/20]
+via 10.1.0.2, Ethernet1
+I L1     172.16.1.0/24 [115/20]
+via 10.1.0.2, Ethernet1
+I L1     172.16.2.0/24 [115/20]
+via 10.1.0.2, Ethernet1
+</code></pre>
+<p>Finally, RFC 1195 specifies that a summary prefix should not be advertised if there are no level-1 routes within that prefix:</p>
+<blockquote>
+<p>The manually configured addresses are included in level 2 LSPs only if they correspond to at least one address which is reachable in the area. </p>
+</blockquote>
+<p>It&rsquo;s easy to check whether your IS-IS implementation meets this requirement:</p>
+<ul>
+<li>Shut down the C1-R1 link</li>
+<li>Inspect the C1 L2 LSP. The summary prefix 172.16.0.0/22 should no longer be advertised.</li>
+</ul>
+<p>While Arista EOS works as expected (try it out), Cisco IOS XE keeps advertising the summary prefix even after the R1 LSP is aged out from the L1 database<sup id="fnref:SPB"><a class="footnote-ref" href="#fn:SPB">8</a></sup>:</p>
+<p>C1 L2 LSP (generated by Cisco IOS XE) hours after the C1-R1 link is shut down</p>
+<pre><code>x1# show isis database detail c1.00-00
+Area Gandalf:
+IS-IS Level-2 link-state database:
+LSP ID                  PduLen  SeqNumber   Chksum  Holdtime  ATT/P/OL
+c1.00-00                  103   0x00000075  0xe019     738    0/0/0
+  Protocols Supported: IPv4
+  Area Address: 49.0100
+  Hostname: c1
+  Extended Reachability: 0000.0000.0003.00 (Metric: 10)
+  IPv4 Interface Address: 10.0.0.2
+  Extended IP Reachability: 10.0.0.2/32 (Metric: 10)
+  Extended IP Reachability: 10.1.0.4/30 (Metric: 10)
+  Extended IP Reachability: 172.16.0.0/22 (Metric: 17)
+</code></pre>
+<p><strong>Next</strong>: <a href="../10-sr/">Build an SR-MPLS Network with IS-IS</a></p>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<p>Point-to-Point Links</p>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>Ethernet1</td>
+<td>c1</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>c1</td>
+<td>Ethernet2</td>
+<td>x1</td>
+<td>eth1</td>
+</tr>
+</tbody>
+</table>
+<p>Stub Links</p>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>Ethernet2</td>
+<td>r1 -&gt; stub</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>Ethernet3</td>
+<td>r1 -&gt; stub</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>Ethernet4</td>
+<td>r1 -&gt; stub</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The interface names depend on the lab devices you use. The printout was generated with R1 and C1 running Arista EOS, and X1 running FRRouting.</p>
+</div>
+<h3 id="lab-addressing">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>c1</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; x1</td>
+</tr>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; c1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">172.16.0.1/24</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; stub</td>
+</tr>
+<tr>
+<td>Ethernet3</td>
+<td style="text-align: right;">172.16.1.1/24</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; stub</td>
+</tr>
+<tr>
+<td>Ethernet4</td>
+<td style="text-align: right;">172.16.2.1/24</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; stub</td>
+</tr>
+<tr>
+<td><strong>x1</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>eth1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>x1 -&gt; c1</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:CLNP">
+<p>Connection-Less Network Protocol, the layer-3 protocol used in the long-obsolete ISO OSI network stack.&#160;<a class="footnote-backref" href="#fnref:CLNP" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:NE">
+<p>Network engineers with a background in programming will quickly realize that (besides hypothetical performance implications) minimizing information in routing tables and the shared state between level-1 and level-2 IS-IS hierarchy is also a tool to control complexity.&#160;<a class="footnote-backref" href="#fnref:NE" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:TM">
+<p>Logging messages are usually not sent to SSH sessions. You have to enable that on every SSH session with a command similar to <strong>terminal monitor</strong> (don&rsquo;t ask about the meaning of that command; it&rsquo;s a long story going all the way back to the 1980s).&#160;<a class="footnote-backref" href="#fnref:TM" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SN">
+<p>You do not have to enable SPF debugging on some network devices, including Arista cEOS. They have a command similar to <strong>show isis spf log</strong> that displays the relevant information on demand.&#160;<a class="footnote-backref" href="#fnref:SN" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:WC">
+<p>As long as the summary information won&rsquo;t change, the changes in the level-1 area won&rsquo;t be flooded into the level-2 backbone anymore. However, the summary prefix might be removed from the L2 LSP when all the level-1 routes within the prefix disappear. The L2 LSP should also change when the cost of the summary prefix (as calculated from the costs to reach the level-1 routes) changes.&#160;<a class="footnote-backref" href="#fnref:WC" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SPM">
+<p>A stark deviation from how engineers familiar with OSPF would expect route summarization to work.&#160;<a class="footnote-backref" href="#fnref:SPM" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SPF">
+<p>Unless you are unlucky and witness a periodic SPF run by pure coincidence. It&rsquo;s usually easy to distinguish between the two.&#160;<a class="footnote-backref" href="#fnref:SPF" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:SPB">
+<p>That seems to be a bug in the Cisco IOS release 17.16.01a; after the C1-R1 link is reestablished, the summary prefix <em>disappears from the L2 LSP</em>.&#160;<a class="footnote-backref" href="#fnref:SPB" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2025 Ivan Pepelnjak (ipSpace.net AG) and contributors</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
