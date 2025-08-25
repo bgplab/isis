@@ -1,22 +1,11 @@
 # Validate the "Summarizing level-1 routes into level-2 backbone" lab
 ---
-
 pfx_sum:
   description: Check for 172.16.0.0/22 summary route on X1
   nodes: [ x1 ]
   plugin: isis_prefix(pfx='172.16.0.0/22',level='2')
 
-ping_stb1:
+ping_stub:
   description: Connectivity check between X1 and R1's 1st stub network
   nodes: [ x1 ]
-  plugin: ping('172.16.0.1')
-
-ping_stb2:
-  description: Connectivity check between X1 and R1's 2nd stub network
-  nodes: [ x1 ]
-  plugin: ping('172.16.1.1')
-
-ping_stb3:
-  description: Connectivity check between X1 and R1's 3rd stub network
-  nodes: [ x1 ]
-  plugin: ping('172.16.2.1')
+  plugin: ping('172.16.0.1',src=nodes.x1.loopback.ipv4)
