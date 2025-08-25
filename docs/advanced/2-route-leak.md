@@ -226,7 +226,7 @@ But wait, there's more. In principle, IS-IS had different TLVs for *internal* an
 
 [^IXT]: Although they are no longer used now that we use *wide metrics* with TLV 135. Modern IS-IS implementations should use Prefix Attribute Flags (sub-TLV 4) in TLV 135 to mark external routes (see [RFC 7794](https://www.rfc-editor.org/rfc/rfc7794.html#section-2.1) for details).
 
-**Next**: [Build an SR-MPLS Network with IS-IS](10-sr.md)
+**Next**: [Summarizing Level-1 Routes into Level-2 Backbone](3-summarization.md)
 
 ## Reference Information
 
