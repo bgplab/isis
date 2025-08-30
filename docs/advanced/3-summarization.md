@@ -202,9 +202,23 @@ You can use the **netlab validate** command if you’re using netlab release 2.0
 
 ![](validate-summary.png)
 
-You could also do manual validation on C1 and X1:
+You could also do manual validation on C1 and X1. Some platforms make it trivial; they have a command similar to **show isis summary-address**. This is what it displays on Arista EOS:
 
-After configuring the summary prefix, examine C1's L2 LSP:
+Summary IS-IS addresses displayed by C1 running Arista cEOS
+{ .code-caption }
+```
+c1#show isis summary-address
+
+IS-IS Instance: Gandalf VRF: default
+
+IS-IS summary-address level-1 to level-2
+
+Summary address              Metric Total Contributors Advertised
+---------------------------- ------ ------------------ ----------
+172.16.0.0/22                    10                  3 yes
+```
+
+If you're using a different device (or want to go into the details), start with C1's L2 LSP:
 
 C1's L2 LSP detail.
 { .code-caption }
