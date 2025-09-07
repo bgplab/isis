@@ -1,8 +1,7 @@
 # Distributing Level-2 IS-IS Routes into Level-1 Areas
 ---
 defaults.sources.extra: [ ../../defaults.yml ]
-version: 2.0.0
-plugin: [ check_isis_type ]
+version: 25.09
 
 module: [ isis ]
 isis.area: '49.0100'
