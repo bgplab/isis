@@ -27,7 +27,7 @@ The initial lab exercises will help you configure basic IS-IS features:
 * [Using IS-IS Metrics](basic/4-metric.md)
 * [Dual-Stack (IPv4+IPv6) IS-IS Routing](basic/5-ipv6.md)
 * [Optimize Simple IS-IS Deployments](basic/6-level-2.md)
-* [Running IS-IS Over IPv4 Unnumbered and IPv6 LLA-only Interfaces](basic/7-unnumbered.md)<!--new-->
+* [Running IS-IS Over IPv4 Unnumbered and IPv6 LLA-only Interfaces](basic/7-unnumbered.md)
 
 The next set of exercises covers individual IS-IS features:
 
