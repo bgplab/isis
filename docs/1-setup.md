@@ -6,11 +6,15 @@ title: Installation and Setup
 It's easiest to use the IS-IS labs with _[netlab](https://netlab.tools/)_. Still, you can use most of them (potentially with slightly reduced functionality) with any other virtual lab environment or on physical gear. For the rest of this document, we'll assume you decided to use _netlab_; if you want to set up your lab in some other way, read the [Manual Setup](https://bgplabs.net/external/) section of the BGP Labs documentation.
 
 !!! Warning
-    IS-IS labs work best with _netlab_ release 1.8.4 or later. If you're using an earlier _netlab_ release, please upgrade with `pip3 install --upgrade networklab`.
+    IS-IS labs work best with _netlab_ release 2.0.0 or later (some lab exercises require a more recent _netlab_ release). If you're using an earlier release, please upgrade with `pip3 install --upgrade networklab`.
 
 ## Select the Network Devices You Will Work With
 
-You can run FRRouting in all [_netlab_-supported virtualization environments](https://netlab.tools/providers/) (VirtualBox, libvirt, or Docker)[^CSF], and if you want to start practicing IS-IS with minimum hassle, consider using FRRouting for all lab devices. You can even [run FRRouting containers on Macbooks with Apple silicon](https://blog.ipspace.net/2024/03/netlab-bgp-apple-silicon.html).
+You can run FRRouting in all [_netlab_-supported virtualization environments](https://netlab.tools/providers/) (libvirt virtual machines or Docker containers)[^CSF], and if you want to start practicing IS-IS with minimum hassle, consider using FRRouting for all lab devices[^ML]. You can even run Arista cEOS, FRRouting, or Nokia SR Linux containers on [MacBooks with Apple silicon](https://blog.ipspace.net/2024/03/netlab-bgp-apple-silicon.html).
+
+[^CSF]: There is no official FRR virtual machine image -- _netlab_ has to download and install FRR on a Ubuntu VM whenever you start an `frr` node as a virtual machine. Using FRR containers is faster and consumes way less bandwidth or memory.
+
+[^ML]: Unless you want to work on multi-level IS-IS configuration, in which case FRRouting is useless. It cannot distribute level-1 IS-IS routes into level-2 topology or vice versa.
 
 If you'd like to use a more traditional networking device, use any other [_netlab_-supported device](https://netlab.tools/platforms/) for which we implemented [basic IS-IS configuration](https://netlab.tools/module/isis/#platform-support) as the device to practice with[^x86]. I recommend Arista cEOS or Nokia SR Linux containers; they are the easiest ones to install and use.
 
@@ -25,17 +29,16 @@ Some labs use additional routers -- preconfigured devices with which your router
 
 The default setup uses FRRouting for additional routers; we also generated all the **show** printouts with FRRouting. Alternatively, you can use any other device for which we [implemented basic IS-IS configuration](https://netlab.tools/module/isis/#platform-support) as additional routers. Additional limitations (should they exist) are listed under the *Device Requirements* section of individual lab exercises.
 
-[^CSF]: There is no official FRR virtual machine image -- _netlab_ has to download and install FRR on a Ubuntu VM whenever you start an `frr` node as a virtual machine. Using FRR containers is faster and consumes way less bandwidth or memory.
-
 ## Select the Virtualization Environment
 
-Now that you know which network device to use, check [which virtualization environment](https://netlab.tools/platforms/#supported-virtualization-providers) you can use. Running IS-IS labs in a [free GitHub Codespace](4-codespaces.md) is an excellent starting point, but if you decide to build your own infrastructure, _containerlab_ is easier to set up than _libvirt_, with _virtualbox_ being a distant third.
+Now that you know which network device to use, check [which virtualization environment](https://netlab.tools/platforms/#supported-virtualization-providers) you can use. Running IS-IS labs in a [free GitHub Codespace](4-codespaces.md) is an excellent starting point, but if you decide to build your own infrastructure, _containerlab_ is easier to set up than _libvirt_.
+
+If you want to run the labs on your laptop (including [Macs with Apple silicon](https://blog.ipspace.net/2024/03/netlab-bgp-apple-silicon/)), create a [Ubuntu VM](https://netlab.tools/install/ubuntu-vm/) to run _netlab_. You could also run them in a VM in a private or public cloud or invest in a tiny brick of densely packed silicon ([example](https://www.minisforum.com/)).
 
 Now for a few gotchas:
 
-* You can use _virtualbox_ if you want to run the lab devices as virtual machines on your Windows- or MacOS laptop with Intel CPU, but even then, I'd prefer running them in a [Ubuntu VM](https://netlab.tools/install/ubuntu-vm/).
-* Your hardware and virtualization software (for example, VirtualBox or VMware Fusion) must support _nested virtualization_ if you want to use _libvirt_ on that Ubuntu VM.
-* You don't need nested virtualization to run Docker containers unless you're using the crazy trick we're forced to use for Juniper vMX or Nokia SR OS -- they're running as a virtual machine _within a container_.
+* Your hardware and virtualization software (for example, VirtualBox or VMware Fusion) must support _nested virtualization_ if you want to run virtual machines on that Ubuntu VM.
+* You don't need nested virtualization to run Docker containers unless you're using containers that run virtual machines _within a container_ (the [*vrnetlab* approach](https://netlab.tools/labs/clab/#using-vrnetlab-containers)).
 
 ## Software Installation
 
@@ -47,9 +50,8 @@ Based on the choices you made, you'll find the installation instructions in one 
 * [Running netlab on any other Linux Server](https://netlab.tools/install/linux/)
 * [Running netlab in a Public Cloud](https://netlab.tools/install/cloud/)
 * [Running netlab on Apple silicon](https://blog.ipspace.net/2024/03/netlab-bgp-apple-silicon.html)
-* Discouraged: [Virtualbox-Based Lab on Windows or MacOS](https://netlab.tools/labs/virtualbox/)
 
-Once you have completed the software installation you have to deal with the stupidities of downloading and installing network device images ([Virtualbox](https://netlab.tools/labs/virtualbox/), [libvirt](https://netlab.tools/labs/libvirt/#vagrant-boxes), [containers](https://netlab.tools/labs/clab/#container-images)) unless you decided to use FRR, Nokia SR Linux, or Vyos.
+Once you have completed the software installation, you have to deal with the stupidities of downloading and installing network device images ([libvirt](https://netlab.tools/labs/libvirt/#vagrant-boxes), [containers](https://netlab.tools/labs/clab/#container-images)) unless you decided to use FRR, Nokia SR Linux, or Vyos.
 
 I would love to simplify the process, but the networking vendors refuse to play along. Even worse, their licenses prohibit me from downloading the images and creating a packaged VM with preinstalled network devices for you[^NPAL]. Fortunately, you only have to go through this colossal waste of time once.
 
@@ -64,16 +66,34 @@ We finally got to the fun part -- setting up the labs. If you're not using GitHu
 
 After you get a local copy of the repository:
 
-* If needed, edit the `defaults.yml` file in the top directory to set your preferred network device and virtualization environment. For example, I'm using the following settings to run the labs with Arista EOS containers while using FRRouting as the external IS-IS routers:
+* Change the directory to the top directory of the cloned repository[^BLB].
+* Verify the current project defaults with the `netlab defaults --project` command:
 
 ```
-device: eos             # Change to your preferred network device
-provider: clab          # Change to virtualbox or libvirt if needed
-
-groups:
-  external:
-    device: frr         # Change to your preferred external router
+$ netlab defaults --project
+device = frr (project)
+groups.external.device = frr (project)
+paths.plugin = ['topology:.', 'topology:../../plugin', 'package:extra'] (project)
+provider = clab (project)
 ```
+
+[^BLB]: `isis` if you used the simple version of the **git clone** command
+
+* If needed, change the project defaults to match your environment with the `netlab defaults --project _setting_=_value_` command. For example, use these commands to change your devices to Cisco CSRs running as virtual machines[^CSR]:
+
+```shell
+$ netlab defaults --project device=csr
+The default setting device is already set in project defaults
+Do you want to change that setting in project defaults [y/n]: y
+device set to csr in /home/user/isis/defaults.yml
+
+$ netlab defaults --project provider=libvirt
+The default setting provider is already set in netlab,project defaults
+Do you want to change that setting in project defaults [y/n]: y
+provider set to libvirt in /home/isis/BGP/defaults.yml
+```
+
+[^CSR]: Assuming you built the [CSR Vagrant box](https://netlab.tools/labs/csr/) first
 
 * In a terminal window, change the current directory to one of the lab directories (for example, `basic/1-simple-ipv4`), and execute **netlab up**.
 * Wait for the lab to start and use **netlab connect** to connect to individual lab devices
