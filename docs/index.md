@@ -33,7 +33,7 @@ The next set of exercises covers individual IS-IS features:
 
 * [Passive IS-IS Interfaces](feature/1-passive.md)
 * [Influence the Designated IS Election](feature/2-dis.md)
-* [Protect IS-IS Routing Data with MD5 Authentication](feature/3-md5.md)<!--new-->
+* [Protect IS-IS Routing Data with MD5 Authentication](feature/3-md5.md)
 * [Hide Transit Subnets in IS-IS Networks](feature/4-hide-transit.md)<!--new-->
 * [Drain Traffic Before Node Maintenance](feature/5-drain.md)<!--new-->
 * [Adjust IS-IS Timers](feature/6-timers.md)<!--new-->
