@@ -282,11 +282,18 @@
 <p>You can run IS-IS labs in (free<sup id="fnref:UTAP"><a class="footnote-ref" href="#fn:UTAP">1</a></sup>) <a href="https://docs.github.com/en/codespaces/overview">GitHub codespaces</a>; all you need is a GitHub account:</p>
 <ul>
 <li><a href="https://github.com/codespaces/new/bgplab/isis" target="_blank">Create a new codespace for your IS-IS labs</a> or <a href="https://github.com/codespaces" target="_blank">connect to an existing codespace</a>.</li>
-<li>Unless you&rsquo;re using GitHub codespaces with VScode (in which case you know what to do), your codespace opens in a new browser window with three tabs: Explorer (repository folders), Preview (starting with README), and Terminal.</li>
+<li>Unless you&rsquo;re using GitHub codespaces with VS Code (in which case you know what to do), your codespace opens in a new browser window with three tabs: Explorer (repository folders), Preview (starting with README), and Terminal.</li>
 </ul>
 <p><a href="../img/codespaces-start.png"><img alt="" src="../img/codespaces-start.png" /></a></p>
 <h2 id="select-lab-devices">Select Lab Devices</h2>
-<p>The IS-IS labs repository uses FRRouting containers as the default device. To change the device settings, edit the <code>defaults.yml</code> file with <code>vi</code> or <code>nano</code>.</p>
+<p>The IS-IS labs repository uses FRRouting containers as the default device. You can change that with the <code>netlab defaults --project device=_value_</code> command executed in the top directory (where the terminal window opens) or edit the <code>defaults.yml</code> file with a text editor like <code>vi</code> or <code>nano</code>.</p>
+<p>For example, the following command changes the user lab devices to SR Linux<sup id="fnref:CER"><a class="footnote-ref" href="#fn:CER">2</a></sup>:</p>
+<pre><code class="language-shell">$ netlab defaults --project device=srlinux
+The default setting device is already set in project defaults
+Do you want to change that setting in project defaults [y/n]: y
+device set to srlinux in /home/pipi/BGP/defaults.yml
+</code></pre>
+<p>Here are a few device selection guidelines:</p>
 <ul>
 <li>It&rsquo;s best to use network devices with free-to-download container images:</li>
 </ul>
@@ -294,7 +301,7 @@
 <thead>
 <tr>
 <th>Device</th>
-<th>Device type to use in <code>defaults.yml</code></th>
+<th>Device type to use in <strong>netlab defaults</strong> command</th>
 </tr>
 </thead>
 <tbody>
@@ -314,13 +321,14 @@
 </table>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Start with the <a href="../basic/0-frrouting/">Configuring IS-IS on FRRouting</a> exercise if you want to use the default settings but never worked with FRRouting before.</p>
+<p>If you want to use the default settings but have never worked with FRRouting before, start with the <a href="../basic/0-frrouting/">Configuring IS-IS on FRRouting</a> exercise.</p>
 </div>
 <ul>
-<li>Use FRRouting to use the 2 CPU/8 GB codespaces VM with more extensive labs.</li>
+<li>Use FRRouting to use the 2 CPU/8 GB codespaces VM with more extensive labs. Other containers, like Arista cEOS or Nokia SR-Linux, need more memory.</li>
+<li>Do not use FRRouting for multi-level IS-IS lab exercises. FRRouting cannot distribute level-1 IS-IS routes into level-2 topology or vice versa.</li>
 <li>Codespaces have persistent storage; you can <a href="https://blog.ipspace.net/2024/07/arista-eos-codespaces/">download and install other containers</a>.</li>
 <li>To use containers that have to be downloaded from the vendors&rsquo; website, download them onto your laptop, <a href="https://blog.ipspace.net/2024/07/arista-eos-codespaces/">drag-and-drop them into the Folders</a>, and install them <a href="https://netlab.tools/labs/clab/#container-images">like you would on a local netlab instance</a>.</li>
-<li>You cannot run virtual machines in codespaces (yet?). This also precludes running VMs in virtual machines (the vrnetlab approach).</li>
+<li>Virtual machines cannot be run in GitHub Codespaces, which also precludes running VMs within containers (the vrnetlab approach).</li>
 </ul>
 <h2 id="start-a-lab">Start a Lab</h2>
 <p>Once you have the codespaces up and running:</p>
@@ -345,6 +353,9 @@
 <ol>
 <li id="fn:UTAP">
 <p>You get 120 free core hours per month or <a href="https://docs.github.com/en/billing/managing-billing-for-github-codespaces/about-billing-for-github-codespaces">pay for more</a>.&#160;<a class="footnote-backref" href="#fnref:UTAP" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:CER">
+<p>Use the <strong>netlab defaults &ndash;project groups.external.device=<em>device</em></strong> command to change the device type of the &ldquo;external&rdquo; routers.&#160;<a class="footnote-backref" href="#fnref:CER" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
