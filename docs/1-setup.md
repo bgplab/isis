@@ -79,7 +79,7 @@ provider = clab (project)
 
 [^BLB]: `isis` if you used the simple version of the **git clone** command
 
-* If needed, change the project defaults to match your environment with the `netlab defaults --project _setting_=_value_` command. For example, use these commands to change your devices to Cisco CSRs running as virtual machines[^CSR]:
+* If needed, change the project defaults to match your environment with the `netlab defaults --project _setting_=_value_` command or edit the `defaults.yml` file with a text editor like `vi` or `nano`. For example, use these commands to change your devices to Cisco CSRs running as virtual machines[^CSR]:
 
 ```shell
 $ netlab defaults --project device=csr
