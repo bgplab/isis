@@ -3,11 +3,13 @@
 By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }
 
-Like OSPF, IS-IS was designed when router memory was measured in megabytes and CPU speeds in MHz. The scalability of a routing protocol and the reduced memory footprint on the edge (access) routers were crucial. OSPF solved that conundrum with *areas*, and IS-IS solved it with *multi-level* topology; some IS-IS routers know only about prefixes in their area (*level-1* routers), while others know the whole network topology (*level-2* routers), but might not be aware of the internal structure of other areas.
+Like OSPF, IS-IS was designed when router memory was measured in megabytes and CPU speeds in MHz. The scalability of a routing protocol and the reduced memory footprint on the edge (access) routers were crucial. OSPF solved that conundrum with *areas*, and IS-IS solved it with *multi-level* topology[^NPA]; some IS-IS routers know only about prefixes in their area (*level-1* routers), while others know the whole network topology (*level-2* routers), but might not be aware of the internal structure of other areas.
+
+[^NPA]: To be more precise, the original IS-IS level-1 areas were functionally equivalent to OSPF totally stubby areas, while the level-2 backbone is somewhat equivalent to the OSPF area 0. The main difference between IS-IS and OSPF is the ability to use the same link as part of a level-1 area and the level-2 backbone *at the same time*.
 
 Decent modern IS-IS implementations have no problems running a single-level IS-IS network with hundreds of routers, and the memory requirements are usually a non-issue. However, you might still find edge cases where a multi-level deployment might be beneficial. For example, your edge switches might have small hardware forwarding tables, or you might want to limit the *blast radius* of network failures -- IS-IS limits the LSP flooding to a single area (or the level-2 backbone)[^SPO].
 
-[^SPO]: The flooding of changed LSPs is limited to a single level (area or backbone), but without the L1 → L2 route summarization, the changes in a level-1 area always spill over into the level-2 backbone.
+[^SPO]: The flooding of changed LSPs is limited to a single level (area or backbone), but as with OSPF, without the L1 → L2 route summarization, the changes in a level-1 area always spill over into the level-2 backbone.
 
 In this exercise, you'll explore multi-level IS-IS deployment using a simple 5-router topology:
 
