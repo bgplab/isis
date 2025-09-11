@@ -301,8 +301,8 @@
 
 <h1 id="multilevel-is-is-deployments">Multilevel IS-IS Deployments</h1>
 <p class="author-byline">By <a href="https://github.com/DanPartelly">Dan Partelly</a><br /></p>
-<p>Like OSPF, IS-IS was designed when router memory was measured in megabytes and CPU speeds in MHz. The scalability of a routing protocol and the reduced memory footprint on the edge (access) routers were crucial. OSPF solved that conundrum with <em>areas</em>, and IS-IS solved it with <em>multi-level</em> topology; some IS-IS routers know only about prefixes in their area (<em>level-1</em> routers), while others know the whole network topology (<em>level-2</em> routers), but might not be aware of the internal structure of other areas.</p>
-<p>Decent modern IS-IS implementations have no problems running a single-level IS-IS network with hundreds of routers, and the memory requirements are usually a non-issue. However, you might still find edge cases where a multi-level deployment might be beneficial. For example, your edge switches might have small hardware forwarding tables, or you might want to limit the <em>blast radius</em> of network failures &ndash; IS-IS limits the LSP flooding to a single area (or the level-2 backbone)<sup id="fnref:SPO"><a class="footnote-ref" href="#fn:SPO">1</a></sup>.</p>
+<p>Like OSPF, IS-IS was designed when router memory was measured in megabytes and CPU speeds in MHz. The scalability of a routing protocol and the reduced memory footprint on the edge (access) routers were crucial. OSPF solved that conundrum with <em>areas</em>, and IS-IS solved it with <em>multi-level</em> topology<sup id="fnref:NPA"><a class="footnote-ref" href="#fn:NPA">1</a></sup>; some IS-IS routers know only about prefixes in their area (<em>level-1</em> routers), while others know the whole network topology (<em>level-2</em> routers), but might not be aware of the internal structure of other areas.</p>
+<p>Decent modern IS-IS implementations have no problems running a single-level IS-IS network with hundreds of routers, and the memory requirements are usually a non-issue. However, you might still find edge cases where a multi-level deployment might be beneficial. For example, your edge switches might have small hardware forwarding tables, or you might want to limit the <em>blast radius</em> of network failures &ndash; IS-IS limits the LSP flooding to a single area (or the level-2 backbone)<sup id="fnref:SPO"><a class="footnote-ref" href="#fn:SPO">2</a></sup>.</p>
 <p>In this exercise, you&rsquo;ll explore multi-level IS-IS deployment using a simple 5-router topology:</p>
 <p><img alt="Lab topology" src="../topology-multiarea.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
@@ -422,7 +422,7 @@ r1#show isis neighbors
 <li>Level-2 routers form L2 adjacencies with other level-2 routers, or with level-1-2 routers. They can form adjacencies with routers in other areas. This is important; the only way to connect two different areas in IS-IS is through an L2 adjacency.</li>
 <li>Level-1-2 routers can form both L1 and L2 adjacencies. They maintain a separate topological database for each of those levels. They act as border routers and manifest many similarities with the OSPF Area Border Routers.</li>
 </ul>
-<p>The adjacency that two routers try to establish depends on their configuration. You can specify the router type in the IS-IS routing process, or limit the adjacency type on a single interface with an interface configuration command. The two parameters limit the IS-IS hellos (ISH) sent through an interface<sup id="fnref:EX"><a class="footnote-ref" href="#fn:EX">2</a></sup>, thus directly limiting the adjacencies formed through that interface.</p>
+<p>The adjacency that two routers try to establish depends on their configuration. You can specify the router type in the IS-IS routing process, or limit the adjacency type on a single interface with an interface configuration command. The two parameters limit the IS-IS hellos (ISH) sent through an interface<sup id="fnref:EX"><a class="footnote-ref" href="#fn:EX">3</a></sup>, thus directly limiting the adjacencies formed through that interface.</p>
 <h2 id="make-c1-and-c2-level-1-2-routers">Make C1 and C2 Level-1-2 Routers</h2>
 <p>Now that you know the rules, it&rsquo;s easy to see why R1 lost its adjacency with C1 and C2. A level-1 router cannot form an adjacency with a level-2 router.</p>
 <p>To fix the problem, change the IS-IS router type of C1 and C2 to level-1-2. Again, the command to do that should be familiar by now.</p>
@@ -479,7 +479,7 @@ Gateway of last resort:
 <p>This is unexpected. X1 and X2 are level-2 routers, and we already know they formed level-2 adjacencies with C1 and C2. It would be logical to have those subnets only in the level-2 LSPs.</p>
 <p>To understand why those routes are present as L1 routes and what we can do about them, we must explore the concept of <em>IS-IS circuit types</em>.</p>
 <h2 id="is-is-circuit-type">IS-IS Circuit Type</h2>
-<p>You can define an IS-IS router as level-1, level-1-2, or level-2-only. IS-IS allows you to do the same for links<sup id="fnref:NAMS"><a class="footnote-ref" href="#fn:NAMS">3</a></sup> (which they call <em>circuits</em>).</p>
+<p>You can define an IS-IS router as level-1, level-1-2, or level-2-only. IS-IS allows you to do the same for links<sup id="fnref:NAMS"><a class="footnote-ref" href="#fn:NAMS">4</a></sup> (which they call <em>circuits</em>).</p>
 <p>The purpose of the IS-IS <em>circuit type</em> is often described as controlling the adjacencies that can be formed over a link. While that&rsquo;s true, it&rsquo;s also misleading. ISO DP 10589 and <a href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a> describe how you can use the IS-IS circuit type (applied to an interface) to: </p>
 <ul>
 <li>Determine whether an interface operates at level-1, level-2, or both levels</li>
@@ -499,7 +499,7 @@ Gateway of last resort:
 <li>level-2 circuit: the subnet is included only in the L2 LSP</li>
 <li>level-1-2 circuit: the subnet is included in L1 LSP and L2 LSP, <em>regardless of the adjacencies formed over that circuit</em>.</li>
 </ul>
-<p>For example, even if a router has only a level-2 adjacency on a level-1-2 circuit, the IP Interface Address TLV and the IP Internal Reachability TLV will still appear in the L1 LSP. Let&rsquo;s check whether that&rsquo;s what we&rsquo;re dealing with, and inspect the IS-IS adjacencies and circuit types on C1<sup id="fnref:IOS"><a class="footnote-ref" href="#fn:IOS">4</a></sup>:</p>
+<p>For example, even if a router has only a level-2 adjacency on a level-1-2 circuit, the IP Interface Address TLV and the IP Internal Reachability TLV will still appear in the L1 LSP. Let&rsquo;s check whether that&rsquo;s what we&rsquo;re dealing with, and inspect the IS-IS adjacencies and circuit types on C1<sup id="fnref:IOS"><a class="footnote-ref" href="#fn:IOS">5</a></sup>:</p>
 <p class="code-caption">C1&rsquo;s neighbors and IS-IS interface status -  Arista cEOS<br /></p>
 <pre><code>c1#show isis neighbors
 
@@ -557,7 +557,7 @@ Area leader priority: 250 algorithm: 0
 </code></pre>
 <h2 id="configure-is-is-circuit-types">Configure IS-IS Circuit Types</h2>
 <p>Let&rsquo;s remove the external subnets (C1-X1, C2-X2) from the L1 LSP.</p>
-<p>Change the IS-IS circuit type on the C1-X1 and C2-X2 links to <em>level-2-only</em> using an interface configuration command similar to <strong>isis circuit-type</strong><sup id="fnref:JX"><a class="footnote-ref" href="#fn:JX">5</a></sup></p>
+<p>Change the IS-IS circuit type on the C1-X1 and C2-X2 links to <em>level-2-only</em> using an interface configuration command similar to <strong>isis circuit-type</strong><sup id="fnref:JX"><a class="footnote-ref" href="#fn:JX">6</a></sup></p>
 <h2 id="revalidating-r1-routing-information">Revalidating R1 Routing Information</h2>
 <p>Once the configuration is done, examine the C1 and C2 LSPs on R1.</p>
 <p class="code-caption">C1&rsquo;s L1 LSP after the IS-IS circuit type has been changed (observed on R1 running Arista cEOS)<br /></p>
@@ -608,7 +608,7 @@ via 10.1.0.1, Ethernet1
 via 10.1.0.5, Ethernet2
 
 </code></pre>
-<p>Mission accomplished. The transit networks towards our external routers are gone from the intra-area (level-1) topology, but you can still find them in the level-2 LSPs<sup id="fnref:TOK"><a class="footnote-ref" href="#fn:TOK">6</a></sup>. The reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. </p>
+<p>Mission accomplished. The transit networks towards our external routers are gone from the intra-area (level-1) topology, but you can still find them in the level-2 LSPs<sup id="fnref:TOK"><a class="footnote-ref" href="#fn:TOK">7</a></sup>. The reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. </p>
 <p>Finally, let&rsquo;s confirm that the smaller routing table on R1 did not break the end-to-end connectivity. R1 should still be able to reach X1 and X2:</p>
 <p class="code-caption">Inter-area connectivity tests on R1<br /></p>
 <pre><code>r1#ping 10.0.0.4
@@ -745,7 +745,7 @@ I&gt;* 10.1.0.16/30 [115/30] via 10.1.0.13, eth1, weight 1, 01:51:40
 </code></pre>
 <h2 id="suboptimal-inter-area-routing">Suboptimal Inter-Area Routing</h2>
 <p>Every time you have an L1 area with multiple gateways, you might get suboptimal routing toward some external destinations, as the level-1 routers always send their traffic toward the nearest level-2 router.</p>
-<p>Let&rsquo;s trace the paths towards X1 and X2 from R1. This is what Arista EOS has to say<sup id="fnref:ECMP"><a class="footnote-ref" href="#fn:ECMP">7</a></sup>:</p>
+<p>Let&rsquo;s trace the paths towards X1 and X2 from R1. This is what Arista EOS has to say<sup id="fnref:ECMP"><a class="footnote-ref" href="#fn:ECMP">8</a></sup>:</p>
 <p class="code-caption">The <strong>traceroute</strong> command shows suboptimal routing from R1 toward X2<br /></p>
 <pre><code>r1#traceroute 10.0.0.4
 traceroute to x1 (10.0.0.4), 30 hops max, 60 byte packets
@@ -761,7 +761,7 @@ traceroute to x2 (10.0.0.5), 30 hops max, 60 byte packets
 
 </code></pre>
 <p>Notice the suboptimal path R1 takes to reach X2. Although X2 is directly connected to C2, and C2 can be used as a default gateway, the outgoing traffic flows through C1.</p>
-<p>Disabling ECMP <sup id="fnref:ECAF"><a class="footnote-ref" href="#fn:ECAF">8</a></sup> does not solve the problem. If you do that, R1 will generate just one default route from the LSP database and choose the LSP with the ATT flag set following these rules<sup id="fnref:ECBC"><a class="footnote-ref" href="#fn:ECBC">9</a></sup>:</p>
+<p>Disabling ECMP <sup id="fnref:ECAF"><a class="footnote-ref" href="#fn:ECAF">9</a></sup> does not solve the problem. If you do that, R1 will generate just one default route from the LSP database and choose the LSP with the ATT flag set following these rules<sup id="fnref:ECBC"><a class="footnote-ref" href="#fn:ECBC">10</a></sup>:</p>
 <ul>
 <li>The closest (based on the metric) level-1-2 router with the ATT flag set</li>
 <li>When multiple equidistant level-1-2 routers exist, choose the one with the highest SystemID.</li>
@@ -948,32 +948,35 @@ ping: sendto: Network unreachable
 <div class="footnote">
 <hr />
 <ol>
+<li id="fn:NPA">
+<p>To be more precise, the original IS-IS level-1 areas were functionally equivalent to OSPF totally stubby areas, while the level-2 backbone is somewhat equivalent to the OSPF area 0. The main difference between IS-IS and OSPF is the ability to use the same link as part of a level-1 area and the level-2 backbone <em>at the same time</em>.&#160;<a class="footnote-backref" href="#fnref:NPA" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
 <li id="fn:SPO">
-<p>The flooding of changed LSPs is limited to a single level (area or backbone), but without the L1 → L2 route summarization, the changes in a level-1 area always spill over into the level-2 backbone.&#160;<a class="footnote-backref" href="#fnref:SPO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The flooding of changed LSPs is limited to a single level (area or backbone), but as with OSPF, without the L1 → L2 route summarization, the changes in a level-1 area always spill over into the level-2 backbone.&#160;<a class="footnote-backref" href="#fnref:SPO" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:EX">
-<p>For example, you could have a level-1-2 router, but limit an interface to be a level-1 circuit. The router will only send level-1 ISHs on that interface. You can also configure a router to be a level-1 router and limit an interface to be a level-2 circuit, resulting in no ISHs.&#160;<a class="footnote-backref" href="#fnref:EX" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>For example, you could have a level-1-2 router, but limit an interface to be a level-1 circuit. The router will only send level-1 ISHs on that interface. You can also configure a router to be a level-1 router and limit an interface to be a level-2 circuit, resulting in no ISHs.&#160;<a class="footnote-backref" href="#fnref:EX" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:NAMS">
-<p>It does not make sense to configure IS-IS circuit types on level-1 or level-2 routers. They only matter on devices running as level-1-2 IS-IS routers.&#160;<a class="footnote-backref" href="#fnref:NAMS" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>It does not make sense to configure IS-IS circuit types on level-1 or level-2 routers. They only matter on devices running as level-1-2 IS-IS routers.&#160;<a class="footnote-backref" href="#fnref:NAMS" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 <li id="fn:IOS">
-<p>Most platforms have a <strong>show isis adjacency</strong> or a <strong>show isis neighbor</strong> command to inspect IS-IS neighbors, and a <strong>show isis interface</strong> command to display the interface parameters. Cisco IOS (because its IS-IS implementation predates RFC 1195) has a <strong>show clns interface</strong> command.&#160;<a class="footnote-backref" href="#fnref:IOS" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>Most platforms have a <strong>show isis adjacency</strong> or a <strong>show isis neighbor</strong> command to inspect IS-IS neighbors, and a <strong>show isis interface</strong> command to display the interface parameters. Cisco IOS (because its IS-IS implementation predates RFC 1195) has a <strong>show clns interface</strong> command.&#160;<a class="footnote-backref" href="#fnref:IOS" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 <li id="fn:JX">
-<p>Some implementations, for example Junos and IOS XR, define interface parameters within the <strong>interface</strong> hierarchy in the routing process.&#160;<a class="footnote-backref" href="#fnref:JX" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<p>Some implementations, for example Junos and IOS XR, define interface parameters within the <strong>interface</strong> hierarchy in the routing process.&#160;<a class="footnote-backref" href="#fnref:JX" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
 <li id="fn:TOK">
-<p>That&rsquo;s OK. They belong there.&#160;<a class="footnote-backref" href="#fnref:TOK" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+<p>That&rsquo;s OK. They belong there.&#160;<a class="footnote-backref" href="#fnref:TOK" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ECMP">
-<p>Even though ECMP is enabled on Arista cEOS, only the first ECMP entry is inserted into the underlying Linux routing table. All inter-area traffic is thus sent to the first default gateway (C1). Other implementations might spray the probe packets across all potential next hops, resulting in an even more interesting <em>traceroute</em> printout.&#160;<a class="footnote-backref" href="#fnref:ECMP" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+<p>Even though ECMP is enabled on Arista cEOS, only the first ECMP entry is inserted into the underlying Linux routing table. All inter-area traffic is thus sent to the first default gateway (C1). Other implementations might spray the probe packets across all potential next hops, resulting in an even more interesting <em>traceroute</em> printout.&#160;<a class="footnote-backref" href="#fnref:ECMP" title="Jump back to footnote 8 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ECAF">
-<p>You can disable ECMP by setting <strong>maximum-paths</strong> to 1 in the IS-IS process. Some devices expect <strong>maximum-paths</strong> configured for a routing process, others expect it configured for individual address families.&#160;<a class="footnote-backref" href="#fnref:ECAF" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+<p>You can disable ECMP by setting <strong>maximum-paths</strong> to 1 in the IS-IS process. Some devices expect <strong>maximum-paths</strong> configured for a routing process, others expect it configured for individual address families.&#160;<a class="footnote-backref" href="#fnref:ECAF" title="Jump back to footnote 9 in the text">&#8617;</a></p>
 </li>
 <li id="fn:ECBC">
-<p>When an IS-IS process uses N-way ECMP, it chooses the top N equidistant level-1-2 routers based on their SystemID.&#160;<a class="footnote-backref" href="#fnref:ECBC" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+<p>When an IS-IS process uses N-way ECMP, it chooses the top N equidistant level-1-2 routers based on their SystemID.&#160;<a class="footnote-backref" href="#fnref:ECBC" title="Jump back to footnote 10 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
