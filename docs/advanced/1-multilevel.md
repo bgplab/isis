@@ -119,7 +119,7 @@ Let's restore the lost adjacencies. Before doing that, we need a short detour th
 
 ## Level-1 and Level-2 Adjacency Rules in IS-IS
 
-As already mentioned, IS-IS uses areas (level-1 routing) connected via an overlay inter-area routing topology (level-2 routing). In many ways, the inter-area overlay is similar to an OSPF backbone, but with many significant differences. Every router can participate in intra-area routing (level-1 router), inter-area routing (level-2 router), or both (level-1-2 router).
+As mentioned, IS-IS uses areas (level-1 routing) connected via an overlay inter-area routing topology (level-2 routing). In many ways, the inter-area overlay is similar to an OSPF backbone, but with many significant differences. Every router can participate in intra-area routing (level-1 router), inter-area routing (level-2 router), or both (level-1-2 router).
 
 In OSPF, all inter-area traffic must go through area zero (the backbone area). Any other area must connect to the backbone area, resulting in a strict hierarchical network. Consequently, border routers must have at least one interface in the backbone area.
 
@@ -129,11 +129,11 @@ The only requirement imposed on an IS-IS transit network is the end-to-end level
 
 The rules governing adjacency formation in IS-IS are simple:
 
-* Level-1 (intra-area) routers) only form adjacencies with level-1 or level-1-2 routers in the same area. A direct consequence of this is that they cannot be border routers.
+* Level-1 (intra-area) routers form adjacencies only with level-1 or level-1-2 routers in the same area. A direct consequence of this is that they cannot be border routers.
 * Level-2 routers form L2 adjacencies with other level-2 routers, or with level-1-2 routers. They can form adjacencies with routers in other areas. This is important; the only way to connect two different areas in IS-IS is through an L2 adjacency.
 * Level-1-2 routers can form both L1 and L2 adjacencies. They maintain a separate topological database for each of those levels. They act as border routers and manifest many similarities with the OSPF Area Border Routers.
 
-The adjacency that two routers try to establish depends on their configuration. You can specify the router type in the IS-IS routing process, or limit the adjacency type on a single interface with an interface configuration command. The two parameters limit the IS-IS hellos (ISH) sent through an interface[^EX], thus directly limiting the adjacencies formed through that interface.
+The adjacency that two routers try to establish depends on their configuration. You can specify the router type in the IS-IS routing process, or limit the adjacency type on a single interface with an interface configuration command. The two parameters limit the IS-IS hellos (IIH) sent through an interface[^EX], thus directly limiting the adjacencies that can be formed through it.
 
 [^EX]: For example, you could have a level-1-2 router, but limit an interface to be a level-1 circuit. The router will only send level-1 ISHs on that interface. You can also configure a router to be a level-1 router and limit an interface to be a level-2 circuit, resulting in no ISHs.
 
@@ -207,7 +207,7 @@ Gateway of last resort:
 
 We can see that the type of IS-IS routes changed from L2 to L1, and X1/X2 loopbacks are no longer in the routing table. The routing table accurately reflects the fact that R1 lost visibility of the level-2 network topology. However, the transit subnets C1-X1 and C2-X2 are still in the routing table.
 
-This is unexpected. X1 and X2 are level-2 routers, and we already know they formed level-2 adjacencies with C1 and C2. It would be logical to have those subnets only in the level-2 LSPs.
+This is unexpected. X1 and X2 are level-2 routers; we already know they formed level-2 adjacencies with C1 and C2. It would be logical to have those subnets only in the level-2 LSPs.
 
 To understand why those routes are present as L1 routes and what we can do about them, we must explore the concept of *IS-IS circuit types*.
 
@@ -261,7 +261,7 @@ Ethernet2 L1L2           10          10 point-to-point         2
 
 ```
 
-[^IOS]: Most platforms have a **show isis adjacency** or a **show isis neighbor** command to inspect IS-IS neighbors, and a **show isis interface** command to display the interface parameters. Cisco IOS (because its IS-IS implementation predates RFC 1195) has a **show clns interface** command.
+[^IOS]: Most platforms have a **show isis adjacency** or a **show isis neighbor** command to inspect IS-IS neighbors, and a **show isis interface** command to display the interface parameters. Cisco IOS has a **show clns interface** command that displays IS-IS interface parameters together with other CLNS-related parameters.
 
 Looking at the printouts, it's easy to confirm that:
 
@@ -304,7 +304,7 @@ Area leader priority: 250 algorithm: 0
 
 ## Configure IS-IS Circuit Types
 
-Let's remove the external subnets (C1-X1, C2-X2) from the L1 LSP.
+Let's remove the inter-area subnets (C1-X1, C2-X2) from the L1 LSP.
 
 Change the IS-IS circuit type on the C1-X1 and C2-X2 links to *level-2-only* using an interface configuration command similar to **isis circuit-type**[^JX]
 
@@ -369,7 +369,7 @@ via 10.1.0.5, Ethernet2
 
 ```
 
-Mission accomplished. The transit networks towards our external routers are gone from the intra-area (level-1) topology, but you can still find them in the level-2 LSPs[^TOK]. The reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. 
+Mission accomplished. The transit networks towards routers in other areas are gone from the intra-area (level-1) topology, but you can still find them in the level-2 LSPs[^TOK]. The reduction of the IP routing table on R1 is significant (almost 50%), even at the small scale of our exercise. 
 
 [^TOK]: That's OK. They belong there.   
 
@@ -434,7 +434,7 @@ Router R1 has ECMP enabled by default, so it uses both C1 and C2 as the exit poi
 
 ## Distribution of L1 Routes into L2 Backbone
 
-We have already checked that R1 can reach routers in other areas (X1 and X2), but there is another part of the puzzle that needs to be explored: how do X1 and X2 know about R1? After all, they are in different areas, and don't know anything about the internal structure of R1's area (49.0100)
+We have already checked that R1 can reach routers in other areas (X1 and X2), but we still need to explore another part of the puzzle: how do X1 and X2 know about R1? After all, they are in different areas, and don't know anything about the internal structure of R1's area (49.0100)
 
 IS-IS solves this problem by automatically distributing level-1 prefixes into level-2 LSPs on level-1-2 routers. Straight from RFC 1195:
 
@@ -537,7 +537,7 @@ I>* 10.1.0.16/30 [115/30] via 10.1.0.13, eth1, weight 1, 01:51:40
 
 ## Suboptimal Inter-Area Routing
 
-Every time you have an L1 area with multiple gateways, you might get suboptimal routing toward some external destinations, as the level-1 routers always send their traffic toward the nearest level-2 router.
+Every time you have an L1 area with multiple gateways, you might get suboptimal routing toward some out-of-area destinations, as the level-1 routers always send their traffic toward the nearest level-2 router.
 
 Let's trace the paths towards X1 and X2 from R1. This is what Arista EOS has to say[^ECMP]:
 
@@ -607,7 +607,7 @@ There is no specific validation test included with the lab. However, at the end 
 
 * R1 working as level-1 router
 * C1 and C2 working as level-1-2 routers
-* C1 and C2's interfaces connecting them to external routers configured as level-2 IS-IS circuits
+* C1 and C2's interfaces connecting them to routers in other areas configured as level-2 IS-IS circuits
 * R1 being able to ping X1 and X2
 * X1 being able to ping X2
 
