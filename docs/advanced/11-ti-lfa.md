@@ -2,13 +2,17 @@
 
 *[Fast Reroute](https://blog.ipspace.net/2020/12/fast-failover-techniques/)* redirects traffic around a link or node failure before a routing protocol recalculates the best paths ([more details](https://blog.ipspace.net/series/fast-failover/)). It was traditionally implemented with traffic engineering tunnels and later with a much simpler *[Loop Free Alternate](https://blog.ipspace.net/2012/01/loop-free-alternate-ospf-meets-eigrp/)*  (LFA) that immediately uses the next best path *when that path is guaranteed to be loop-free*.
 
-Unfortunately, LFA works only in a subset of well-designed network topologies. For example, in our lab topology, the R1-R2 link is a high-bandwidth link (with IS-IS cost 10), while the other links have lower bandwidth (and IS-IS cost 20). We thus cannot shift the R1→R2 traffic toward R3 after the R1-R2 link fails. As R3 uses R1 to get to R2, we'd create an immediate routing loop.
+Unfortunately, LFA works only in a subset of well-designed network topologies. For example, in our lab topology, the R1-R2 link is a high-bandwidth link (with IS-IS cost 10), while the other links have lower bandwidth (and IS-IS cost 20). We thus cannot shift the R1→R2 traffic toward R3 after the R1-R2 link fails; we'd create an immediate routing loop as R3 uses R1 to get to R2.
 
 ![Lab topology](topology-ti-lfa.png)
 
-The only way to make LFA work in our lab topology is to have a mechanism that could push the R1→R2 traffic through R3 to R4 after the R1-R2 link failure *without R3 inspecting the traffic*. An MPLS LSP is commonly used to achieve that, and the global MPLS labels created by Segment Routing (SR-MPLS) are just what we need to implement Topology-independent LFA (TI-LFA).
+The only way to make LFA work in our lab topology is to have a mechanism that could attach an explicit path[^TEH] to the R1→R2 traffic, allowing R3 to forward that traffic after the R1-R2 link failure *based on the explicit path and without inspecting the original IP headers*. An MPLS LSP is commonly used to achieve that, and the global MPLS labels created by Segment Routing (SR-MPLS) are just what we need to implement Topology-independent LFA (TI-LFA).
 
-In this lab exercise, you'll explore how TI-LFA calculates the backup paths. Unfortunately, it's hard to trigger the *fast-failover* behavior on virtual devices; interface shutdowns or IS-IS adjacency failures always trigger an immediate IS-IS response. We'll have to rely on **show** commands to figure out the details.
+[^TEH]: Or a tunnel encapsulation header
+
+In this lab exercise, you'll explore how TI-LFA calculates the backup paths. Unfortunately, it's hard to trigger the *fast-failover* behavior on virtual devices; interface shutdowns or IS-IS adjacency failures always trigger an immediate IS-IS response[^LSPG]. We'll have to rely on **show** commands to figure out the details.
+
+[^LSPG]: You might try to delay the propagation of that change by tweaking the initial delay in the *LSP Generation Interval*  nerd knob (assuming your platform implements it).
 
 !!! Expert
     This is an expert-level challenge lab -- you are mostly on your own. Have fun!
@@ -71,7 +75,7 @@ TI-LFA paths for IPv4 address family
    r3                SPF             exclude Ethernet1    r4
 ```
 
-In our case, if the Ethernet2 (R1-R2) link fails, R1 would use R3 to reach R4, and R4 to reach R2. Use the **show isis ti-lfa path detail** command for even more details. Here's how R1 would get to R2:
+In our case, if the Ethernet2 (R1-R2) link fails, R1 would use R3 to reach R4 and R4 to reach R2. Use the **show isis ti-lfa path detail** command for even more details. Here's how R1 would get to R2:
 
 The details of the TI-LFA path R1 would use to get to R2 (displayed by Arista EOS)
 { .code-caption }
