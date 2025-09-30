@@ -261,10 +261,10 @@
 
 <h1 id="configure-is-is-fast-reroute-using-ti-lfa">Configure IS-IS Fast Reroute Using TI-LFA</h1>
 <p><em><a href="https://blog.ipspace.net/2020/12/fast-failover-techniques/">Fast Reroute</a></em> redirects traffic around a link or node failure before a routing protocol recalculates the best paths (<a href="https://blog.ipspace.net/series/fast-failover/">more details</a>). It was traditionally implemented with traffic engineering tunnels and later with a much simpler <em><a href="https://blog.ipspace.net/2012/01/loop-free-alternate-ospf-meets-eigrp/">Loop Free Alternate</a></em>  (LFA) that immediately uses the next best path <em>when that path is guaranteed to be loop-free</em>.</p>
-<p>Unfortunately, LFA works only in a subset of well-designed network topologies. For example, in our lab topology, the R1-R2 link is a high-bandwidth link (with IS-IS cost 10), while the other links have lower bandwidth (and IS-IS cost 20). We thus cannot shift the R1→R2 traffic toward R3 after the R1-R2 link fails. As R3 uses R1 to get to R2, we&rsquo;d create an immediate routing loop.</p>
+<p>Unfortunately, LFA works only in a subset of well-designed network topologies. For example, in our lab topology, the R1-R2 link is a high-bandwidth link (with IS-IS cost 10), while the other links have lower bandwidth (and IS-IS cost 20). We thus cannot shift the R1→R2 traffic toward R3 after the R1-R2 link fails; we&rsquo;d create an immediate routing loop as R3 uses R1 to get to R2.</p>
 <p><img alt="Lab topology" src="../topology-ti-lfa.png" /></p>
-<p>The only way to make LFA work in our lab topology is to have a mechanism that could push the R1→R2 traffic through R3 to R4 after the R1-R2 link failure <em>without R3 inspecting the traffic</em>. An MPLS LSP is commonly used to achieve that, and the global MPLS labels created by Segment Routing (SR-MPLS) are just what we need to implement Topology-independent LFA (TI-LFA).</p>
-<p>In this lab exercise, you&rsquo;ll explore how TI-LFA calculates the backup paths. Unfortunately, it&rsquo;s hard to trigger the <em>fast-failover</em> behavior on virtual devices; interface shutdowns or IS-IS adjacency failures always trigger an immediate IS-IS response. We&rsquo;ll have to rely on <strong>show</strong> commands to figure out the details.</p>
+<p>The only way to make LFA work in our lab topology is to have a mechanism that could attach an explicit path<sup id="fnref:TEH"><a class="footnote-ref" href="#fn:TEH">1</a></sup> to the R1→R2 traffic, allowing R3 to forward that traffic after the R1-R2 link failure <em>based on the explicit path and without inspecting the original IP headers</em>. An MPLS LSP is commonly used to achieve that, and the global MPLS labels created by Segment Routing (SR-MPLS) are just what we need to implement Topology-independent LFA (TI-LFA).</p>
+<p>In this lab exercise, you&rsquo;ll explore how TI-LFA calculates the backup paths. Unfortunately, it&rsquo;s hard to trigger the <em>fast-failover</em> behavior on virtual devices; interface shutdowns or IS-IS adjacency failures always trigger an immediate IS-IS response<sup id="fnref:LSPG"><a class="footnote-ref" href="#fn:LSPG">2</a></sup>. We&rsquo;ll have to rely on <strong>show</strong> commands to figure out the details.</p>
 <div class="admonition expert">
 <p class="admonition-title">Expert</p>
 <p>This is an expert-level challenge lab &ndash; you are mostly on your own. Have fun!</p>
@@ -279,7 +279,7 @@
 <p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
 <ul>
 <li>Change directory to <code>advanced/11-ti-lfa</code></li>
-<li>Execute <strong>netlab up</strong> to start the lab if you want to configure Segment Routing yourself, or <strong>netlab up -s sr=yes</strong> if you&rsquo;d like <em>netlab</em> to configure Segment Routing<sup id="fnref:SRMBS"><a class="footnote-ref" href="#fn:SRMBS">1</a></sup></li>
+<li>Execute <strong>netlab up</strong> to start the lab if you want to configure Segment Routing yourself, or <strong>netlab up -s sr=yes</strong> if you&rsquo;d like <em>netlab</em> to configure Segment Routing<sup id="fnref:SRMBS"><a class="footnote-ref" href="#fn:SRMBS">3</a></sup></li>
 <li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
 </ul>
 <div class="admonition tip">
@@ -292,12 +292,12 @@
 <h2 id="configuration-sequence">Configuration Sequence</h2>
 <ul>
 <li>Configure SR-MPLS on all routers (<a href="../10-sr/">more details</a>)</li>
-<li>Reduce the IS-IS timers on all interfaces to the minimum your device supports to get faster failure detection<sup id="fnref:NBFD"><a class="footnote-ref" href="#fn:NBFD">2</a></sup>.</li>
+<li>Reduce the IS-IS timers on all interfaces to the minimum your device supports to get faster failure detection<sup id="fnref:NBFD"><a class="footnote-ref" href="#fn:NBFD">4</a></sup>.</li>
 <li>Configure TI-LFA <em>link protection</em> (the network is not big enough for a meaningful <em>node protection</em>) using an IS-IS router configuration command similar to <strong>fast-reroute ti-lfa</strong>.</li>
 <li>Some platforms allow you to configure TI-LFA within the routing protocol configuration, while others require TI-LFA configuration on every interface. Cisco IOS requires both, plus LFA (<strong>isis fast-reroute protection</strong>) configured on all interfaces.</li>
 </ul>
 <h2 id="validation">Validation</h2>
-<p>It&rsquo;s tough to see what TI-LFA is doing. Most modern IS-IS implementations flood changes immediately and start SPF within milliseconds<sup id="fnref:FLC"><a class="footnote-ref" href="#fn:FLC">3</a></sup>. It&rsquo;s therefore best to inspect what TI-LFA would do with the <strong>show</strong> commands.</p>
+<p>It&rsquo;s tough to see what TI-LFA is doing. Most modern IS-IS implementations flood changes immediately and start SPF within milliseconds<sup id="fnref:FLC"><a class="footnote-ref" href="#fn:FLC">5</a></sup>. It&rsquo;s therefore best to inspect what TI-LFA would do with the <strong>show</strong> commands.</p>
 <p>For example, the <strong>show isis ti-lfa path</strong> command on Arista EOS displays the nodes the router would use to get to a specific destination in case of a link failure:</p>
 <p class="code-caption">TI-LFA paths displayed by Arista EOS<br /></p>
 <pre><code>r1#show isis ti-lfa path
@@ -311,7 +311,7 @@ TI-LFA paths for IPv4 address family
 
    r3                SPF             exclude Ethernet1    r4
 </code></pre>
-<p>In our case, if the Ethernet2 (R1-R2) link fails, R1 would use R3 to reach R4, and R4 to reach R2. Use the <strong>show isis ti-lfa path detail</strong> command for even more details. Here&rsquo;s how R1 would get to R2:</p>
+<p>In our case, if the Ethernet2 (R1-R2) link fails, R1 would use R3 to reach R4 and R4 to reach R2. Use the <strong>show isis ti-lfa path detail</strong> command for even more details. Here&rsquo;s how R1 would get to R2:</p>
 <p class="code-caption">The details of the TI-LFA path R1 would use to get to R2 (displayed by Arista EOS)<br /></p>
 <pre><code>r1#show isis ti-lfa path detail r2
 TI-LFA paths for IPv4 address family
@@ -497,14 +497,20 @@ MP2     Et0/2      10.1.0.14        10.0.0.4         16004     r4
 <div class="footnote">
 <hr />
 <ol>
+<li id="fn:TEH">
+<p>Or a tunnel encapsulation header&#160;<a class="footnote-backref" href="#fnref:TEH" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:LSPG">
+<p>You might try to delay the propagation of that change by tweaking the initial delay in the <em>LSP Generation Interval</em>  nerd knob (assuming your platform implements it).&#160;<a class="footnote-backref" href="#fnref:LSPG" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
 <li id="fn:SRMBS">
-<p>In which case, your device has to be <a href="https://netlab.tools/module/sr-mpls/#supported-platforms">supported by the <em>netlab</em> Segment Routing configuration module</a>.&#160;<a class="footnote-backref" href="#fnref:SRMBS" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>In which case, your device has to be <a href="https://netlab.tools/module/sr-mpls/#supported-platforms">supported by the <em>netlab</em> Segment Routing configuration module</a>.&#160;<a class="footnote-backref" href="#fnref:SRMBS" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:NBFD">
-<p>You could also use BFD, but it looks like Arista EOS interprets BFD session failure as a node failure.&#160;<a class="footnote-backref" href="#fnref:NBFD" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>You could also use BFD, but it looks like Arista EOS interprets BFD session failure as a node failure.&#160;<a class="footnote-backref" href="#fnref:NBFD" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 <li id="fn:FLC">
-<p>Unless the routers are overloaded with too many consecutive failures&#160;<a class="footnote-backref" href="#fnref:FLC" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>Unless the routers are overloaded with too many consecutive failures&#160;<a class="footnote-backref" href="#fnref:FLC" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div></div>
