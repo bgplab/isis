@@ -267,9 +267,12 @@
 <p>Like OSPF and BGP, IS-IS contains a simple mechanism to authenticate routing traffic &ndash; IS-IS packets can include a cleartext password or an <a href="https://datatracker.ietf.org/doc/html/rfc5304">MD5</a>- or <a href="https://datatracker.ietf.org/doc/html/rfc5310">SHA hash</a><sup id="fnref:HO"><a class="footnote-ref" href="#fn:HO">1</a></sup>. Unlike OSPF, IS-IS can authenticate:</p>
 <ul>
 <li>The packets exchanged between routers (hello packets)</li>
-<li>The contents of Link State PDUs flooded across an area or a domain.</li>
+<li>The contents of Link State PDUs that are flooded across an area or a domain.</li>
 </ul>
-<p>Authenticating IS-IS traffic is not as critical as authenticating EBGP traffic. It&rsquo;s almost impossible to inject IS-IS packets into a LAN segment the intruder is not connected to, and you&rsquo;re not supposed to run an IGP on an untrusted network anyway.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Authenticating IS-IS traffic is not as critical as authenticating EBGP traffic. It&rsquo;s almost impossible to inject IS-IS packets into a LAN segment the intruder is not connected to, and you&rsquo;re not supposed to run an IGP on an untrusted network anyway. However, as IS-IS packets have no checksum, you could use MD5 authentication to detect malformed packets or inadvertent data corruption.</p>
+</div>
 <p>Most IS-IS implementations have <em>interface</em> passwords (authenticating the IS-IS hello packets), <em>area</em> passwords (authenticating level-1 LSPs), and <em>domain</em> passwords (authenticating level-2 LSPs). You&rsquo;ll practice configuring all three in this lab exercise. </p>
 <p><img alt="Lab topology" src="../topology-md5.png" /></p>
 <h2 id="device-requirements">Device Requirements</h2>
@@ -339,7 +342,7 @@
 </tbody>
 </table>
 <h2 id="the-problem">The Problem</h2>
-<p>Some IS-IS implementations exhibit bizarre behavior when adjacent devices have an authentication mismatch. The device not using IS-IS authentication can claim full adjacency with its neighbors. In contrast, the adjacent device claims the adjacency is in the INIT state or shows no IS-IS neighbors on the interface.</p>
+<p>Some IS-IS implementations exhibit bizarre behavior when adjacent devices have an authentication mismatch. The device that does not use IS-IS authentication can claim full adjacency with its neighbors. In contrast, the adjacent device claims the adjacency is in the INIT state or shows no IS-IS neighbors on the interface.</p>
 <p>For example, R1 running FRRouting claims it has three IS-IS neighbors and full adjacency with two of them.</p>
 <p class="code-caption">IS-IS neighbors on R1 running FRRouting<br /></p>
 <pre><code>$ netlab connect r1 --show isis neighbor
@@ -422,7 +425,7 @@ IS-IS Instance: Gandalf VRF: default
 <ul>
 <li>After configuring the area (level-1) password on R1, R2 and R3 should display R1&rsquo;s LSPs in their level-1 database:</li>
 </ul>
-<p class="code-caption">IS-IS level-1 database on R2 running Arista EOS contains authenticated R1 LSP<br /></p>
+<p class="code-caption">The IS-IS level-1 database on R2 running Arista EOS contains an authenticated R1 LSP<br /></p>
 <pre><code>r2#show isis database level-1
 Legend:
 H - hostname conflict
@@ -439,7 +442,7 @@ IS-IS Instance: Gandalf VRF: default
 <ul>
 <li>Similarly, R2 and R4 won&rsquo;t display R1 level-2 LSP until you configure the domain (level-2) password:</li>
 </ul>
-<p class="code-caption">IS-IS level-2 database on R4 (running Arista EOS) does not contain the R1 LSP<br /></p>
+<p class="code-caption">The IS-IS level-2 database on R4 (running Arista EOS) does not contain the R1 LSP<br /></p>
 <pre><code>r4#show isis database
 Legend:
 H - hostname conflict
@@ -580,7 +583,7 @@ IS-IS Instance: Gandalf VRF: default
 <hr />
 <ol>
 <li id="fn:HO">
-<p>Please note that the IS-IS packets are not encrypted. Anyone can see their contents, but the Hashed Message Authentication Code (HMAC) makes it really hard for an intruder to impersonate an IS-IS router using MD5 or SHA authentication (but not impossible as we know it&rsquo;s possible to break MD5).&#160;<a class="footnote-backref" href="#fnref:HO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>Please note that the IS-IS packets are not encrypted. Anyone can see their contents, but the Hashed Message Authentication Code (HMAC) makes it hard for an intruder to impersonate an IS-IS router using MD5 or SHA authentication (but not impossible; we know MD5 is insecure).&#160;<a class="footnote-backref" href="#fnref:HO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:SHC">
 <p>Figuring that out from the <strong>show</strong> printouts, particularly when you don&rsquo;t have access to the remote router, is an interesting hair-pulling exercise.&#160;<a class="footnote-backref" href="#fnref:SHC" title="Jump back to footnote 2 in the text">&#8617;</a></p>
