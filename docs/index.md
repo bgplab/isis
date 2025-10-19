@@ -35,7 +35,7 @@ The next set of exercises covers individual IS-IS features:
 * [Influence the Designated IS Election](feature/2-dis.md)
 * [Protect IS-IS Routing Data with MD5 Authentication](feature/3-md5.md)
 * [Hide Transit Subnets in IS-IS Networks](feature/4-hide-transit.md)
-* [Drain Traffic Before Node Maintenance](feature/5-drain.md)<!--new-->
+* [Drain Traffic Before Node Maintenance](feature/5-drain.md)
 * [Adjust IS-IS Timers](feature/6-timers.md)<!--new-->
 * [Route Redistribution into IS-IS](feature/7-redistribute.md)<!--new-->
 * [Use BFD to Speed Up IS-IS Failure Detection](feature/8-bfd.md)<!--new-->
