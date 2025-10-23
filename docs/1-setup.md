@@ -90,7 +90,7 @@ device set to csr in /home/user/isis/defaults.yml
 $ netlab defaults --project provider=libvirt
 The default setting provider is already set in netlab,project defaults
 Do you want to change that setting in project defaults [y/n]: y
-provider set to libvirt in /home/isis/BGP/defaults.yml
+provider set to libvirt in /home/user/isis/defaults.yml
 ```
 
 [^CSR]: Assuming you built the [CSR Vagrant box](https://netlab.tools/labs/csr/) first
