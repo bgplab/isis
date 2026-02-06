@@ -52,6 +52,7 @@ nav:
   - advanced/1-multilevel.md
   - advanced/2-route-leak.md
   - advanced/3-summarization.md
+  - advanced/4-l1split.md
   - advanced/10-sr.md
   - advanced/11-ti-lfa.md
 

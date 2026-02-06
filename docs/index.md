@@ -45,6 +45,7 @@ Interested in advanced concepts? How about:
 * [Multilevel IS-IS Deployments](advanced/1-multilevel.md)<!--new-->
 * [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak.md)<!--new-->
 * [Summarizing Level-1 Routes into Level-2 Backbone](advanced/3-summarization.md)<!--new-->
+* [The Impact of Level-1 IS-IS Area Partitioning](advanced/4-l1split.md)<!--new-->
 
 Ready for a challenge? Try to solve these lab exercises:
 
