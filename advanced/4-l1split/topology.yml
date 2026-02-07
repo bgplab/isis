@@ -1,4 +1,4 @@
-# The Impact of Level-1 IS-IS Area Partitioning
+# The Impact of IS-IS Area Partitioning
 ---
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 25.09
@@ -29,7 +29,7 @@ nodes:
 
 links:
 - group: area_100
-  members: [ r1-c1,  r1-r2, r2-c2 ]
+  members: [ r1-c1, r1-r2, r2-c2 ]
   isis.type: level-1
   isis.metric: 20
 - group: core
@@ -42,5 +42,6 @@ links:
   isis.metric: 5
 
 message: |
-  The "Impact of Level-1 IS-IS Area Partitioning" lab is ready.
+  The "The Impact of IS-IS Area Partitioning" lab is ready.
+
   Connect to the lab devices with "netlab connect".
