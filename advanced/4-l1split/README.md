@@ -1,4 +1,4 @@
-# The Impact of IS-IS Area Partitioning
+# Suboptimal IS-IS intra-area routing
 
 This directory contains the *netlab* topology file for the
-**[The Impact of IS-IS Area Partitioning](../../docs/advanced/4-l1split.md)** lab.
+**[Suboptimal IS-IS intra-area routing](../../docs/advanced/4-l1split.md)** lab.

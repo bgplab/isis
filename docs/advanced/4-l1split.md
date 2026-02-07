@@ -1,4 +1,4 @@
-# The Impact of IS-IS Area Partitioning
+# Suboptimal IS-IS intra-area routing
 
 By [Dan Partelly](https://github.com/DanPartelly)
 {.author-byline }

@@ -371,7 +371,7 @@ c1.00-00                  103   0x00000075  0xe019     738    0/0/0
   Extended IP Reachability: 172.16.0.0/22 (Metric: 17)
 ```
 
-**Next**: [The Impact of Level-1 IS-IS Area Partitioning](4-l1split.md)
+**Next**: [Suboptimal IS-IS intra-area routing](4-l1split.md)
 
 ## Reference Information
 

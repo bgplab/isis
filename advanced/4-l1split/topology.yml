@@ -1,4 +1,4 @@
-# The Impact of IS-IS Area Partitioning
+# Suboptimal IS-IS intra-area routing
 ---
 defaults.sources.extra: [ ../../defaults.yml ]
 version: 25.09
@@ -42,6 +42,6 @@ links:
   isis.metric: 5
 
 message: |
-  The "The Impact of IS-IS Area Partitioning" lab is ready.
+  The "Suboptimal IS-IS intra-area routing" lab is ready.
 
   Connect to the lab devices with "netlab connect".
