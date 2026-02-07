@@ -36,13 +36,13 @@ The next set of exercises covers individual IS-IS features:
 * [Protect IS-IS Routing Data with MD5 Authentication](feature/3-md5.md)
 * [Hide Transit Subnets in IS-IS Networks](feature/4-hide-transit.md)
 * [Drain Traffic Before Node Maintenance](feature/5-drain.md)
-* [Adjust IS-IS Timers](feature/6-timers.md)<!--new-->
-* [Route Redistribution into IS-IS](feature/7-redistribute.md)<!--new-->
+* [Adjust IS-IS Timers](feature/6-timers.md)
+* [Route Redistribution into IS-IS](feature/7-redistribute.md)
 * [Use BFD to Speed Up IS-IS Failure Detection](feature/8-bfd.md)<!--new-->
 
 Interested in advanced concepts? How about:
 
-* [Multilevel IS-IS Deployments](advanced/1-multilevel.md)<!--new-->
+* [Multilevel IS-IS Deployments](advanced/1-multilevel.md)
 * [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak.md)<!--new-->
 * [Summarizing Level-1 Routes into Level-2 Backbone](advanced/3-summarization.md)<!--new-->
 
