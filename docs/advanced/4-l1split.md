@@ -161,7 +161,7 @@ This IS-IS behavior is documented in [RFC 1195](https://datatracker.ietf.org/doc
 
 ## Split the L1 area
 
-Split the L1 area by disabling the link between R1 and R2. Shutdown Ethernet2 on R1(the name of the interface will be different if you do not use cEOS). Once you are done, let's see what changed in C1's routing table:
+Split the L1 area by disabling the link between R1 and R2. Shutdown Ethernet2 on R1 (the name of the interface will be different if you do not use cEOS). Once you are done, let's see what changed in C1's routing table:
 
 C1's routing table after L1 split, Arista cEOS:
 { .code-caption }
