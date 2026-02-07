@@ -19,7 +19,7 @@ Unfortunately, this leaves FRRouting off the table. As of February 2026, FRRouti
 
 You can start the lab [on your own lab infrastructure](../1-setup.md) or in [GitHub Codespaces](https://github.com/codespaces/new/bgplab/isis) ([more details](https://bgplabs.net/4-codespaces/)):
 
-* Change directory to `advanced/4-l1-leak`
+* Change directory to `advanced/4-l1split`
 * Execute **netlab up**
 * Log into lab devices with **netlab connect**
 
