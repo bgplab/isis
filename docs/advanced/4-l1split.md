@@ -199,7 +199,7 @@ You can now start to solve the problem of suboptimal routing.
 
 ## Configuration Task
 
-* Change the ISIS circuit type on the interfaces used for the p2p link between C1 and C2 to a  level-1-2 circuit. You will find the relevant command under the interface configuration.
+* Change the IS-IS circuit type on the interfaces used for the p2p link between C1 and C2 to a  level-1-2 circuit. You will find the relevant command under the interface configuration.
 
 By changing the IS-IS circuit type on the interfaces participating in the C1-C2 link, you ensured that from the point of view of IS-IS routing, the level-2 link now doubles as a level-1 link.
 
