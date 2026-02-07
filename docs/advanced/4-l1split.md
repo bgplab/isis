@@ -25,7 +25,7 @@ You can start the lab [on your own lab infrastructure](../1-setup.md) or in [Git
 
 ## Existing Device Configuration
 
-When starting the lab, _netlab_ configures IPv4 addresses and IS-IS protocol on the lab router. IS-IS parameters of individual lab devices are summarized in the table below.
+When starting the lab, _netlab_ configures IPv4 addresses and the IS-IS protocol on the lab routers. IS-IS parameters of individual lab devices are summarized in the table below.
 
 Links between X1-C1, C1-C2, and C2-X2 are high-speed links (low metric).
 Links between C1-R1, R1-R2, and R2-C2 are low-speed links (high metric).
