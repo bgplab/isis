@@ -127,7 +127,7 @@ via 10.1.0.14, Ethernet2
 ```
 
 
-We can see that IS-Is installed a level 1 route to C2 in the routing table of C1, with a metric of 70.
+We can see that IS-IS installed a level-1 route to C2 in the routing table of C1, with a metric of 70.
 
 Look at the IS-IS RIB. A "show isis rib command" is not available on cEOS, the device we used most in this series. Cisco IOL provides it, so I will take advantage of Netlab's device abstraction power to quickly change the devices:
 
