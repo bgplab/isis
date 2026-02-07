@@ -29,8 +29,8 @@ When starting the lab, _netlab_ configures IPv4 addresses and IS-IS protocol on 
 
 Links between X1-C1, C1-C2, and C2-X2 are high-speed links (low metric).
 Links between C1-R1, R1-R2, and R2-C2 are low-speed links (high metric).
-X1-X2 are part of your level2 backbone.
-The circuit type on the link between C1 and C2  is level-2. Circuit type on C1-R1, R1-R2, R2-C2 is level-1.
+X1 and X2 are part of your level-2 backbone.
+The circuit type on the link between C1 and C2 is level-2. The circuit type on C1-R1, R1-R2, and R2-C2 is level-1.
 
 
 | Node | IS-IS Area | System ID | IS type |
