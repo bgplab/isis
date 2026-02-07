@@ -62,7 +62,7 @@ This is interesting. C1 has reachability to R2 over high-cost links, instead of 
 
 Let's try a traceroute to C2, starting from C1.
 
-Traceroute to R2, starting on C1
+Traceroute to C2, starting on C1
 { .code-caption }
 ```
 netlab connect c1 traceroute 10.0.0.4
