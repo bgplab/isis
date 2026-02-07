@@ -155,7 +155,7 @@ This rib printout from Cisco IOL clearly shows that the IS-IS process has inform
 
 The L1 route ends up installed in the routing table by the IS-IS process.
 
-This IS-IS behavior is documented in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195) - chapter 3.10 -  Order of Preference of Routes / Dijkstra Computation. A qoute from the [RFC](https://datatracker.ietf.org/doc/html/rfc1195) is in order:
+This IS-IS behavior is documented in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195) - chapter 3.10 -  Order of Preference of Routes / Dijkstra Computation. A quote from the [RFC](https://datatracker.ietf.org/doc/html/rfc1195) is in order:
 
 "The Integrated IS-IS prefers routes within the area (via level 1 routing) whenever possible. If level 2 routes must be used, then routes within the routing domain (specifically, those routes using internal metrics) are preferred to routes outside of the routing domain (using external metrics)."
 
