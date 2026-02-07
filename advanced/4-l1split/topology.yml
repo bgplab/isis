@@ -42,5 +42,5 @@ links:
   isis.metric: 5
 
 message: |
-  The "The Impact of Level-1 IS-IS Area Partitioning" lab is ready.
+  The "Impact of Level-1 IS-IS Area Partitioning" lab is ready.
   Connect to the lab devices with "netlab connect".
