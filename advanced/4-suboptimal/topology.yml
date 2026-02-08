@@ -1,0 +1,47 @@
+# Suboptimal IS-IS Intra-area Routing
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 25.09
+
+module: [ isis ]
+isis.area: '49.0100'
+
+groups:
+  external:
+    members: [ x1, x2 ]
+    isis.type: level-2
+  core:
+    members: [ c1, c2 ]
+    isis.type: level-1-2
+  l1:
+    members: [ r1, r2 ]
+    isis.type: level-1
+
+nodes:
+  r1:
+  r2:
+  c1:
+  c2:
+  x1:
+    isis.area: '49.0001'
+  x2:
+    isis.area: '49.0002'
+
+links:
+- group: area_100
+  members: [ r1-c1, r1-r2, r2-c2 ]
+  isis.type: level-1
+  isis.metric: 20
+- group: core
+  members: [ c1-c2 ]
+  isis.type: level-2
+  isis.metric: 5
+- group: external
+  members: [ c1-x1, c2-x2 ]
+  isis.type: level-2
+  isis.metric: 5
+
+message: |
+  The "Suboptimal IS-IS Intra-area Routing" lab is ready.
+
+  Connect to the lab devices with "netlab connect".

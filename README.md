@@ -29,6 +29,7 @@ Interested in advanced concepts? How about:
 * [Multilevel IS-IS Deployments](advanced/1-multilevel)
 * [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak)
 * [Summarizing Level-1 Routes into Level-2 Backbone](advanced/3-summarization)
+* [Suboptimal IS-IS Intra-area Routing](advanced/4-suboptimal)
 
 Ready for a challenge? Try to solve these lab exercises:
 

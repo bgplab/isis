@@ -1,0 +1,280 @@
+# Suboptimal IS-IS Intra-area Routing
+
+By [Dan Partelly](https://github.com/DanPartelly)
+{.author-byline }
+
+In [previous exercises](2-route-leak.md), we saw that every time you use level-1 areas with multiple exit points towards the level-2 IS-IS backbone, you have the potential to create suboptimal routing.
+
+In this exercise, you will see how the design of a level-1 area can impact routing. You will be introduced to IS-IS in-area routing preferences and learn how to solve suboptimal routing induced by incorrect area design. Finally, you will explore what happens when a level-1 area partitions.
+
+![Lab topology](topology-l1-split.png)
+
+## Device Requirements
+
+Use any device supported by the Netlab IS-IS configuration module that correctly implements the distribution of intra-area (level-1) routes into inter-area (level-2) backbone.
+
+Unfortunately, this leaves FRRouting off the table. As of February 2026, FRRouting’s IS-IS implementation is incomplete and does not propagate level-1 IP prefixes into the level-2 LSP database as required by RFC 1195. Nevertheless, the implemented parts are solid, and FRR can be used without problems in single-level IS-IS deployments.
+
+## Starting the Lab
+
+You can start the lab [on your own lab infrastructure](../1-setup.md) or in [GitHub Codespaces](https://github.com/codespaces/new/bgplab/isis) ([more details](https://bgplabs.net/4-codespaces/)):
+
+* Change directory to `advanced/4-suboptimal`
+* Execute **netlab up**
+* Log into lab devices with **netlab connect**
+
+## Existing Device Configuration
+
+After starting the lab, _netlab_ configures IPv4 addresses and the IS-IS routing protocol on the lab routers. IS-IS parameters of individual lab devices are summarized in the following table:
+
+| Node | IS-IS Area | System ID | IS type |
+|------|-----------:|----------:|---------|
+| x1 | 49.0001 | 0000.0000.0005 | level-2 |
+| x2 | 49.0002 | 0000.0000.0006 | level-2 |
+| r1 | 49.0100 | 0000.0000.0001 | level-1 |
+| r2 | 49.0100 | 0000.0000.0002 | level-1 |
+| c1 | 49.0100 | 0000.0000.0003 | level-1-2 |
+| c2 | 49.0100 | 0000.0000.0004 | level-1-2 |
+
+* The links between X1, C1, C2, and X2 are level-2-only high-speed links (low metric).
+* The links between C1, R1, R2, and C2 and level-1 low-speed links (high metric).
+
+## The Problem
+
+Once you have examined the running configuration of your routers and are familiar with them, examine the path from C1 to R2:
+
+Traceroute from C1 to R2
+{ .code-caption }
+```
+$ netlab connect c1 traceroute 10.0.0.2
+Connecting to 192.168.121.103 using SSH port 22, executing traceroute 10.0.0.2
+traceroute to 10.0.0.2 (10.0.0.2), 30 hops max, 60 byte packets
+1  r1 (10.1.0.2)  0.050 ms  0.009 ms  0.007 ms
+2  r2 (10.0.0.2)  1.103 ms  1.115 ms  1.325 ms
+
+```
+
+This is interesting. C1 forwards traffic toward R2 over high-cost links, even though it has a cheaper route via C2.
+
+How about the traffic from C1 to C2?
+
+Traceroute from C1 to C2
+{ .code-caption }
+```
+$ netlab connect c1 traceroute 10.0.0.4
+Connecting to 192.168.121.103 using SSH port 22, executing traceroute 10.0.0.4
+traceroute to 10.0.0.4 (10.0.0.4), 30 hops max, 60 byte packets
+1  r1 (10.1.0.2)  0.052 ms  0.009 ms  0.007 ms
+2  r2 (10.1.0.6)  0.955 ms  0.966 ms  1.103 ms
+3  c2 (10.0.0.4)  1.473 ms  1.856 ms  2.228 ms
+
+```
+
+If the previous trace was interesting, this one is downright bizarre. Although C1 is directly connected to C2, the traffic from C1 to C2 uses low-speed links via R1 and R2.
+
+Let's confirm that the link between C1 and C2 is up and that we have IS-IS running on it:
+
+IS-IS neighbors on C1 running Arista cEOS:
+{ .code-caption }
+```
+$ netlab connect c1 show isis neighbors
+Connecting to 192.168.121.103 using SSH port 22, executing show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  r1               L1   Ethernet1          P2P               UP    21          12
+Gandalf   default  c2               L2   Ethernet2          P2P               UP    27          17
+Gandalf   default  x1               L2   Ethernet3          P2P               UP    28          00
+```
+
+That seems OK. Next, let's examine the routing table on C1:
+
+Routing table of C1 running Arista cEOS
+{ .code-caption }
+```
+c1#show ip route | begin Gateway
+Gateway of last resort is not set
+
+I L1     10.0.0.1/32 [115/30]
+via 10.1.0.2, Ethernet1
+I L1     10.0.0.2/32 [115/50]
+via 10.1.0.2, Ethernet1
+C        10.0.0.3/32
+directly connected, Loopback0
+I L1     10.0.0.4/32 [115/70]
+via 10.1.0.2, Ethernet1
+I L2     10.0.0.5/32 [115/15]
+via 10.1.0.18, Ethernet3
+I L2     10.0.0.6/32 [115/20]
+via 10.1.0.14, Ethernet2
+C        10.1.0.0/30
+directly connected, Ethernet1
+I L1     10.1.0.4/30 [115/40]
+via 10.1.0.2, Ethernet1
+I L1     10.1.0.8/30 [115/60]
+via 10.1.0.2, Ethernet1
+C        10.1.0.12/30
+directly connected, Ethernet2
+C        10.1.0.16/30
+directly connected, Ethernet3
+I L2     10.1.0.20/30 [115/10]
+via 10.1.0.14, Ethernet2
+```
+
+We can see that IS-IS installed a level-1 route to C2 (metric 70) in C1's routing table.
+
+At this point, it's worth examining the internal IS-IS structures, particularly its interpretation of the routing table (Routing Information Base -- RIB). A **show isis rib** command is not available on Arista cEOS (the device commonly used in IS-IS lab exercises), but works on Cisco IOL. Let's take advantage of Netlab's device abstraction power and quickly change the devices:
+
+IS-IS Rib entry for C2, as viewed on C1 running Cisco IOL
+{ .code-caption }
+```
+c1#show isis rib 10.0.0.4 255.255.255.255
+
+IPv4 local RIB for IS-IS process Gandalf
+
+IPV4 unicast topology base (TID 0, TOPOID 0x0) =================
+
+10.0.0.4/32  prefix attr X:0 R:0 N:1
+[115/L1/70] via 10.1.0.2(Ethernet0/1), from 10.0.0.4, tag 0
+prefix attr: X:0 R:0 N:1
+(installed)
+[115/L2/15] via 10.1.0.14(Ethernet0/2), from 10.0.0.4, tag 0
+prefix attr: X:0 R:0 N:1
+```
+
+The IS-IS RIB printout from Cisco IOL clearly shows that the IS-IS process knows about both routes to 10.0.0.4/32 -- an L1 route with a metric of 70 and an L2 route with a metric of 15. Regardless of the metrics, the IS-IS process installs the L1 route into the main routing table.
+
+!!! tip
+    You can reproduce the same information from the IS-IS database, but it's much nicer to have a direct view of the routing process RIB.
+
+This IS-IS behavior is documented in [RFC 1195](https://datatracker.ietf.org/doc/html/rfc1195) - chapter 3.10 -  Order of Preference of Routes/Dijkstra Computation:
+
+> The Integrated IS-IS prefers routes within the area (via level 1 routing) whenever possible. If level 2 routes must be used, then routes within the routing domain (specifically, those routes using internal metrics) are preferred to routes outside of the routing domain (using external metrics).
+
+## Aside: Impact of Area Partitioning
+
+Let's try out something: turn off the R1-R2 link (for example, shut down the R2->R1 interface on R2) to split the area 49.0100, and examine the changes in C1's routing table:
+
+C1's routing table after L1 split, Arista cEOS:
+{ .code-caption }
+```
+I L1     10.0.0.1/32 [115/30]
+via 10.1.0.2, Ethernet1
+I L2     10.0.0.2/32 [115/35]
+via 10.1.0.14, Ethernet2
+C        10.0.0.3/32
+directly connected, Loopback0
+I L2     10.0.0.4/32 [115/15]
+via 10.1.0.14, Ethernet2
+I L2     10.0.0.5/32 [115/15]
+via 10.1.0.18, Ethernet3
+I L2     10.0.0.6/32 [115/20]
+via 10.1.0.14, Ethernet2
+C        10.1.0.0/30
+directly connected, Ethernet1
+I L2     10.1.0.8/30 [115/25]
+via 10.1.0.14, Ethernet2
+C        10.1.0.12/30
+directly connected, Ethernet2
+C        10.1.0.16/30
+directly connected, Ethernet3
+I L2     10.1.0.20/30 [115/10]
+via 10.1.0.14, Ethernet2
+
+```
+
+Most L1 IS-IS routes we observed earlier are no longer present in the routing table. C2 and R2 are now directly accessible over low-cost L2 routes. Furthermore, we have complete reachability between all our routers.
+
+Since we want the R1-R2 link, this is not a solution, but it suggests we might need better connectivity within the L1 area. Let's reenable the R1-R2 link and figure out which link we could add to the L1 area to solve the suboptimal routing problem.
+
+## Configuration Task
+
+Using the [commands](1-multilevel.md/#configure-is-is-circuit-types) you mastered in the [Multilevel IS-IS Deployments](1-multilevel.md) lab exercise, change the ISIS circuit type on the C1-C2 link to the `level-1-2` circuit.
+
+This change improves connectivity within the level-1 area. The C1-C2 link is now not only a backbone link but also an intra-area link.
+
+## Validation
+
+Check the IS-IS neighbors on C1. C2 should be a level-1-2 neighbor:
+
+IS-IS neighbors on C1 running Arista cEOS
+{ .code-caption }
+```
+c1#show isis neighbors
+
+Instance  VRF      System Id        Type Interface          SNPA              State Hold time   Circuit Id
+Gandalf   default  r1               L1   Ethernet1          P2P               UP    26          12
+Gandalf   default  c2               L1L2 Ethernet2          P2P               UP    27          17
+Gandalf   default  x1               L2   Ethernet3          P2P               UP    27          00
+```
+
+Examine the routing table on C1. It should contain an entry for C2 (10.0.0.4) with a low metric (15 on most platforms):
+
+C1's routing table, Arista cEOS
+{ .code-caption }
+```
+c1#show ip route 10.0.0.4
+...
+ I L1     10.0.0.4/32 [115/15]
+           via 10.1.0.14, Ethernet2
+```
+
+The routing table on C1 should also contain a route to R2 via C2:
+
+```
+c1#show ip route 10.0.0.2 detail
+...
+ I L1     10.0.0.2/32 [115/35] PM
+           via 10.1.0.14, Ethernet2 c1 -> c2
+```
+
+Just to be on the safe side, let's redo the traceroutes:
+
+Traceroute from C1 to R2
+{ .code-caption }
+```
+c1#traceroute r2
+traceroute to r2 (10.0.0.2), 30 hops max, 60 byte packets
+ 1  c2 (10.1.0.14)  0.085 ms  0.006 ms  0.006 ms
+ 2  r2 (10.0.0.2)  2.048 ms  2.112 ms  2.623 ms
+```
+
+**Next**: [Build an SR-MPLS Network with IS-IS](10-sr.md)
+
+## Reference Information
+
+### Lab Wiring
+
+| Origin Device | Origin Port | Destination Device | Destination Port |
+|---------------|-------------|--------------------|------------------|
+| r1 | Ethernet1 | c1 | Ethernet1 |
+| r1 | Ethernet2 | r2 | Ethernet1 |
+| r2 | Ethernet2 | c2 | Ethernet1 |
+| c1 | Ethernet2 | c2 | Ethernet2 |
+| c1 | Ethernet3 | x1 | eth1 |
+| c2 | Ethernet3 | x2 | eth1 |
+
+!!! Note
+    The interface names depend on the lab devices you use. The printout was generated with user routers running Arista EOS and X1/X2 running FRRouting.
+
+### Lab Addressing
+
+| Node/Interface | IPv4 Address | IPv6 Address | Description |
+|----------------|-------------:|-------------:|-------------|
+| **r1** |  10.0.0.1/32 |  | Loopback |
+| Ethernet1 | 10.1.0.2/30 |  | r1 -> c1 |
+| Ethernet2 | 10.1.0.5/30 |  | r1 -> r2 |
+| **r2** |  10.0.0.2/32 |  | Loopback |
+| Ethernet1 | 10.1.0.6/30 |  | r2 -> r1 |
+| Ethernet2 | 10.1.0.10/30 |  | r2 -> c2 |
+| **c1** |  10.0.0.3/32 |  | Loopback |
+| Ethernet1 | 10.1.0.1/30 |  | c1 -> r1 |
+| Ethernet2 | 10.1.0.13/30 |  | c1 -> c2 |
+| Ethernet3 | 10.1.0.17/30 |  | c1 -> x1 |
+| **c2** |  10.0.0.4/32 |  | Loopback |
+| Ethernet1 | 10.1.0.9/30 |  | c2 -> r2 |
+| Ethernet2 | 10.1.0.14/30 |  | c2 -> c1 |
+| Ethernet3 | 10.1.0.21/30 |  | c2 -> x2 |
+| **x1** |  10.0.0.5/32 |  | Loopback |
+| eth1 | 10.1.0.18/30 |  | x1 -> c1 |
+| **x2** |  10.0.0.6/32 |  | Loopback |
+| eth1 | 10.1.0.22/30 |  | x2 -> c2 |

@@ -4,10 +4,6 @@ A large number of IS-IS labs are [already online](index.md), but we keep getting
 
 ## Advanced Labs
 
-The Impact of IS-IS Area Partitioning
-: * Explain suboptimal routing within a poorly-designed area (L1 routes are preferred over L2 routes)
-  * Explore what happens when an area partitions
-
 Securing Multi-Level Networks at the Area Level
 :  * Use level-specific passwords
 
