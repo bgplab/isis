@@ -43,13 +43,13 @@ The next set of exercises covers individual IS-IS features:
 Interested in advanced concepts? How about:
 
 * [Multilevel IS-IS Deployments](advanced/1-multilevel.md)
-* [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak.md)<!--new-->
+* [Distributing Level-2 IS-IS Routes into Level-1 Areas](advanced/2-route-leak.md)
 * [Summarizing Level-1 Routes into Level-2 Backbone](advanced/3-summarization.md)<!--new-->
 * [Suboptimal IS-IS Intra-area Routing](advanced/4-suboptimal.md)<!--new-->
 
 Ready for a challenge? Try to solve these lab exercises:
 
-* [Build an SR-MPLS Network with IS-IS](advanced/10-sr.md)<!--new-->
+* [Build an SR-MPLS Network with IS-IS](advanced/10-sr.md)
 * [Configure IS-IS Fast Reroute Using TI-LFA](advanced/11-ti-lfa.md)<!--new-->
 
 Want to know what other advanced labs we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.
