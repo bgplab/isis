@@ -98,7 +98,7 @@ You must configure a delay metric-based flexible algorithm in your network. You 
 
 
 * You will work on the routers R1, C3, and R2.
-* Define a flexible algorithm based on delay metric on router R1. Algorithm ids 0 to 127 are reserved. Define algorithm 128, with a priority of 100 and the label of LOW_LATECNY. At least one router must define the flexible algorithms. If multiple routers define the same algorithm, the lower-priority definition wins. On Arista, the commands you are looking for are under router traffic-engineering.
+* Define a flexible algorithm based on delay metric on router R1. Algorithm ids 0 to 127 are reserved. Define algorithm 128, with a priority of 100 and the label of LOW_LATENCY. At least one router must define the flexible algorithms. If multiple routers define the same algorithm, the lower-priority definition wins. On Arista, the commands you are looking for are under router traffic-engineering.
 * Even if only one router defines the algorithm, all other routers that want to participate must declare the algorithm. Since in our case, only R1 defines the algorithm, go to C2 and R2 and declare the algo.
 * The router that defines the algorithm should advertise it into the IGP. The command on Arista is under the IS-IS segment routing configuration. You can advertise an algorithm into various IS-IS levels. We are using a pure level-2 area, so advertise it into L2.
 * All other routers that want to participate in the constrained graph represented by this flex-algo must announce their intent. On Arista, you do this using the same command you used in the step before, but without advertisement.
