@@ -1,0 +1,27 @@
+# Configure IS-IS Flexible Algorithms
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 2.0.0
+
+name: delay
+
+isis.area: '49.0001'
+isis.type: level-2
+
+groups:
+  _auto_create: True
+  routers:
+    module: [ isis, sr ]
+    members: [ r1, r2, c1, c2, c3 ]
+
+links:
+- group: high_speed
+  isis.cost: 5
+  members: [ r1-c1, c1-c2, c2-r2 ]
+- group: low_latency
+  isis.cost: 10
+  members: [ r1-c3, c3-r2 ]
+
+message: |
+  The "Configure IS-IS Flexible Algorithms" lab is ready. Connect to the
+  lab devices with "netlab connect".
