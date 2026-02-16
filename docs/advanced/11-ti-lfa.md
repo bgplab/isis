@@ -149,6 +149,7 @@ The forwarding table contains the repair information, which shows that:
 
 !!! tip
     Cisco IOS/XE has extensive TI-LFA debugging. Enable **isis fast-reroute trigger** and **isis fast-reroute ti-lfa** debugging on R1, shut down the R1-R2 link on R2, and enjoy the show 🍿
+And now we're ready to move to the next exercise: [Configure IS-IS Flexible Algorithms](12-delay.md).
 
 ## Reference Information
 
