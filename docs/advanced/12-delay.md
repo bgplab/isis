@@ -75,7 +75,7 @@ Configure a delay metric-based flexible algorithm in your network:
 * The router that defines the algorithm should advertise it into the IGP. We are using a pure level-2 IS-IS network; advertise your algorithm only into the level-2 backbone.
 
 !!! tip
-		On Arista EOS, you'll have to configure that in the **segment-routing mpls** part of the **router isis** configuration.
+    On Arista EOS, you'll have to configure that in the **segment-routing mpls** part of the **router isis** configuration.
 
 * Even if only one router defines the algorithm, all other routers that want to participate in that algorithm must declare it. We defined the algorithm on R1, so we have to declare it on R2 and C2.
 * All other routers that want to participate in the constrained graph represented by this flex-algo must announce their intent.
@@ -94,267 +94,206 @@ Finally:
 
 ## Validation
 
-For validation, use a flex algo aware mpls traceroute from R1 to R2. If the configuration is correct, R1 must reach R2 through C2.
+You can use a Flex-Algo-Aware MPLS traceroute to check the path from R1 to R2 using the LOW_LATENCY algorithm. If your configuration is correct, R1 must reach R2 through C3.
 
-
-Algorithm-aware MPLS traceroute from R1 to R2.
+Flex-Algo-Aware MPLS traceroute from R1 to R2.
 {: .code-caption}
 ```
-
 r1#traceroute mpls segment-routing ip 10.0.0.2/32 algorithm LOW_LATENCY
-
-
-
+! Warning: NTP synchronization is required for 1-Way time measurement accuracy.
 LSP traceroute IS-IS segment-routing to 10.0.0.2/32 , algorithm LOW_LATENCY
-
-via 10.1.0.13, label stack: [901000]
-
-1. 10.1.0.13MTU 1500RTT:0.857ms1-Way:0.648mssuccess: label switched
-
-downstream information (DSMAP) 1:
-
-interface address: 10.1.0.18
-
-IP address: 10.1.0.18
-
-label stack: [implicit-null]
-
-1. 10.1.0.18RTT:1.294ms1-Way:1.11mssuccess: egress ok
-
-
+  via 10.1.0.13, label stack: [901000]
+  1  10.1.0.13         MTU 1500  RTT:0.853ms   1-Way:0.563ms     success: label switched
+     downstream information (DSMAP) 1:
+        interface address: 10.1.0.18
+        IP address: 10.1.0.18
+        label stack: [implicit-null]
+  2  10.1.0.18         RTT:1.333ms   1-Way:0.838ms     success: egress ok
 ```
 
+However, the scenic journey is usually more fun: let's explore IS-IS data structures and gradually discover how they're used to create the label-switched path from R1 to R2 via C3.
 
-Examine the lfib on R1:
-{: .code-caption}
-```
-
-r1#show mpls lfib route 10.0.0.2/32 | beg IP
-
-.....
-
-IP900002[1], 10.0.0.2/32
-
-via M, 10.1.0.1, swap 900002
-
-payload autoDecide, ttlMode uniform, apply egress-acl
-
-interface Ethernet1
-
-IP901000[1], 10.0.0.2/32, algorithm LOW_LATENCY
-
-via M, 10.1.0.13, swap 901000
-
-payload autoDecide, ttlMode uniform, apply egress-acl
-
-interface Ethernet2
-
-
-```
-
-
-The Label Forwarding Information Base should contain two entries for 10.0.0.2/32, with two different labels, one of them explicitly referencing algorithm 128.
-
-If you have a different outcome, it's time for troubleshooting.
-
-As soon as you successfully configure and advertise a flex algo on R1, you can check for its presence is sub-tlv's of R1 LSPs. Notice that now it reports it knows about two algorithms, 0 and 128. 0 is the IGP default algorithm.
+As soon as you configure an advertised Flex-Algo on R1, you can check its presence in the sub-TLVs of R1's LSP. Notice that R1 advertises that it uses two algorithms: zero (the IGP default) and 128 (the LOW_LATENCY algorithm).
 
 Contents of R1.00-00 LSP on PE1 running Arista EOS
 {: .code-caption}
 ```
-
 r1#show isis database r1.00-00 detail
-
 Legend:
-
 H - hostname conflict
-
 U - node unreachable
 
-
-
 IS-IS Instance: Gandalf VRF: default
-
-IS-IS Level 2 Link State Database
-
-LSPIDSeq NumCksumLife Length ISReceived LSPIDFlags
-
-r1.00-006616091061216 L20000.0000.0001.00-00<>
-
-LSP generation remaining wait time: 0 ms
-
-Time remaining until refresh: 761 s
-
-NLPID: 0xCC(IPv4)
-
-Hostname: r1
-
-Area addresses: 49.0001
-
-Interface address: 10.1.0.14
-
-Interface address: 10.1.0.2
-
-Interface address: 10.0.0.1
-
-IS Neighbor: c3.00Metric: 10
-
-IPv4 Neighbor Address: 10.1.0.13
-
-IPv4 Interface Address: 10.1.0.14
-
-Adj-sid: 100001 flags: [L V] weight: 0x0
-
-IS Neighbor: c1.00Metric: 5
-
-IPv4 Neighbor Address: 10.1.0.1
-
-IPv4 Interface Address: 10.1.0.2
-
-Adj-sid: 100000 flags: [L V] weight: 0x0
-
-Reachability: 10.1.0.12/30 Metric: 10 Type: 1 Up
-
-Reachability: 10.1.0.0/30 Metric: 5 Type: 1 Up
-
-Reachability: 10.0.0.1/32 Metric: 10 Type: 1 Up
-
-SR Prefix-SID: 1 Flags: [N] Algorithm: 0
-
-Router Capabilities: Router Id: 10.0.0.1 Flags: []
-
-SR Local Block:
-
-SRLB Base: 965536 Range: 65536
-
-Area leader priority: 250 algorithm: 0
-
-Maximum SID depth:
-
-Base MPLS imposition (MSD type 1):6
-
-SR Capability: Flags: [I]
-
-SRGB Base: 900000 Range: 65536
-
-Algorithms:0, 128
-
-Flex Algo: Algorithm: 128 Metric: Min Unidirectional Delay Metric (1) Calc: SPF (0) Prio: 100
-
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                      5  52940   978    216 L2  0000.0000.0001.00-00  <>
+      LSP generation remaining wait time: 0 ms
+      Time remaining until refresh: 678 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r1
+      Area addresses: 49.0001
+      Interface address: 10.1.0.2
+      Interface address: 10.1.0.14
+      Interface address: 10.0.0.1
+      IS Neighbor          : c3.00               Metric: 10
+        IPv4 Neighbor Address: 10.1.0.13
+        IPv4 Interface Address: 10.1.0.14
+        Adj-sid: 100000 flags: [L V] weight: 0x0
+      IS Neighbor          : c1.00               Metric: 5
+        IPv4 Neighbor Address: 10.1.0.1
+        IPv4 Interface Address: 10.1.0.2
+        Adj-sid: 100001 flags: [L V] weight: 0x0
+      Reachability         : 10.1.0.0/30 Metric: 5 Type: 1 Up
+      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.1/32 Metric: 10 Type: 1 Up
+        SR Prefix-SID: 1 Flags: [N] Algorithm: 0
+      Router Capabilities: Router Id: 10.0.0.1 Flags: []
+        SR Local Block:
+          SRLB Base: 965536 Range: 65536
+        Area leader priority: 250 algorithm: 0
+        Maximum SID depth:
+          Base MPLS imposition (MSD type 1):  6
+        SR Capability: Flags: [I]
+          SRGB Base: 900000 Range: 65536
+        Algorithms:  0, 128
+        Flex Algo: Algorithm: 128 Metric: Min Unidirectional Delay Metric (1) Calc: SPF (0) Prio: 100
 ```
 
+What about R2 and C3? They advertise they're using algorithms zero and 128, but not the definition of algorithm 128:
 
-
-At this stage, you can also use "show isis flex-algo" to verify you are correctly advertising the flex algo:
-
-
-
-Correctly advertised flex algo on R1, Arista cEOS.
+Contents of R2.00-00 LSP on PE1 running Arista EOS
 {: .code-caption}
 ```
+r1#show isis database r2.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
 
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r2.00-00                      5  61368   880    218 L2  0000.0000.0002.00-00  <>
+      LSP received time: 2026-02-23 17:54:31
+      Remaining lifetime received: 1199 s Modified to: 1200 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r2
+      Area addresses: 49.0001
+      Interface address: 10.1.0.10
+      Interface address: 10.1.0.18
+      Interface address: 10.0.0.2
+      IS Neighbor          : c3.00               Metric: 10
+        IPv4 Neighbor Address: 10.1.0.17
+        IPv4 Interface Address: 10.1.0.18
+        Adj-sid: 100000 flags: [L V] weight: 0x0
+      IS Neighbor          : c2.00               Metric: 5
+        IPv4 Neighbor Address: 10.1.0.9
+        IPv4 Interface Address: 10.1.0.10
+        Adj-sid: 100001 flags: [L V] weight: 0x0
+      Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+        SR Prefix-SID: 2 Flags: [N] Algorithm: 0
+        SR Prefix-SID: 1000 Flags: [N] Algorithm: 128
+      Reachability         : 10.1.0.8/30 Metric: 5 Type: 1 Up
+      Reachability         : 10.1.0.16/30 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.2 Flags: []
+        SR Local Block:
+          SRLB Base: 965536 Range: 65536
+        Area leader priority: 250 algorithm: 0
+        Maximum SID depth:
+          Base MPLS imposition (MSD type 1):  6
+        SR Capability: Flags: [I]
+          SRGB Base: 900000 Range: 65536
+        Algorithms:  0, 128
+```
+
+You can also use the **show isis flex-algo** command instead of digging through the arcane sub-TLVs in IS-IS LSPs:
+
+IS-IS flex algorithms known to R1 running Arista cEOS
+{: .code-caption}
+```
 r1#show isis flex-algo
 
-
-
 IS-IS Instance: Gandalf VRF: default
 
-
-
-AlgorithmAdvertised Level MetricSelected
-
+Algorithm   Advertised Level Metric    Selected
 ----------- ---------- ----- --------- --------
-
-LOW_LATENCY yesL2min-delay r1
-
-
+LOW_LATENCY yes        L2    min-delay r1
 ```
 
+How about checking which routers participate in an algorithm? Arista cEOS has a command for that:
 
-
-Once you configured the participation of all other required routers in our flex algorithm, you can seeall the routers participating in the constrained topology:
-
-
-
-All routers participating in flex-algo 128, as viewed on R1, Arista cEOS
+Routers participating in IS-IS flex algorithms, as displayed by R1 running Arista cEOS
 {: .code-caption}
 ```
-r1#show isis flex-algo routers algorithm 128
-
-
+r1#show isis flex-algo routers
 
 IS-IS Instance: Gandalf VRF: default
-
-
 
 Algorithm: LOW_LATENCY
 
-
-
 Router Level Advertising Priority
-
 ------ ----- ----------- --------
-
-c3L2no
-
-r1L2yes100
-
-r2L2no
-
-
-
-
-
+c3     L2    no
+r1     L2    yes              100
+r2     L2    no
 ```
 
+Finally, let's see how the routers use SR-MPLS segment identifiers to build MPLS paths, starting with the prefix segments advertised by IS-IS:
 
-
-Once you configured a second SID on R2's loopback, you should see it immediately as a known prefix in the segment-routing database. If it was correctly bound to algorithm 128, you will see it will use algorithm 128 (LOW_LATENCY in our case).
-
-Segment routing prefixes on R1, Arista cEOS
+IS-IS advertised SR-MPLS prefix segments as displayed on R1 running Arista cEOS
 {: .code-caption}
 ```
+r1#show isis segment-routing prefix-segments
 
-show isis segment-routing prefix-segments
+System ID: r1                   Instance: 'Gandalf'
+SR supported Data-plane: MPLS                   SR Router ID: 10.0.0.1
 
-
-System ID: r1Instance: 'Gandalf'
-
-SR supported Data-plane: MPLSSR Router ID: 10.0.0.1
-
-
-
-Node: 6Proxy-Node: 0Prefix: 0Total Segments: 6
-
-
+Node: 6      Proxy-Node: 0      Prefix: 0       Total Segments: 6
 
 Flag Descriptions: R: Re-advertised, N: Node Segment, P: no-PHP
-
-E: Explicit-NULL, V: Value, L: Local, A: Proxy-Node attached
-
+                   E: Explicit-NULL, V: Value, L: Local, A: Proxy-Node attached
 Segment status codes: * - Self originated Prefix, L1 - level 1, L2 - level 2, ! - SR-unreachable,
-
-# - Some IS-IS next-hops are SR-unreachable
-
-PrefixSIDLabel TypeFlagsSystem IDLevel ProtectionAlgorithm
-
-------------------------- ----- ------- ---------- ---------------------------- --------------- ----- ----------- -------------
-
-* 10.0.0.1/321900001 NodeR:0 N:1 P:0 E:0 V:0 L:0r1L2unprotected SPF
-
-10.0.0.2/322900002 NodeR:0 N:1 P:0 E:0 V:0 L:0r2L2unprotected SPF
-
-10.0.0.2/321000901000 NodeR:0 N:1 P:0 E:0 V:0 L:0r2L2unprotected LOW_LATENCY
-
-10.0.0.3/323900003 NodeR:0 N:1 P:0 E:0 V:0 L:0c1L2unprotected SPF
-
-10.0.0.4/324900004 NodeR:0 N:1 P:0 E:0 V:0 L:0c2L2unprotected SPF
-
-10.0.0.5/325900005 NodeR:0 N:1 P:0 E:0 V:0 L:0c3L2unprotected SPF
-
-
+                      # - Some IS-IS next-hops are SR-unreachable
+   Prefix                      SID   Label Type       Flags                        System ID       Level Protection  Algorithm
+   ------------------------- ----- ------- ---------- ---------------------------- --------------- ----- ----------- -------------
+*  10.0.0.1/32                   1  900001 Node       R:0 N:1 P:0 E:0 V:0 L:0      r1              L2    unprotected SPF
+   10.0.0.2/32                   2  900002 Node       R:0 N:1 P:0 E:0 V:0 L:0      r2              L2    unprotected SPF
+   10.0.0.2/32                1000  901000 Node       R:0 N:1 P:0 E:0 V:0 L:0      r2              L2    unprotected LOW_LATENCY
+   10.0.0.3/32                   3  900003 Node       R:0 N:1 P:0 E:0 V:0 L:0      c1              L2    unprotected SPF
+   10.0.0.4/32                   4  900004 Node       R:0 N:1 P:0 E:0 V:0 L:0      c2              L2    unprotected SPF
+   10.0.0.5/32                   5  900005 Node       R:0 N:1 P:0 E:0 V:0 L:0      c3              L2    unprotected SPF
 ```
 
+Did you notice R2 advertises two SIDs for the 10.0.0.2/32 prefix, one per algorithm? Want to see how those labels get installed into the MPLS forwarding table (LFIB)? Let's do it:
+
+Examine the MPLS LFIB on R1 running Arista cEOS
+{: .code-caption}
+```
+r1#show mpls lfib route 10.0.0.2/32 | begin 900
+ IP    900002   [1], 10.0.0.2/32
+                via M, 10.1.0.1, swap 900002
+                 payload autoDecide, ttlMode uniform, apply egress-acl
+                 interface Ethernet1
+ IP    901000   [1], 10.0.0.2/32, algorithm LOW_LATENCY
+                via M, 10.1.0.13, swap 901000
+                 payload autoDecide, ttlMode uniform, apply egress-acl
+                 interface Ethernet2
+```
+
+SR-MPLS usually uses the same label across the entire LSP (there's no swapping of label values like in traditional LDP- or MPLS-TE-based networks). The label 900002 (mapped to SPF path toward 10.0.0.2/32) has C1 (10.1.0.1) as the next hop, while the label 901000 (mapped to LOW_LATENCY path toward 10.0.0.2/32) has C3 (10.1.0.13) as the next hop.
+
+Finally, let's see what the routing table entry for 10.0.0.2/32 looks like:
+
+IP routing table entry for R2's loopback on R1 running Arista cEOS
+{.code-caption}
+```
+r1#show ip route 10.0.0.2/32 detail | begin 10.0.0.2
+ I L2     10.0.0.2/32 [115/25] PM
+           via 10.1.0.1, Ethernet1 r1 -> c1
+```
+
+The routing table entry still points to the SPF path (over C1 and C2); that's why we had to use the MLPS traceroute to check the low-delay path.
+
+Is there a way to make the router use the flex-algo paths for regular traffic? That's the topic for the next flex-algo lab exercise.
 
 ## Cheating
 
