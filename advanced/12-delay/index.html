@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="Ivan Pepelnjak, ipSpace.net AG">
+        <link rel="canonical" href="https://isis.bgplabs.net/advanced/12-delay/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Configure IS-IS Flexible Algorithms &#171; IS-IS Labs</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">IS-IS Labs</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Home</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../.." class="dropdown-item">Labs Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../99-about/" class="dropdown-item">About the Project</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Installation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../1-setup/" class="dropdown-item">Installation and Setup</a>
+</li>
+                                    
+<li>
+    <a href="../../4-codespaces/" class="dropdown-item">Use GitHub Codespaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Basics</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../basic/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/0-frrouting/" class="dropdown-item">Configuring IS-IS on FRRouting</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/1-simple-ipv4/" class="dropdown-item">Configure IS-IS Routing for IPv4</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/2-explore/" class="dropdown-item">Explore IS-IS Data Structures</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/3-p2p/" class="dropdown-item">IS-IS on Point-to-Point Links</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/4-metric/" class="dropdown-item">Using IS-IS Metrics</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/5-ipv6/" class="dropdown-item">Dual-Stack (IPv4+IPv6) IS-IS Routing</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/6-level-2/" class="dropdown-item">Optimize Simple IS-IS Deployments</a>
+</li>
+                                    
+<li>
+    <a href="../../basic/7-unnumbered/" class="dropdown-item">Running IS-IS Over Unnumbered/LLA-only Interfaces</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Features</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../feature/1-passive/" class="dropdown-item">Passive IS-IS Interfaces</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/2-dis/" class="dropdown-item">Influence the Designated IS Election</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/3-md5/" class="dropdown-item">Protect IS-IS Routing Data with MD5 Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/4-hide-transit/" class="dropdown-item">Hide Transit Subnets in IS-IS Networks</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/5-drain/" class="dropdown-item">Drain Traffic Before Node Maintenance</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/6-timers/" class="dropdown-item">Adjust IS-IS Timers</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/7-redistribute/" class="dropdown-item">Route Redistribution into IS-IS</a>
+</li>
+                                    
+<li>
+    <a href="../../feature/8-bfd/" class="dropdown-item">Use BFD to Speed Up IS-IS Failure Detection</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Advanced</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../1-multilevel/" class="dropdown-item">Multilevel IS-IS Deployments</a>
+</li>
+                                    
+<li>
+    <a href="../2-route-leak/" class="dropdown-item">Distributing Level-2 IS-IS Routes into Level-1 Areas</a>
+</li>
+                                    
+<li>
+    <a href="../3-summarization/" class="dropdown-item">Summarizing Level-1 Routes into Level-2 Backbone</a>
+</li>
+                                    
+<li>
+    <a href="../4-suboptimal/" class="dropdown-item">Suboptimal IS-IS Intra-area Routing</a>
+</li>
+                                    
+<li>
+    <a href="../10-sr/" class="dropdown-item">Build an SR-MPLS Network with IS-IS</a>
+</li>
+                                    
+<li>
+    <a href="../11-ti-lfa/" class="dropdown-item">Configure IS-IS Fast Reroute Using TI-LFA</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Configure IS-IS Flexible Algorithms</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Upcoming</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../3-upcoming/" class="dropdown-item">Overview</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../11-ti-lfa/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../3-upcoming/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3">
+<div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+  <div class="navbar-header">
+      <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+          <span class="fa fa-angle-down"></span>
+      </button>
+  </div>
+
+  
+  
+  
+  
+  
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary"  style="margin-bottom: 1em;">
+      <ul class="nav flex-column">
+          
+      <li class="nav-item" data-level="1"><a href="#configure-is-is-flexible-algorithms" class="nav-link">Configure IS-IS Flexible Algorithms</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="2"><a href="#device-requirements" class="nav-link">Device Requirements</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#starting-the-lab" class="nav-link">Starting the Lab</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#existing-routing-protocol-configuration" class="nav-link">Existing Routing Protocol Configuration</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#the-problem" class="nav-link">The Problem</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#configuration-hints" class="nav-link">Configuration Hints</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#validation" class="nav-link">Validation</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#cheating" class="nav-link">Cheating</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#reference-information" class="nav-link">Reference Information</a>
+        <ul class="nav flex-column">
+      <li class="nav-item" data-level="3"><a href="#lab-wiring" class="nav-link">Lab Wiring</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#addr" class="nav-link">Lab Addressing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="3"><a href="#isis" class="nav-link">IS-IS Routing</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+        </ul>
+      </li>
+        </ul>
+      </li>
+      </ul>
+    </div>
+  
+  
+  
+  
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="configure-is-is-flexible-algorithms">Configure IS-IS Flexible Algorithms</h1>
+<p class="author-byline">By <a href="https://github.com/DanPartelly">Dan Partelly</a><br /></p>
+<p>Traditional routing protocols like IS-IS and OSPF make forwarding decisions based on a single metric, typically configured or derived from interface bandwidth. While this approach works well for many networks, it doesn&rsquo;t account for the diverse requirements of applications that need low-latency paths, require high bandwidth without latency considerations, or have specific compliance or security constraints.</p>
+<p>IS-IS Flexible Algorithm (Flex-Algo) addresses this limitation. It allows multiple routing topologies to coexist in the same network, each optimized for different metrics or constraints. Instead of running separate routing protocol instances, Flex-Algo enables a single IS-IS deployment to compute multiple shortest-path trees using different optimization criteria.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>ISIS is not the only IGP to support flexible algorithms. OSPF does support them as well. Flexible algorithms were initially introduced in <a href="https://datatracker.ietf.org/doc/html/rfc9350">RFC 9350: IGP Flexible Algorithm</a></p>
+</div>
+<p>In this exercise, you&rsquo;ll use the IS-IS Flexible Algorithm to implement delay-based routing. You&rsquo;ll configure routers to compute paths based on link delay instead of the default IGP metric, enabling latency-sensitive traffic to follow optimal low-delay paths while regular traffic continues to use bandwidth-optimized routes.</p>
+<p><img alt="Lab topology" src="../topology-delay.png" /></p>
+<div class="admonition expert">
+<p class="admonition-title">Expert</p>
+<p>This is an expert-level challenge lab. We&rsquo;ll give you guidelines, but you&rsquo;re mostly on your own.</p>
+</div>
+<h2 id="device-requirements">Device Requirements</h2>
+<p>Use any device supported by the <em>netlab</em> <a href="https://netlab.tools/module/isis/#platform-support">IS-IS</a> and <a href="https://netlab.tools/module/sr-mpls/#platform-support">Segment Routing</a> configuration modules for the routers in your lab. The device should support IS-IS flexible algorithms and delay metric.</p>
+<h2 id="starting-the-lab">Starting the Lab</h2>
+<p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
+<ul>
+<li>Change directory to <code>advanced/12-delay</code></li>
+<li>Execute <strong>netlab up</strong>.</li>
+<li>Log into lab routers with <strong>netlab connect</strong> and verify their configuration.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Use Arista EOS containers with GitHub Codespaces. You won&rsquo;t be able to load the kernel drivers needed by FRRouting or VyOS containers, and SR Linux containers need a license to run MPLS.</p>
+</div>
+<h2 id="existing-routing-protocol-configuration">Existing Routing Protocol Configuration</h2>
+<ul>
+<li>When starting the lab, <em>netlab</em> configures IPv4 addresses (<a href="#addr">details</a>), IS-IS, and SR-MPLS on the lab routers.</li>
+<li>All routers are IS-IS level-2 routers in area 49.0001 (<a href="#isis">details</a>)</li>
+<li>The R1-C1, C1-C2, and C2-R2 are high-bandwidth links with IS-IS metric 5 (<a href="#isis-cost">details</a>).</li>
+<li>The R1-C3 and C3-R2 are low-bandwidth, low-latency links with IS-IS metric 10 (<a href="#isis-cost">details</a>).</li>
+</ul>
+<h2 id="the-problem">The Problem</h2>
+<p>After the IS-IS adjacencies are established, router R1 will reach R2 over the path with the lowest cost (the high-bandwidth path R1-C1-C2-R2):</p>
+<p class="code-caption">Traceroute to R2 starting on R1, Arista cEOS<br /></p>
+<pre><code>r1#traceroute ip r2
+
+traceroute to r2 (10.0.0.2), 30 hops max, 60 byte packets
+
+1. c1 (10.1.0.1)0.043 ms0.009 ms0.008 ms
+2. c2 (10.1.0.6)1.011 ms1.020 ms1.150 ms
+3. r2 (10.0.0.2)1.537 ms1.832 ms2.119 ms
+
+</code></pre>
+<p>We want to enable a second path in our network. The path should enable R1 to reach R2 over the low-latency path (R1-C3-R2). You will use a flexible-algorithm-based solution to create that path.</p>
+<h2 id="configuration-hints">Configuration Hints</h2>
+<p>Configure a delay metric-based flexible algorithm in your network:</p>
+<ul>
+<li>At least one router must define the flexible algorithms<sup id="fnref:MTO"><a class="footnote-ref" href="#fn:MTO">1</a></sup>; the algorithm definition is propagated to all other routers via IS-IS TLVs/OSPF LSAs. Configure your algorithm on R1.</li>
+<li>Algorithm IDs 0 to 127 are reserved. Define algorithm 128, with a priority of 100<sup id="fnref:AP"><a class="footnote-ref" href="#fn:AP">2</a></sup> and the label of LOW_LATENCY.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>On Arista EOS, you&rsquo;ll find the <strong>flex-algo</strong> section in the <strong>router traffic-engineering</strong> configuration block.</p>
+</div>
+<ul>
+<li>The router that defines the algorithm should advertise it into the IGP. We are using a pure level-2 IS-IS network; advertise your algorithm only into the level-2 backbone.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>On Arista EOS, you&rsquo;ll have to configure that in the <strong>segment-routing mpls</strong> part of the <strong>router isis</strong> configuration.</p>
+</div>
+<ul>
+<li>Even if only one router defines the algorithm, all other routers that want to participate in that algorithm must declare it. We defined the algorithm on R1, so we have to declare it on R2 and C2.</li>
+<li>All other routers that want to participate in the constrained graph represented by this flex-algo must announce their intent.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>On Arista EOS, you use the same command you used to advertise the algorithm into the IGP, but without the <strong>advertised</strong> option.</p>
+</div>
+<p>Finally:</p>
+<ul>
+<li>Assign a delay based metric on all interfaces in the path R1-C3-R2. Use a value of 500 microseconds.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Use the <strong>traffic-engineering</strong> interface configuration command on Arista EOS</p>
+</div>
+<ul>
+<li>For verification purposes, assign a second node Segment ID (SID) specifically referencing algorithm 128 on R2&rsquo;s loopback. Use a unique label; the SID labels advertised in SR-MPLS TLVs are global and must be <em>recognized by every node in the network</em>.</li>
+</ul>
+<h2 id="validation">Validation</h2>
+<p>You can use a Flex-Algo-Aware MPLS traceroute to check the path from R1 to R2 using the LOW_LATENCY algorithm. If your configuration is correct, R1 must reach R2 through C3.</p>
+<p class="code-caption">Flex-Algo-Aware MPLS traceroute from R1 to R2.<br /></p>
+<pre><code>r1#traceroute mpls segment-routing ip 10.0.0.2/32 algorithm LOW_LATENCY
+! Warning: NTP synchronization is required for 1-Way time measurement accuracy.
+LSP traceroute IS-IS segment-routing to 10.0.0.2/32 , algorithm LOW_LATENCY
+  via 10.1.0.13, label stack: [901000]
+  1  10.1.0.13         MTU 1500  RTT:0.853ms   1-Way:0.563ms     success: label switched
+     downstream information (DSMAP) 1:
+        interface address: 10.1.0.18
+        IP address: 10.1.0.18
+        label stack: [implicit-null]
+  2  10.1.0.18         RTT:1.333ms   1-Way:0.838ms     success: egress ok
+</code></pre>
+<p>However, the scenic journey is usually more fun: let&rsquo;s explore IS-IS data structures and gradually discover how they&rsquo;re used to create the label-switched path from R1 to R2 via C3.</p>
+<p>As soon as you configure an advertised Flex-Algo on R1, you can check its presence in the sub-TLVs of R1&rsquo;s LSP. Notice that R1 advertises that it uses two algorithms: zero (the IGP default) and 128 (the LOW_LATENCY algorithm).</p>
+<p class="code-caption">Contents of R1.00-00 LSP on PE1 running Arista EOS<br /></p>
+<pre><code>r1#show isis database r1.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r1.00-00                      5  52940   978    216 L2  0000.0000.0001.00-00  &lt;&gt;
+      LSP generation remaining wait time: 0 ms
+      Time remaining until refresh: 678 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r1
+      Area addresses: 49.0001
+      Interface address: 10.1.0.2
+      Interface address: 10.1.0.14
+      Interface address: 10.0.0.1
+      IS Neighbor          : c3.00               Metric: 10
+        IPv4 Neighbor Address: 10.1.0.13
+        IPv4 Interface Address: 10.1.0.14
+        Adj-sid: 100000 flags: [L V] weight: 0x0
+      IS Neighbor          : c1.00               Metric: 5
+        IPv4 Neighbor Address: 10.1.0.1
+        IPv4 Interface Address: 10.1.0.2
+        Adj-sid: 100001 flags: [L V] weight: 0x0
+      Reachability         : 10.1.0.0/30 Metric: 5 Type: 1 Up
+      Reachability         : 10.1.0.12/30 Metric: 10 Type: 1 Up
+      Reachability         : 10.0.0.1/32 Metric: 10 Type: 1 Up
+        SR Prefix-SID: 1 Flags: [N] Algorithm: 0
+      Router Capabilities: Router Id: 10.0.0.1 Flags: []
+        SR Local Block:
+          SRLB Base: 965536 Range: 65536
+        Area leader priority: 250 algorithm: 0
+        Maximum SID depth:
+          Base MPLS imposition (MSD type 1):  6
+        SR Capability: Flags: [I]
+          SRGB Base: 900000 Range: 65536
+        Algorithms:  0, 128
+        Flex Algo: Algorithm: 128 Metric: Min Unidirectional Delay Metric (1) Calc: SPF (0) Prio: 100
+</code></pre>
+<p>What about R2 and C3? They advertise they&rsquo;re using algorithms zero and 128, but not the definition of algorithm 128:</p>
+<p class="code-caption">Contents of R2.00-00 LSP on PE1 running Arista EOS<br /></p>
+<pre><code>r1#show isis database r2.00-00 detail
+Legend:
+H - hostname conflict
+U - node unreachable
+
+IS-IS Instance: Gandalf VRF: default
+  IS-IS Level 2 Link State Database
+    LSPID                   Seq Num  Cksum  Life Length IS  Received LSPID        Flags
+    r2.00-00                      5  61368   880    218 L2  0000.0000.0002.00-00  &lt;&gt;
+      LSP received time: 2026-02-23 17:54:31
+      Remaining lifetime received: 1199 s Modified to: 1200 s
+      NLPID: 0xCC(IPv4)
+      Hostname: r2
+      Area addresses: 49.0001
+      Interface address: 10.1.0.10
+      Interface address: 10.1.0.18
+      Interface address: 10.0.0.2
+      IS Neighbor          : c3.00               Metric: 10
+        IPv4 Neighbor Address: 10.1.0.17
+        IPv4 Interface Address: 10.1.0.18
+        Adj-sid: 100000 flags: [L V] weight: 0x0
+      IS Neighbor          : c2.00               Metric: 5
+        IPv4 Neighbor Address: 10.1.0.9
+        IPv4 Interface Address: 10.1.0.10
+        Adj-sid: 100001 flags: [L V] weight: 0x0
+      Reachability         : 10.0.0.2/32 Metric: 10 Type: 1 Up
+        SR Prefix-SID: 2 Flags: [N] Algorithm: 0
+        SR Prefix-SID: 1000 Flags: [N] Algorithm: 128
+      Reachability         : 10.1.0.8/30 Metric: 5 Type: 1 Up
+      Reachability         : 10.1.0.16/30 Metric: 10 Type: 1 Up
+      Router Capabilities: Router Id: 10.0.0.2 Flags: []
+        SR Local Block:
+          SRLB Base: 965536 Range: 65536
+        Area leader priority: 250 algorithm: 0
+        Maximum SID depth:
+          Base MPLS imposition (MSD type 1):  6
+        SR Capability: Flags: [I]
+          SRGB Base: 900000 Range: 65536
+        Algorithms:  0, 128
+</code></pre>
+<p>You can also use the <strong>show isis flex-algo</strong> command instead of digging through the arcane sub-TLVs in IS-IS LSPs:</p>
+<p class="code-caption">IS-IS flex algorithms known to R1 running Arista cEOS<br /></p>
+<pre><code>r1#show isis flex-algo
+
+IS-IS Instance: Gandalf VRF: default
+
+Algorithm   Advertised Level Metric    Selected
+----------- ---------- ----- --------- --------
+LOW_LATENCY yes        L2    min-delay r1
+</code></pre>
+<p>How about checking which routers participate in an algorithm? Arista cEOS has a command for that:</p>
+<p class="code-caption">Routers participating in IS-IS flex algorithms, as displayed by R1 running Arista cEOS<br /></p>
+<pre><code>r1#show isis flex-algo routers
+
+IS-IS Instance: Gandalf VRF: default
+
+Algorithm: LOW_LATENCY
+
+Router Level Advertising Priority
+------ ----- ----------- --------
+c3     L2    no
+r1     L2    yes              100
+r2     L2    no
+</code></pre>
+<p>Finally, let&rsquo;s see how the routers use SR-MPLS segment identifiers to build MPLS paths, starting with the prefix segments advertised by IS-IS:</p>
+<p class="code-caption">IS-IS advertised SR-MPLS prefix segments as displayed on R1 running Arista cEOS<br /></p>
+<pre><code>r1#show isis segment-routing prefix-segments
+
+System ID: r1                   Instance: 'Gandalf'
+SR supported Data-plane: MPLS                   SR Router ID: 10.0.0.1
+
+Node: 6      Proxy-Node: 0      Prefix: 0       Total Segments: 6
+
+Flag Descriptions: R: Re-advertised, N: Node Segment, P: no-PHP
+                   E: Explicit-NULL, V: Value, L: Local, A: Proxy-Node attached
+Segment status codes: * - Self originated Prefix, L1 - level 1, L2 - level 2, ! - SR-unreachable,
+                      # - Some IS-IS next-hops are SR-unreachable
+   Prefix                      SID   Label Type       Flags                        System ID       Level Protection  Algorithm
+   ------------------------- ----- ------- ---------- ---------------------------- --------------- ----- ----------- -------------
+*  10.0.0.1/32                   1  900001 Node       R:0 N:1 P:0 E:0 V:0 L:0      r1              L2    unprotected SPF
+   10.0.0.2/32                   2  900002 Node       R:0 N:1 P:0 E:0 V:0 L:0      r2              L2    unprotected SPF
+   10.0.0.2/32                1000  901000 Node       R:0 N:1 P:0 E:0 V:0 L:0      r2              L2    unprotected LOW_LATENCY
+   10.0.0.3/32                   3  900003 Node       R:0 N:1 P:0 E:0 V:0 L:0      c1              L2    unprotected SPF
+   10.0.0.4/32                   4  900004 Node       R:0 N:1 P:0 E:0 V:0 L:0      c2              L2    unprotected SPF
+   10.0.0.5/32                   5  900005 Node       R:0 N:1 P:0 E:0 V:0 L:0      c3              L2    unprotected SPF
+</code></pre>
+<p>Did you notice R2 advertises two SIDs for the 10.0.0.2/32 prefix, one per algorithm? Want to see how those labels get installed into the MPLS forwarding table (LFIB)? Let&rsquo;s do it:</p>
+<p class="code-caption">Examine the MPLS LFIB on R1 running Arista cEOS<br /></p>
+<pre><code>r1#show mpls lfib route 10.0.0.2/32 | begin 900
+ IP    900002   [1], 10.0.0.2/32
+                via M, 10.1.0.1, swap 900002
+                 payload autoDecide, ttlMode uniform, apply egress-acl
+                 interface Ethernet1
+ IP    901000   [1], 10.0.0.2/32, algorithm LOW_LATENCY
+                via M, 10.1.0.13, swap 901000
+                 payload autoDecide, ttlMode uniform, apply egress-acl
+                 interface Ethernet2
+</code></pre>
+<p>SR-MPLS usually uses the same label across the entire LSP (there&rsquo;s no swapping of label values like in traditional LDP- or MPLS-TE-based networks). The label 900002 (mapped to SPF path toward 10.0.0.2/32) has C1 (10.1.0.1) as the next hop, while the label 901000 (mapped to LOW_LATENCY path toward 10.0.0.2/32) has C3 (10.1.0.13) as the next hop.</p>
+<p>Finally, let&rsquo;s see what the routing table entry for 10.0.0.2/32 looks like:</p>
+<p class="code-caption">IP routing table entry for R2&rsquo;s loopback on R1 running Arista cEOS<br /></p>
+<pre><code>r1#show ip route 10.0.0.2/32 detail | begin 10.0.0.2
+ I L2     10.0.0.2/32 [115/25] PM
+           via 10.1.0.1, Ethernet1 r1 -&gt; c1
+</code></pre>
+<p>The routing table entry still points to the SPF path (over C1 and C2); that&rsquo;s why we had to use the MLPS traceroute to check the low-delay path.</p>
+<p>Is there a way to make the router use the flex-algo paths for regular traffic? That&rsquo;s the topic for the next flex-algo lab exercise.</p>
+<h2 id="cheating">Cheating</h2>
+<p>If you&rsquo;re using Arista EOS, execute the <strong>netlab config -l r1,r2,c3 flex-algo</strong>.</p>
+<p><strong>Note:</strong> The exercise includes the supplementary configuration files for Arista EOS. These configuration snippets will not work with any other device.</p>
+<h2 id="reference-information">Reference Information</h2>
+<h3 id="lab-wiring">Lab Wiring</h3>
+<table>
+<thead>
+<tr>
+<th>Origin Device</th>
+<th>Origin Port</th>
+<th>Destination Device</th>
+<th>Destination Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td>Ethernet1</td>
+<td>c1</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>c1</td>
+<td>Ethernet2</td>
+<td>c2</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>c2</td>
+<td>Ethernet2</td>
+<td>r2</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>Ethernet2</td>
+<td>c3</td>
+<td>Ethernet1</td>
+</tr>
+<tr>
+<td>c3</td>
+<td>Ethernet2</td>
+<td>r2</td>
+<td>Ethernet2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> The interface names depend on the devices you use in the lab. The printout was generated with lab devices running Arista EOS.</p>
+<h3 id="addr">Lab Addressing</h3>
+<table>
+<thead>
+<tr>
+<th>Node/Interface</th>
+<th style="text-align: right;">IPv4 Address</th>
+<th style="text-align: right;">IPv6 Address</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>r1</strong></td>
+<td style="text-align: right;">10.0.0.1/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.2/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; c1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.14/30</td>
+<td style="text-align: right;"></td>
+<td>r1 -&gt; c3</td>
+</tr>
+<tr>
+<td><strong>r2</strong></td>
+<td style="text-align: right;">10.0.0.2/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.10/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; c2</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.18/30</td>
+<td style="text-align: right;"></td>
+<td>r2 -&gt; c3</td>
+</tr>
+<tr>
+<td><strong>c1</strong></td>
+<td style="text-align: right;">10.0.0.3/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.1/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.5/30</td>
+<td style="text-align: right;"></td>
+<td>c1 -&gt; c2</td>
+</tr>
+<tr>
+<td><strong>c2</strong></td>
+<td style="text-align: right;">10.0.0.4/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.6/30</td>
+<td style="text-align: right;"></td>
+<td>c2 -&gt; c1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.9/30</td>
+<td style="text-align: right;"></td>
+<td>c2 -&gt; r2</td>
+</tr>
+<tr>
+<td><strong>c3</strong></td>
+<td style="text-align: right;">10.0.0.5/32</td>
+<td style="text-align: right;"></td>
+<td>Loopback</td>
+</tr>
+<tr>
+<td>Ethernet1</td>
+<td style="text-align: right;">10.1.0.13/30</td>
+<td style="text-align: right;"></td>
+<td>c3 -&gt; r1</td>
+</tr>
+<tr>
+<td>Ethernet2</td>
+<td style="text-align: right;">10.1.0.17/30</td>
+<td style="text-align: right;"></td>
+<td>c3 -&gt; r2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="isis">IS-IS Routing</h3>
+<p>IS-IS routers and areas:</p>
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th style="text-align: right;">Router ID</th>
+<th style="text-align: right;">IS-IS Area</th>
+<th style="text-align: right;">System ID</th>
+<th>IS type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r1</td>
+<td style="text-align: right;">10.0.0.1</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0001</td>
+<td>level-2</td>
+</tr>
+<tr>
+<td>r2</td>
+<td style="text-align: right;">10.0.0.2</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0002</td>
+<td>level-2</td>
+</tr>
+<tr>
+<td>c1</td>
+<td style="text-align: right;">10.0.0.3</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0003</td>
+<td>level-2</td>
+</tr>
+<tr>
+<td>c2</td>
+<td style="text-align: right;">10.0.0.4</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0004</td>
+<td>level-2</td>
+</tr>
+<tr>
+<td>c3</td>
+<td style="text-align: right;">10.0.0.5</td>
+<td style="text-align: right;">49.0001</td>
+<td style="text-align: right;">0000.0000.0005</td>
+<td>level-2</td>
+</tr>
+</tbody>
+</table>
+<p id="isis-cost">IS-IS links and metrics:<br /></p>
+<table>
+<thead>
+<tr>
+<th>Node</th>
+<th>Interface</th>
+<th>Circuit<br>Type</th>
+<th style="text-align: right;">Metric</th>
+<th>Network<br>type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>c1</strong></td>
+<td>eth1</td>
+<td></td>
+<td style="text-align: right;">5</td>
+<td>point-to-point</td>
+<td>c1 -&gt; r1</td>
+</tr>
+<tr>
+<td></td>
+<td>eth2</td>
+<td></td>
+<td style="text-align: right;">5</td>
+<td>point-to-point</td>
+<td>c1 -&gt; c2</td>
+</tr>
+<tr>
+<td><strong>c2</strong></td>
+<td>eth1</td>
+<td></td>
+<td style="text-align: right;">5</td>
+<td>point-to-point</td>
+<td>c2 -&gt; c1</td>
+</tr>
+<tr>
+<td></td>
+<td>eth2</td>
+<td></td>
+<td style="text-align: right;">5</td>
+<td>point-to-point</td>
+<td>c2 -&gt; r2</td>
+</tr>
+<tr>
+<td><strong>c3</strong></td>
+<td>eth1</td>
+<td></td>
+<td style="text-align: right;">10</td>
+<td>point-to-point</td>
+<td>c3 -&gt; r1</td>
+</tr>
+<tr>
+<td></td>
+<td>eth2</td>
+<td></td>
+<td style="text-align: right;">10</td>
+<td>point-to-point</td>
+<td>c3 -&gt; r2</td>
+</tr>
+<tr>
+<td><strong>r1</strong></td>
+<td>eth1</td>
+<td></td>
+<td style="text-align: right;">5</td>
+<td>point-to-point</td>
+<td>r1 -&gt; c1</td>
+</tr>
+<tr>
+<td></td>
+<td>eth2</td>
+<td></td>
+<td style="text-align: right;">10</td>
+<td>point-to-point</td>
+<td>r1 -&gt; c3</td>
+</tr>
+<tr>
+<td><strong>r2</strong></td>
+<td>eth1</td>
+<td></td>
+<td style="text-align: right;">5</td>
+<td>point-to-point</td>
+<td>r2 -&gt; c2</td>
+</tr>
+<tr>
+<td></td>
+<td>eth2</td>
+<td></td>
+<td style="text-align: right;">10</td>
+<td>point-to-point</td>
+<td>r2 -&gt; c3</td>
+</tr>
+</tbody>
+</table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:MTO">
+<p>Usually, you should define the same algorithm on multiple routers for redundancy.&#160;<a class="footnote-backref" href="#fnref:MTO" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:AP">
+<p>If multiple routers define the same algorithm, the lower-priority definition wins. You can use the algorithm <em>priority</em> to implement changes.&#160;<a class="footnote-backref" href="#fnref:AP" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+<hr>
+    <p>(C) 2023–2025 Ivan Pepelnjak (ipSpace.net AG) and contributors</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
