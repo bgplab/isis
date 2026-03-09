@@ -1,0 +1,36 @@
+# Trafic Sterring to Flexible Algorithm Paths
+---
+defaults.sources.extra: [ ../../defaults.yml ]
+version: 2.0.0
+
+isis.area: '49.0001'
+isis.type: level-2
+bgp.as: 65000
+
+groups:
+  _auto_create: True
+  routers:
+    module: [ isis, sr ]
+    members: [ r1, r2, c1, c2, c3 ]
+  pe:
+    module: [ bgp]
+    members: [r1, r2]
+  hosts:
+    members: [h1, h2]
+    device: linux
+
+links:
+- group: high_speed
+  isis.cost: 5
+  members: [ r1-c1, c1-c2, c2-r2 ]
+- group: low_latency
+  isis.cost: 10
+  members: [ r1-c3, c3-r2 ]
+- group: edge
+  isis: false
+  bgp.advertise: true
+  members: [ h1-r1, r2-h2 ]
+
+message: |
+  The "Traffic Steering to Flexible Algorithm Paths" lab is ready. Connect to the
+  lab devices with "netlab connect".

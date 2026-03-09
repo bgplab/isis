@@ -293,7 +293,8 @@ r1#show ip route 10.0.0.2/32 detail | begin 10.0.0.2
 
 The routing table entry still points to the SPF path (over C1 and C2); that's why we had to use the MLPS traceroute to check the low-delay path.
 
-Is there a way to make the router use the flex-algo paths for regular traffic? That's the topic for the next flex-algo lab exercise.
+Is there a way to make the router use the flex-algo paths for regular traffic? 
+That's the topic for the next flex-algo lab exercise: [Traffic Steering to Flexible Algorithm Paths](13-steer.md).
 
 ## Cheating
 

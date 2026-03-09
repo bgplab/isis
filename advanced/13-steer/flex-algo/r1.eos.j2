@@ -1,0 +1,18 @@
+!
+interface Ethernet2
+   traffic-engineering min-delay static 500 microseconds
+!
+interface Loopback0
+    node-segment ipv4 index 1000 flex-algo LOW_LATENCY
+!
+router traffic-engineering
+   flex-algo
+      flex-algo 128 LOW_LATENCY
+         !! low latency r1->r2
+         priority 100
+         metric min-delay
+!
+router isis Gandalf
+   segment-routing mpls
+      flex-algo LOW_LATENCY level-2 advertised
+!
