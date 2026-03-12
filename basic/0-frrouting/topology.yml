@@ -3,9 +3,11 @@
 defaults.sources.extra: [ ../../defaults.yml ]
 name: frrouting
 defaults.device: frr
+version: 25.12.03
 
 nodes:
   r1:
+    frr.daemons: [ isisd ]
   r2:
     module: [ isis ]
 
