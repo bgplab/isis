@@ -75,14 +75,16 @@ You cannot use the same command in FRRouting containers as they don't use `syste
 
 ## Start the IS-IS Routing Daemon
 
-The list of FRRouting daemons you want to enable is stored in the `/etc/frr/daemons` file. To enable the FRRouting IS-IS daemon in FRRouting virtual machines, you have to:
+The list of FRRouting daemons you want to enable is stored in the `/etc/frr/daemons` file. If you have to enable the FRRouting IS-IS daemon in FRRouting virtual machines:
 
 * Add the `isisd=yes` line to the `/etc/frr/daemons` file[^FRMD].
 * Restart FRRouting with the `sudo systemctl restart frr.service` command (see also: [using sudo](#sudo))
 
-[^FRMD]: See [Configuring FRRouting](https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-41/Layer-3/Configuring-FRRouting/) Cumulus Linux documentation for more details.
+!!! tip
+    * _netlab_ enables the IS-IS daemon in FRRouting virtual machines when the lab starts; you might need to do it manually if you're using a different lab provisioning process.
+    * You cannot change the FRR daemons in FRR containers; restarting FRR would kill the container. _netlab_ takes care of that and enables all the daemons necessary to complete the lab exercises.
 
-You cannot change the FRR daemons in FRR containers; restarting FRR would kill the container. _netlab_ takes care of that and enables all the daemons necessary to complete the lab exercises.
+[^FRMD]: See [Configuring FRRouting](https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-41/Layer-3/Configuring-FRRouting/) Cumulus Linux documentation for more details.
 
 !!! warning
     * Restarting FRR daemons wipes out the current (running) configuration. If you want to retain it, save it to the startup configuration with the _vtysh_ **write** command.
