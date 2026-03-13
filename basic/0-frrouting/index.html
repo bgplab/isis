@@ -228,7 +228,15 @@
         <ul class="nav flex-column">
         </ul>
       </li>
-      <li class="nav-item" data-level="2"><a href="#daemon" class="nav-link">Start the IS-IS Daemon</a>
+      <li class="nav-item" data-level="2"><a href="#daemon" class="nav-link">Check the IS-IS Daemon in FRRouting Virtual Machines</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#check-the-is-is-daemon-in-frrouting-containers" class="nav-link">Check the IS-IS Daemon in FRRouting Containers</a>
+        <ul class="nav flex-column">
+        </ul>
+      </li>
+      <li class="nav-item" data-level="2"><a href="#start-the-is-is-routing-daemon" class="nav-link">Start the IS-IS Routing Daemon</a>
         <ul class="nav flex-column">
         </ul>
       </li>
@@ -263,7 +271,7 @@
 <li><a href="#daemon">Edit FRRouting configuration files</a> to start routing protocol daemons</li>
 <li><a href="#vtysh">Start FRRouting configuration shell</a> from the Linux CLI.</li>
 </ul>
-<p>The Linux interfaces and IP addresses will be configured automatically if you start the IS-IS labs with the <strong>netlab up</strong> command. You will have to start the routing protocol daemons in the initial lab exercises if you plan to use FRRouting within virtual machines as the user routers, and you might have to execute <strong>show</strong> commands on Cumulus Linux or FRRouting acting as the external routers. You&rsquo;ll practice both in this lab exercise.</p>
+<p>The Linux interfaces and IP addresses will be configured automatically if you start the IS-IS labs with the <strong>netlab up</strong> command. You will have to start the routing protocol daemons in the initial lab exercises if you plan to use FRRouting within virtual machines as the user routers, and you might have to execute <strong>show</strong> commands on FRRouting devices acting as the external routers. You&rsquo;ll practice both in this lab exercise.</p>
 <p><img alt="Lab topology" src="../topology-frrouting.png" /></p>
 <h2 id="start-the-lab">Start the Lab</h2>
 <p>You can start the lab <a href="../../1-setup/">on your own lab infrastructure</a> or in <a href="https://github.com/codespaces/new/bgplab/isis">GitHub Codespaces</a> (<a href="https://bgplabs.net/4-codespaces/">more details</a>):</p>
@@ -272,7 +280,7 @@
 <li>Execute <strong>netlab up</strong> to start a lab with two FRRouting virtual machines or containers (depending on your lab setup). R2 is preconfigured to run IS-IS; if you&rsquo;re using virtual machines, you might have to enable the IS-IS daemon on R1.</li>
 <li>Log into the devices (<code>r1</code> and <code>r2</code>) with the <strong>netlab connect</strong> command.</li>
 </ul>
-<h2 id="daemon">Start the IS-IS Daemon</h2>
+<h2 id="daemon">Check the IS-IS Daemon in FRRouting Virtual Machines</h2>
 <p>Most network devices start routing daemons when you configure them through the configuration CLI or API. FRRouting is different. To start a routing daemon, you must enable the desired routing daemons in a configuration file and restart the top-level FRRouting process.</p>
 <p>You can check the FRR daemon processes running on your virtual machines with the <code>sudo systemctl status frr.service</code> command. It displays the running FRR daemons and the recent FRR logging messages, for example<sup id="fnref:DEV"><a class="footnote-ref" href="#fn:DEV">2</a></sup>:</p>
 <pre><code class="language-bash">r2(bash)#sudo systemctl status frr.service
@@ -299,6 +307,7 @@ Jul 17 17:09:27 r2 watchfrr[4071]: [KWE5Q-QNGFC] all daemons up, doing startup-c
 Jul 17 17:09:27 r2 frrinit.sh[4051]:  * Started watchfrr
 Jul 17 17:09:27 r2 systemd[1]: Started FRRouting.
 </code></pre>
+<h2 id="check-the-is-is-daemon-in-frrouting-containers">Check the IS-IS Daemon in FRRouting Containers</h2>
 <p>You cannot use the same command in FRRouting containers as they don&rsquo;t use <code>systemd</code>. The easiest way to find daemons in FRRouting containers is to use the <code>ps -ef|grep frr</code> command<sup id="fnref:UE"><a class="footnote-ref" href="#fn:UE">3</a></sup>. This is the printout you could get when the IS-IS daemon is already running:</p>
 <pre><code class="language-bash">    1 root      0:00 /sbin/tini -- /usr/lib/frr/docker-start
     7 root      0:00 {docker-start} /bin/bash /usr/lib/frr/docker-start
@@ -309,15 +318,22 @@ Jul 17 17:09:27 r2 systemd[1]: Started FRRouting.
    35 frr       0:00 /usr/lib/frr/staticd -d -F datacenter -A 127.0.0.1
   366 root      0:00 grep frr
 </code></pre>
-<p>The list of FRRouting daemons you want to enable is stored in the <code>/etc/frr/daemons</code> file. To enable the FRRouting IS-IS daemon, you have to:</p>
+<h2 id="start-the-is-is-routing-daemon">Start the IS-IS Routing Daemon</h2>
+<p>The list of FRRouting daemons you want to enable is stored in the <code>/etc/frr/daemons</code> file. If you have to enable the FRRouting IS-IS daemon in FRRouting virtual machines:</p>
 <ul>
 <li>Add the <code>isisd=yes</code> line to the <code>/etc/frr/daemons</code> file<sup id="fnref:FRMD"><a class="footnote-ref" href="#fn:FRMD">4</a></sup>.</li>
 <li>Restart FRRouting with the <code>sudo systemctl restart frr.service</code> command (see also: <a href="#sudo">using sudo</a>)</li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<ul>
+<li><em>netlab</em> enables the IS-IS daemon in FRRouting virtual machines when the lab starts; you might need to do it manually if you&rsquo;re using a different lab provisioning process.</li>
+<li>You cannot change the FRR daemons in FRR containers; restarting FRR would kill the container. <em>netlab</em> takes care of that and enables all the daemons necessary to complete the lab exercises.</li>
+</ul>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <ul>
-<li>You cannot change the FRR daemons in FRR containers. Restarting FRR would kill the container. <em>netlab</em> takes care of that and enables all the daemons necessary to complete the lab exercises.</li>
 <li>Restarting FRR daemons wipes out the current (running) configuration. If you want to retain it, save it to the startup configuration with the <em>vtysh</em> <strong>write</strong> command.</li>
 <li>The <strong>write</strong> command saves the running configuration (that you can inspect with <strong>show running-config</strong>) into the <code>/etc/frr/frr.conf</code> file. However, the <strong>show startup-config</strong><sup id="fnref:CLSC"><a class="footnote-ref" href="#fn:CLSC">5</a></sup> does not display the content of that file. Exit <em>vtysh</em> and use the <strong>more /etc/frr/frr.conf</strong> command<sup id="fnref:MNS"><a class="footnote-ref" href="#fn:MNS">6</a></sup> to inspect it.</li>
 </ul>
@@ -328,12 +344,12 @@ Jul 17 17:09:27 r2 systemd[1]: Started FRRouting.
 <li>Use the <strong>echo</strong> command with output redirection to add a line to the <code>/etc/frr/daemons</code> file.</li>
 </ul>
 <pre><code class="language-bash">rtr(bash)#sudo bash
-root@rtr:/# echo 'isis=yes' &gt;&gt;/etc/frr/daemons
+root@rtr:/# echo 'isisd=yes' &gt;&gt;/etc/frr/daemons
 root@rtr:/# exit
 </code></pre>
 <p>After enabling the IS-IS daemon and restarting FRR, you should see the <code>isisd</code> process in the <code>ps -ef</code> printout or the IS-IS daemon mentioned in the <code>sudo systemctl status frr.service</code> printout.</p>
 <h2 id="vtysh">Work with the FRRouting CLI</h2>
-<p>FRRouting suite includes a virtual shell (<em>vtysh</em>) closely resembling industry-standard CLI<sup id="fnref:ISC"><a class="footnote-ref" href="#fn:ISC">8</a></sup>. It has to be started from the Linux command line with the vtysh command. The <code>vtysh</code> CLI has to run as the root user unless you change the FRR-related permissions to allow a regular user to use it. The usual command to start the <em>vtysh</em> is thus <code>sudo vtysh</code> (but see also <a href="#sudo">To Sudo Or Not to Sudo</a>).</p>
+<p>FRRouting suite includes a virtual shell (<em>vtysh</em>) closely resembling industry-standard CLI<sup id="fnref:ISC"><a class="footnote-ref" href="#fn:ISC">8</a></sup>. It has to be started from the Linux command line with the vtysh command. The <code>vtysh</code> CLI has to run as the root user unless you change the FRR-related permissions to allow a regular user to use it. The usual command to start the <em>vtysh</em> is thus <code>sudo vtysh</code> on FRRouting virtual machines and <code>vtysh</code> (because you&rsquo;re already logged in as root) on FRRouting containers (see also: <a href="#sudo">To Sudo Or Not to Sudo</a>).</p>
 <pre><code class="language-bash">r2(bash)#sudo vtysh
 
 Hello, this is FRRouting (version 9.1_git).
@@ -358,7 +374,7 @@ Codes: K - kernel route, C - connected, S - static, R - RIP,
 C&gt;* 10.0.0.2/32 is directly connected, lo, 00:02:26
 C&gt;* 10.1.0.0/30 is directly connected, eth1, 00:02:26
 </code></pre>
-<p>You can also use the <code>--show</code> option of the <strong>netlab connect</strong> command to execute a single command on a FRR/Cumulus Linux device[^UQ]. For example, to inspect the IS-IS topology database, use <code>netlab connect --show isis database</code>:</p>
+<p>You can also use the <code>--show</code> option of the <strong>netlab connect</strong> command to execute a single command on an FRR device. For example, to inspect the IS-IS topology database, use <code>netlab connect --show isis database</code>:</p>
 <pre><code>$ netlab connect r2 --show isis database
 Connecting to container clab-frrouting-r2, executing vtysh -c &quot;show isis database&quot;
 Area Gandalf:
@@ -380,9 +396,8 @@ r2(config-router)#
 <h2 id="sudo">To Sudo Or Not to Sudo</h2>
 <p>The <em>vtysh</em> usually has to run as the <strong>root</strong> user, so you should start it with the <code>sudo vtysh</code> command. Unfortunately, things are never as simple as they look in the Linux world:</p>
 <ul>
-<li>When using SSH, you log into Cumulus Linux or FRRouting virtual machines as a regular user (user <em>vagrant</em> in <em>netlab</em>-created labs) and have to use the <code>sudo</code> command to start <em>vtysh</em>.</li>
-<li>Cumulus Linux and FRR containers run as the <strong>root</strong> user, and you connect to them as the <strong>root</strong> user with the <code>docker exec</code> or <code>netlab connect</code> commands<sup id="fnref:WIDUW"><a class="footnote-ref" href="#fn:WIDUW">9</a></sup>. When working with containers, you can start <em>vtysh</em> without using the <code>sudo</code> command.</li>
-<li>You can execute <code>sudo vtysh</code> as a root user on Cumulus Linux containers but not within an FRR container. The FRR container does not include the <code>sudo</code> command.</li>
+<li>When using SSH, you log into an FRRouting virtual machine as a regular user (user <em>vagrant</em> in <em>netlab</em>-created labs) and have to use the <code>sudo</code> command to start <em>vtysh</em>.</li>
+<li>FRR containers run as the <strong>root</strong> user, and you connect to them as the <strong>root</strong> user with the <code>docker exec</code> or <code>netlab connect</code> commands<sup id="fnref:WIDUW"><a class="footnote-ref" href="#fn:WIDUW">9</a></sup>. When working with containers, you can start <em>vtysh</em> without using the <code>sudo</code> command.</li>
 </ul>
 <p><strong>Long story short:</strong></p>
 <ul>
