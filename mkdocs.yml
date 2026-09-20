@@ -15,8 +15,12 @@ extra:
     'GitHub Codespaces': '4-codespaces'
     'Upcoming Labs': '3-upcoming'
     'About': '99-about'
+  other:
+    'BGP': 'https://bgplabs.net/'
+    'EVPN/VXLAN': 'https://evpn.bgplabs.net/'
+    'SR-MPLS': 'https://github.com/ipspace/sr-workshop'
 
-copyright: (C) 2023–2025 Ivan Pepelnjak (ipSpace.net AG) and contributors
+copyright: (C) 2023–2026 Ivan Pepelnjak (ipSpace.net AG) and contributors
 plugins:
 - search
 - include_dir_to_nav
