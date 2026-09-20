@@ -52,5 +52,6 @@ Ready for a challenge? Try to solve these lab exercises:
 * [Build an SR-MPLS Network with IS-IS](advanced/10-sr.md)
 * [Configure IS-IS Fast Reroute Using TI-LFA](advanced/11-ti-lfa.md)<!--new-->
 * [Configure IS-IS Flexible Algorithms](advanced/12-delay.md)<!--new-->
+* [Traffic Steering to Flexible Algorithm Paths](advanced/13-steer.md)<!--new-->
 
-Want to know what other advanced labs we have planned? Check the [Upcoming Lab Exercises](3-upcoming.md) document.
+Want to know what other advanced labs we have planned? Check the [:Upcoming Lab Exercises](3-upcoming.md) document.

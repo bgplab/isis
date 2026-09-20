@@ -1,0 +1,38 @@
+!
+interface Ethernet2
+   traffic-engineering min-delay static 500 microseconds
+!
+interface Loopback0
+    node-segment ipv4 index 1000 flex-algo LOW_LATENCY
+!
+ip prefix-list customer-1 seq 10 permit 172.16.1.0/24
+!
+route-map set-color-100 permit 10
+   match ip address prefix-list customer-1
+   set extcommunity color 100
+!
+route-map set-color-100 permit 20
+!
+router bgp 65000
+   address-family ipv4
+      neighbor 10.0.0.2 route-map set-color-100 in
+!
+router traffic-engineering
+   segment-routing
+      policy endpoint dynamic color 100
+         path-group preference 100 computation local
+            path segment-routing flex-algo LOW_LATENCY
+      rib system-colored-tunnel-rib
+      binding-sid specified-only disabled
+   router-id ipv4 10.0.0.1
+   !
+   flex-algo
+      flex-algo 128 LOW_LATENCY
+         !! low latency r1->r2
+         priority 100
+         metric min-delay
+!
+router isis Gandalf
+   segment-routing mpls
+      flex-algo LOW_LATENCY level-2 advertised
+!
