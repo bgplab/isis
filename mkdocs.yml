@@ -15,6 +15,7 @@ extra:
     'GitHub Codespaces': '4-codespaces'
     'Upcoming Labs': '3-upcoming'
     'About': '99-about'
+  min_extra_toc: 2
   other:
     'BGP': 'https://bgplabs.net/'
     'EVPN/VXLAN': 'https://evpn.bgplabs.net/'
